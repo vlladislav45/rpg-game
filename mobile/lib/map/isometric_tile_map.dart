@@ -7,6 +7,7 @@ import 'package:flame/gestures.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Image;
+import 'package:rpg_game/components/player.dart';
 
 const x = 500.0;
 const y = 500.0;
@@ -31,6 +32,8 @@ class IsometricTileMap extends BaseGame with MouseMovementDetector {
       [1, 1, 1, 1, 0, 2, 0],
       [1, 3, 3, 3, 0, 3, 2],
     ];
+    final player = Player(Vector2(0, 0));
+
     add(
       base = IsometricTileMapComponent(
         tileset,
@@ -40,6 +43,7 @@ class IsometricTileMap extends BaseGame with MouseMovementDetector {
         ..x = x
         ..y = y,
     );
+    add(player);
   }
 
   @override
