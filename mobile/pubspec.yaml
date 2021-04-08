@@ -23,7 +23,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flame: ^1.0.0-rc8
+  flame: ^1.0.0-rc9
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -49,6 +49,8 @@ flutter:
   assets:
    - assets/images/tile_maps/selector.png
    - assets/images/tile_maps/tiles.png
+   - assets/images/characters/goblin_lumberjack_black.png
+   - assets/images/characters/girl_spritesheet.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
