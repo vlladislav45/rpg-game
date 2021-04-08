@@ -55,8 +55,6 @@ class MyGame extends BaseGame with MouseMovementDetector {
     add(player);
   }
 
-class MyGameState extends State<MyGame> {
-  final IsometricTileMap _isometricTileMap = IsometricTileMap();
   @override
   void render(Canvas canvas) {
     super.render(canvas);
