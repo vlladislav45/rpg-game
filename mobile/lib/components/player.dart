@@ -2,30 +2,38 @@
 import 'dart:ui';
 
 import 'package:flame/components.dart';
-import 'package:flame/gestures.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
 import 'package:flame/extensions.dart';
-import 'package:rpg_game/map/isometric_tile_map.dart';
 
-class Player extends Component with HasGameRef<IsometricTileMap> {
+class Player extends SpriteAnimationComponent {
   static const speed = 200;
   static final Paint _blue = BasicPalette.blue.paint();
   static final Paint _white = BasicPalette.white.paint();
   static final Vector2 objSize = Vector2.all(50);
 
-  Vector2 position = Vector2(0, 0);
   Vector2 target;
 
   bool onTarget = false;
-
-  Player(this.target); // @override
-  // void onMouseMove(PointerHoverEvent event) {
-  //   target = event.localPosition.toVector2();
-  // }
-
   Rect _toRect() => position.toPositionedRect(objSize);
+
+  Player({
+    Vector2 position,
+    Vector2 size,
+  }) : super(position: position, size: size);
+
+  Player.fromFrameData(
+      Image image,
+      SpriteAnimationData data, {
+        Vector2 position,
+        Vector2 size,
+      }) : super(position: position, size: size) {
+    animation = SpriteAnimation.fromFrameData(image, data);
+  }
+
+  void mouseHover(Vector2 mousePosition) {
+    target = mousePosition;
+  }
 
   @override
   void render(Canvas canvas) {
