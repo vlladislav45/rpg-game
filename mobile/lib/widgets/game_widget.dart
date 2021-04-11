@@ -1,6 +1,7 @@
 import 'package:flame/game.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:rpg_game/game.dart';
 
 class MyGameWidget extends StatefulWidget {
@@ -13,14 +14,24 @@ class MyGameWidget extends StatefulWidget {
 }
 
 class MyGameWidgetState extends State<MyGameWidget> {
-  final MyGame _myGame = MyGame();
-  
+
   @override
   Widget build(BuildContext context) {
-    final myGame = _myGame;
     return MaterialApp(
       home: Scaffold(
-        body: GameWidget<MyGame>(game: myGame),
+        body: FutureBuilder(
+          future: DefaultAssetBundle.of(context).loadString('assets/maps/main-map.json'),
+          builder: (context, snapshot) {
+            if(!snapshot.hasData || snapshot.connectionState == ConnectionState.waiting)
+              return Container(
+                alignment: Alignment.center,
+                child: CircularProgressIndicator(),
+              );
+            final jsonMap = snapshot.data;
+
+            return GameWidget<MyGame>(game: MyGame(jsonMap: jsonMap));
+          },
+        ),
       ),
     );
   }

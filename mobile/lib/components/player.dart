@@ -44,7 +44,6 @@ class Player extends SpriteAnimationComponent with Hitbox {
       onTarget ? _blue : _white,
     );
     debugMode = true;
-    //addShape(HitboxRectangle());
   }
 
   @override
