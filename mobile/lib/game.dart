@@ -15,9 +15,11 @@ const s = 48.0;
 final topLeft = Vector2(x, y);
 final originColor = Paint()..color = const Color(0xFFFF00FF);
 
-class MyGame extends BaseGame with MouseMovementDetector {
+class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
   IsometricTileMapComponent map;
   Player player = Player();
+
+  Vector2 screenMousePosition;
 
   MyGame();
 
@@ -43,15 +45,15 @@ class MyGame extends BaseGame with MouseMovementDetector {
         ..y = y,
     );
 
-    // var playerSpriteSheet = await images.load(
-    //     'characters/goblin_lumberjack_black.png');
-    // final spriteSize = Vector2(152 * 1.4, 142 * 1.4);
-    // SpriteAnimationData spriteData = SpriteAnimationData.sequenced(
-    //     amount: 6, stepTime: 0.80, textureSize: Vector2(65.0, 45.0));
-    // player = Player.fromFrameData(playerSpriteSheet, spriteData)
-    //   ..x = 150
-    //   ..y = 30
-    //   ..size = spriteSize;
+    var playerSpriteSheet = await images.load(
+        'characters/goblin_lumberjack_black.png');
+    final spriteSize = Vector2(152 * 1.4, 142 * 1.4);
+    SpriteAnimationData spriteData = SpriteAnimationData.sequenced(
+        amount: 6, stepTime: 0.80, textureSize: Vector2(65.0, 45.0));
+    player = Player.fromFrameData(playerSpriteSheet, spriteData)
+      ..x = 150
+      ..y = 30
+      ..size = spriteSize;
     add(player);
   }
 
@@ -63,15 +65,23 @@ class MyGame extends BaseGame with MouseMovementDetector {
   }
 
   @override
+  void onTap() {
+    player.onMouseMove(screenMousePosition);
+  }
+
+  @override
   void onMouseMove(PointerHoverEvent event) {
-    final screenPosition = event.localPosition.toVector2();
+    screenMousePosition = event.localPosition.toVector2();
     //player = Player(position: screenPosition);
-    player.mouseHover(screenPosition);
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-    player.update(dt);
+    // player..x += 2;
+    // if(player.x > size.x)
+    //   player.x -= 2;
+    // else if(player.x < size.x)
+    //   player.x += 2;
   }
 }
