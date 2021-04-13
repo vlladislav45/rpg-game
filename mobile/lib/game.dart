@@ -28,7 +28,7 @@ class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
 
   @override
   Future<void> onLoad() async {
-    viewport = FixedResolutionViewport(Vector2(500, 1500));
+    //viewport = FixedResolutionViewport(Vector2(1500, 1500));
 
     final tilesetImage = await images.load('tile_maps/tiles.png');
     final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2.all(32));
@@ -49,14 +49,27 @@ class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
     final spriteSize = Vector2(152 * 1.4, 142 * 1.4);
     SpriteAnimationData spriteData = SpriteAnimationData.sequenced(
         amount: 6, stepTime: 0.80, textureSize: Vector2(65.0, 45.0));
-    player = Player.fromFrameData(playerSpriteSheet, spriteData)
-      ..x = 150
-      ..y = 30
-      ..size = spriteSize;
-    add(player);
 
-    // camera.cameraSpeed = 1;
-    // camera.followComponent(player);
+    Vector2 charCoordinates = map.getBlockPositionInts(2, 3);
+    player = Player.fromFrameData(playerSpriteSheet, spriteData)
+      ..x = charCoordinates.x
+      ..y = charCoordinates.y
+      ..size = spriteSize;
+
+
+    add(player);
+    //    for(int i = 0; i < map.matrix.length; i++) {
+    //   for(int j = 0; j < map.matrix[i].length; j++) {
+    //     //  add(Rock(map.cartToIso(Vector2(Map.genCoord(), Map.genCoord()))));
+    //     if(map.getBlockPositionInts(i, j) == map.cartToIso(Vector2(0,1))) {
+    //       add(player);
+    //     }
+    //   }
+    // }
+    
+
+    camera.cameraSpeed = 1;
+    camera.followComponent(player);
   }
 
   @override
@@ -78,10 +91,5 @@ class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
   @override
   void update(double dt) {
     super.update(dt);
-    // player..x += 2;
-    // if(player.x > size.x)
-    //   player.x -= 2;
-    // else if(player.x < size.x)
-    //   player.x += 2;
   }
 }
