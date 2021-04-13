@@ -8,7 +8,7 @@ import 'package:flame/extensions.dart';
 class Player extends SpriteAnimationComponent with Hitbox {
   static const speed = 200;
 
-  static final Vector2 objSize = Vector2.all(150);
+  static final Vector2 objSize = Vector2.all(25);
 
   Vector2 target;
 

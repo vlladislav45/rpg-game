@@ -30,7 +30,7 @@ class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
 
   @override
   Future<void> onLoad() async {
-    //viewport = FixedResolutionViewport(Vector2(500, 1500));
+    viewport = FixedResolutionViewport(Vector2(500, 500));
 
     final tilesetImage = await images.load('tile_maps/tiles.png');
     final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2.all(32));
@@ -48,25 +48,22 @@ class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
 
     var playerSpriteSheet = await images.load(
         'characters/goblin_lumberjack_black.png');
-    final spriteSize = Vector2(152, 142);
+    final spriteSize = Vector2(75, 75);
     SpriteAnimationData spriteData = SpriteAnimationData.sequenced(
         amount: 6, stepTime: 0.80, textureSize: Vector2(65.0, 45.0));
 
-    final p = map.getBlock(Vector2(350, 500));
-    print('Map position spawn: $p');
-
+    final p = map.getBlock(Vector2(500, 500));
     player = Player.fromFrameData(playerSpriteSheet, spriteData)
       ..size = spriteSize;
-
     player.position.setFrom(map.getBlockPosition(p) + topLeft);
-
-    print('Player position: ${player.position}');
     add(player);
 
     final selectorImage = await images.load('tile_maps/selector.png');
     add(_selector = Selector(s, selectorImage));
-    // camera.cameraSpeed = 1;
-    // camera.followComponent(player);
+
+    camera.cameraSpeed = 1;
+    camera.followComponent(player);
+    camera.setRelativeOffset(Anchor.center.toVector2());
   }
 
   @override
