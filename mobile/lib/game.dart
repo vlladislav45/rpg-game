@@ -9,6 +9,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:rpg_game/components/map.dart';
 import 'package:rpg_game/components/player.dart';
+import 'package:rpg_game/components/selector.dart';
 import 'package:rpg_game/utils/hex_color.dart';
 
 const x = 500.0;
@@ -21,6 +22,7 @@ class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
   String jsonMap;
   Map map;
   Player player = Player();
+  Selector _selector;
 
   Vector2 screenMousePosition;
 
@@ -28,7 +30,7 @@ class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
 
   @override
   Future<void> onLoad() async {
-    viewport = FixedResolutionViewport(Vector2(500, 1500));
+    //viewport = FixedResolutionViewport(Vector2(500, 1500));
 
     final tilesetImage = await images.load('tile_maps/tiles.png');
     final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2.all(32));
@@ -46,15 +48,23 @@ class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
 
     var playerSpriteSheet = await images.load(
         'characters/goblin_lumberjack_black.png');
-    final spriteSize = Vector2(152 * 1.4, 142 * 1.4);
+    final spriteSize = Vector2(152, 142);
     SpriteAnimationData spriteData = SpriteAnimationData.sequenced(
         amount: 6, stepTime: 0.80, textureSize: Vector2(65.0, 45.0));
+
+    final p = map.getBlock(Vector2(350, 500));
+    print('Map position spawn: $p');
+
     player = Player.fromFrameData(playerSpriteSheet, spriteData)
-      ..x = 150
-      ..y = 30
       ..size = spriteSize;
+
+    player.position.setFrom(map.getBlockPosition(p) + topLeft);
+
+    print('Player position: ${player.position}');
     add(player);
 
+    final selectorImage = await images.load('tile_maps/selector.png');
+    add(_selector = Selector(s, selectorImage));
     // camera.cameraSpeed = 1;
     // camera.followComponent(player);
   }
@@ -67,21 +77,22 @@ class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
 
   @override
   void onTap() {
-    player.onMouseMove(screenMousePosition);
+    final block = map.getBlock(screenMousePosition);
+    bool isInMap = map.containsBlock(block);
+    if(isInMap)
+      player.onMouseMove(screenMousePosition);
   }
 
   @override
   void onMouseMove(PointerHoverEvent event) {
     screenMousePosition = event.localPosition.toVector2();
+    final block = map.getBlock(screenMousePosition);
+    _selector.show = map.containsBlock(block);
+    _selector.position.setFrom(map.getBlockPosition(block) + topLeft);
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-    // player..x += 2;
-    // if(player.x > size.x)
-    //   player.x -= 2;
-    // else if(player.x < size.x)
-    //   player.x += 2;
   }
 }

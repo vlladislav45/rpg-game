@@ -2,21 +2,18 @@
 import 'dart:ui';
 
 import 'package:flame/components.dart';
-import 'package:flame/palette.dart';
 import 'package:flame/game.dart';
 import 'package:flame/extensions.dart';
 
 class Player extends SpriteAnimationComponent with Hitbox {
   static const speed = 200;
-  static final Paint _blue = BasicPalette.blue.paint();
-  static final Paint _white = BasicPalette.white.paint();
-  static final Vector2 objSize = Vector2.all(50);
 
-  Vector2 characterPosition = Vector2(0, 0);
+  static final Vector2 objSize = Vector2.all(150);
+
   Vector2 target;
 
   bool onTarget = false;
-  Rect _toRect() => characterPosition.toPositionedRect(objSize);
+  Rect _toMousePosition() => position.toPositionedRect(objSize);
 
   Player({
     Vector2 position,
@@ -39,24 +36,25 @@ class Player extends SpriteAnimationComponent with Hitbox {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    canvas.drawRect(
-      _toRect(),
-      onTarget ? _blue : _white,
-    );
+    // canvas.drawRect(
+    //   _toRect(),
+    //   onTarget ? _blue : _white,
+    // );
     debugMode = true;
   }
 
   @override
   void update(double dt) {
     super.update(dt);
+
     final target = this.target;
 
     if (target != null) {
-      onTarget = _toRect().contains(target.toOffset());
+      onTarget = _toMousePosition().contains(target.toOffset());
 
       if (!onTarget) {
-        final dir = (target - characterPosition).normalized();
-        characterPosition += dir * (speed * dt);
+        final dir = (target - position).normalized();
+        position += dir * (speed * dt);
       }
     }
   }
