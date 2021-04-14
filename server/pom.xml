@@ -19,7 +19,7 @@
             <artifactId>postgresql</artifactId>
             <version>42.2.19</version>
         </dependency>
-
+<!--    github.cdimascio library is for reading of environment variables-->
     </dependencies>
 
 </project>

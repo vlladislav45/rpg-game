@@ -11,7 +11,7 @@ public class Main {
         JdbConnector jdbConnector = new JdbConnector(
           "jdbc:postgresql://localhost:5432/rpg_game??useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC&useLegacyDatetimeCode=false",
                 "postgres",
-                "123456"
+                "postgres"
         );
     }
 }

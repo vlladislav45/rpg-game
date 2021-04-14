@@ -65,3 +65,8 @@ application.properties
 ## Logger
 ##########################
 log/
+
+##########################
+## Environment variables .env
+##########################
+.env
