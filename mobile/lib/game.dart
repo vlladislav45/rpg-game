@@ -3,10 +3,11 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
-import 'package:flame/gestures.dart';
+import 'package:flame/keyboard.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Image;
+import 'package:flutter/services.dart';
 import 'package:rpg_game/components/map.dart';
 import 'package:rpg_game/components/player.dart';
 import 'package:rpg_game/components/selector.dart';
@@ -18,7 +19,7 @@ const s = 48.0;
 final topLeft = Vector2(x, y);
 final originColor = Paint()..color = Color(HexColor.convertHexColor('#C0C0C0'));
 
-class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
+class MyGame extends BaseGame with KeyboardEvents {
   String jsonMap;
   Map map;
   Player player = Player();
@@ -30,10 +31,10 @@ class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
 
   @override
   Future<void> onLoad() async {
-    viewport = FixedResolutionViewport(Vector2(500, 500));
+    //viewport = FixedResolutionViewport(Vector2(500, 500));
 
-    final tilesetImage = await images.load('tile_maps/tiles.png');
-    final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2.all(32));
+    final tilesetImage = await images.load('tile_maps/grass.png');
+    final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2.all(70));
     final matrix = Map.toList(this.jsonMap);
     
     add(
@@ -58,12 +59,11 @@ class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
     player.position.setFrom(map.getBlockPosition(p) + topLeft);
     add(player);
 
-    final selectorImage = await images.load('tile_maps/selector.png');
-    add(_selector = Selector(s, selectorImage));
-
     camera.cameraSpeed = 1;
     camera.followComponent(player);
-    camera.setRelativeOffset(Anchor.center.toVector2());
+
+    final selectorImage = await images.load('tile_maps/selector.png');
+    add(_selector = Selector(s, selectorImage));
   }
 
   @override
@@ -81,6 +81,20 @@ class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
   }
 
   @override
+  void onKeyEvent(RawKeyEvent e) {
+    final isKeyDown = e is RawKeyDownEvent;
+
+    if (e.data.keyLabel == 'a') {
+      player.velocity.x = isKeyDown ? -1 : 0;
+    } else if (e.data.keyLabel == 'd') {
+      player.velocity.x = isKeyDown ? 1 : 0;
+    } else if (e.data.keyLabel == 'w') {
+      player.velocity.y = isKeyDown ? -1 : 0;
+    } else if (e.data.keyLabel == 's') {
+      player.velocity.y = isKeyDown ? 1 : 0;
+    }
+  }
+
   void onMouseMove(PointerHoverEvent event) {
     screenMousePosition = event.localPosition.toVector2();
     final block = map.getBlock(screenMousePosition);
@@ -91,5 +105,18 @@ class MyGame extends BaseGame with MouseMovementDetector, TapDetector {
   @override
   void update(double dt) {
     super.update(dt);
+
+    Block block = map.getBlock(player.position);
+    if(!map.containsBlock(block)) {
+      print('MAP WIDHT ${map.width}');
+      print('MAP height ${map.size}');
+      print('A player is not correctly on the map, at${player.position}');
+      player.stopCharacter(true);
+      player.stopCharacter(false);
+
+      // if (this.player.y + this.player.height > this.map.height) {
+      //   this.player.position.y = this.map.height - this.player.height;
+      // }
+    }
   }
 }

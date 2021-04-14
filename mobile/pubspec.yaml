@@ -49,6 +49,8 @@ flutter:
   assets:
    - assets/images/tile_maps/selector.png
    - assets/images/tile_maps/tiles.png
+   - assets/images/tile_maps/map.png
+   - assets/images/tile_maps/grass.png
    - assets/images/characters/goblin_lumberjack_black.png
    - assets/images/characters/girl_spritesheet.png
    - assets/maps/main-map.json
