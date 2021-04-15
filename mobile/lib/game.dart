@@ -53,7 +53,7 @@ class MyGame extends BaseGame with KeyboardEvents {
     SpriteAnimationData spriteData = SpriteAnimationData.sequenced(
         amount: 6, stepTime: 0.80, textureSize: Vector2(65.0, 45.0));
 
-    final p = map.getBlock(Vector2(500, 500));
+    final p = map.getBlock(Vector2(x, y));
     player = Player.fromFrameData(playerSpriteSheet, spriteData)
       ..size = spriteSize;
     player.position.setFrom(map.getBlockPosition(p) + topLeft);
@@ -107,16 +107,16 @@ class MyGame extends BaseGame with KeyboardEvents {
     super.update(dt);
 
     Block block = map.getBlock(player.position);
-    if(!map.containsBlock(block)) {
-      print('MAP WIDHT ${map.width}');
-      print('MAP height ${map.size}');
-      print('A player is not correctly on the map, at${player.position}');
-      player.stopCharacter(true);
-      player.stopCharacter(false);
 
-      // if (this.player.y + this.player.height > this.map.height) {
-      //   this.player.position.y = this.map.height - this.player.height;
-      // }
+    if(!map.containsBlock(block)) {
+      if(block.y <= 0)
+        player.y += 20;
+      else if(block.y >= map.matrix.length)
+         player.y -= 20;
+      else if(block.x <= 0)
+        player.x += 20;
+      else if(block.x >= map.matrix[block.y].length)
+        player.x -= 20;
     }
   }
 }
