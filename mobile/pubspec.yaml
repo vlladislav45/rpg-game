@@ -53,6 +53,7 @@ flutter:
    - assets/images/tile_maps/grass.png
    - assets/images/characters/goblin_lumberjack_black.png
    - assets/images/characters/girl_spritesheet.png
+   - assets/images/walls/rock_01.jpg
    - assets/maps/main-map.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
