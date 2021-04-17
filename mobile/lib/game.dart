@@ -64,12 +64,21 @@ class MyGame extends BaseGame with KeyboardEvents {
     final spriteSize = Vector2(65, 45);
     SpriteAnimationData spriteData = SpriteAnimationData.sequenced(
         amount: 6, stepTime: 0.80, textureSize: Vector2(65.0, 45.0));
-
+    
     final playerSpawnPosition = map.getBlock(Vector2(x,y) + topLeft + Vector2(0,150));
     player = Player.fromFrameData(playerSpriteSheet, spriteData)
       ..size = spriteSize;
     player.position.setFrom(map.getBlockPosition(playerSpawnPosition));
     add(player);
+    //    for(int i = 0; i < map.matrix.length; i++) {
+    //   for(int j = 0; j < map.matrix[i].length; j++) {
+    //     //  add(Rock(map.cartToIso(Vector2(Map.genCoord(), Map.genCoord()))));
+    //     if(map.getBlockPositionInts(i, j) == map.cartToIso(Vector2(0,1))) {
+    //       add(player);
+    //     }
+    //   }
+    // }
+    
 
     camera.cameraSpeed = 1;
     camera.followComponent(player);
