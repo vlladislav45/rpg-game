@@ -8,6 +8,6 @@
 
 ## Getting Started in debug mode
 * Use -> main branch.
-* You have to download the dependencies from file pubspec.yaml through command line dart fluuter pub get or by yours IDE which you use
+* You have to download the dependencies from file pubspec.yaml through command line flutter pub get or by yours IDE which you use
 * Start the android emulator and build the project
 
