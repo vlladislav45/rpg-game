@@ -10,7 +10,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
   static const double S = 1500;
   static final R = Random();
 
-
+  // Constructor
   Map(SpriteSheet tileset, List<List<int>> matrix, {Vector2 destTileSize})
       : super(tileset, matrix);
 
