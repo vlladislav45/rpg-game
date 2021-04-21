@@ -27,7 +27,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
         .toList();
 
     return fromJson(test);
-  }
+  }       
 
   /// If map is loaded in onLoad method, 
   /// the stones will be appear below the iso tiles
