@@ -1,18 +1,23 @@
-
 import 'package:flame/components.dart';
-import 'package:rpg_game/components/square.dart';
-import 'package:flame/extensions.dart';
-import 'package:flame/geometry.dart';
-import 'package:flutter/material.dart';
+import 'package:rpg_game/game.dart';
 
-class Rock extends SquareComponent with Hitbox {
-  Rock(Vector2 position) {
-    this.position.setFrom(position);
-    size.setValues(50, 50);
-    paint = Paint()..color = const Color(0xFF2222FF);
-    addShape(HitboxRectangle());
+class Rock extends SpriteComponent with HasGameRef<MyGame>, Hitbox, Collidable {
+  Sprite sprite;
+  bool _isWallHit = false;
+  bool _isCollision = false;
+
+  Rock({
+    this.sprite,
+    Vector2 position,
+    Vector2 size,
+  }) : super(position: position, size: size);
+  
+   @override
+  void onCollision(Set<Vector2> intersectionPoints, Collidable other) {
+    if (other is ScreenCollidable) {
+      _isWallHit = true;
+      return;
+    }
+    _isCollision = true;
   }
-
-  @override
-  int get priority => 2;
 }
