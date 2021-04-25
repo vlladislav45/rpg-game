@@ -17,10 +17,10 @@ services:
       POSTGRES_DB: rpg_game
     volumes:
       - /var/lib/postgresql
-  jrpgserver:
-    container_name: jrpg-server-docker
-    image: jrpgserver/jrpg-server-docker:latest
-    restart: on-failure
+#  jrpgserver:
+#    container_name: jrpg-server-docker
+#    image: jrpgserver/jrpg-server-docker:latest
+#    restart: on-failure
 #    build:
 #      context: .
 #      dockerfile: Dockerfile

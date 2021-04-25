@@ -1,0 +1,11 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE IF NOT EXISTS public.users (
+  id uuid UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
+  email VARCHAR(50) UNIQUE NOT NULL,
+  username VARCHAR(12) UNIQUE,
+  password VARCHAR NOT NULL,
+  FOREIGN KEY (id) REFERENCES characters (id)
+      DEFERRABLE INITIALLY DEFERRED,
+  PRIMARY KEY (id)
+);

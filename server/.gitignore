@@ -11,6 +11,7 @@ hs_err_pid*
 ##########################
 ## Maven
 ##########################
+output/
 target/
 release.properties
 
