@@ -11,11 +11,9 @@ import 'package:flutter/services.dart';
 import 'package:rpg_game/components/map.dart';
 import 'package:rpg_game/components/player.dart';
 import 'package:rpg_game/components/selector.dart';
-import 'package:rpg_game/components/rock.dart';
-import 'package:rpg_game/parallax/parallax.dart';
 
-const x = 500.0;
-const y = 500.0;
+const x = 750.0;
+const y = 150.0;
 final topLeft = Vector2(x, y);
 
 class MyGame extends BaseGame with KeyboardEvents, HasCollidables {
@@ -24,16 +22,19 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables {
   Player _player = Player();
   Selector _selector;
   Vector2 screenMousePosition;
-  MyParallaxComponent _myParallaxComponent = MyParallaxComponent();
 
   MyGame({this.jsonMap});
 
+
+  @override
+  Color backgroundColor() {
+    return Colors.transparent;
+  }
+
   @override
   Future<void> onLoad() async {
-    //add(_myParallaxComponent);
-
-    final tilesetImage = await images.load('sprites/tile_maps/grass.png');
-    final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2.all(80));
+    final tilesetImage = await images.load('sprites/tile_maps/grass_default.png');
+    final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2(40,20));
     final matrix = Map.toList(this.jsonMap);
 
     add(
@@ -58,8 +59,8 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables {
     _player.position.setFrom(map.getBlockPosition(playerSpawnPosition));
     add(_player);
 
-    camera.cameraSpeed = 1;
-    camera.followComponent(_player);
+    //camera.cameraSpeed = 1;
+    //camera.followComponent(_player);
 
     map.setWalls();
 

@@ -23,7 +23,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flame: ^1.0.0-rc9
+  flame: ^1.0.0-rc10
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -58,6 +58,7 @@ flutter:
    - assets/images/parallax/mountains/bgMid_mountain.png
    - assets/images/parallax/farground_cloud_1.png
    - assets/images/parallax/sun.png
+   - assets/images/bg/Background_1_3840x2160.jpg
    - assets/maps/main-map.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
