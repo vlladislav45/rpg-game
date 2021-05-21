@@ -15,25 +15,25 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
       : super(tileset, matrix);
 
   static List<List<int>> fromJson(List<dynamic> list1) => [
-        for (final list2 in list1) [for (final number in list2) number as int]
-      ];
+    for (final list2 in list1) [for (final number in list2) number as int]
+  ];
 
   static List<List<int>> toList(String response) {
     final decodedJson = json.decode(response.toString());
     if (decodedJson == null) return [];
 
-    List<dynamic> test = decodedJson
+    List<dynamic> array = decodedJson
         .map((s) => (s as List).map((e) => e as int).cast<int>().toList())
         .toList();
 
-    return fromJson(test);
-  }       
+    return fromJson(array);
+  }
 
   /// If map is loaded in onLoad method, 
   /// the stones will be appear below the iso tiles
   void setWalls() async {
     final rockWallSprite = await gameRef.loadSprite('sprites/walls/stones.png');
-    //Add walls arround isometric map
+    //Add walls around isometric map
     for (int i = 0; i < this.matrix.length; i++) {
       int lastRow = this.matrix.length - 1;
       if (i == 0 || i == lastRow) {
