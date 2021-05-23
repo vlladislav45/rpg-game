@@ -14,7 +14,6 @@ class Castle extends SpriteComponent with HasGameRef<MyGame>, Tapable {
   @override
   bool get debugMode => true;
 
-
   @override
   void onGameResize(Vector2 gameSize) {
     super.onGameResize(gameSize);
