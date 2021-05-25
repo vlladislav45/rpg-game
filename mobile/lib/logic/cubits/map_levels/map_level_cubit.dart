@@ -1,6 +1,6 @@
 
 import 'package:bloc/bloc.dart';
-import 'package:rpg_game/logic/cubits/states/map_level_state.dart';
+import 'package:rpg_game/logic/cubits/map_levels/map_level_state.dart';
 
 class MapLevelCubit extends Cubit<MapLevelState> {
 

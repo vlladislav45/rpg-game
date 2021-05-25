@@ -4,23 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
-import 'package:rpg_game/logic/cubits/map_level_cubit.dart';
-import 'package:rpg_game/logic/cubits/states/map_level_state.dart';
+import 'package:rpg_game/logic/cubits/map_levels/map_level_cubit.dart';
+import 'package:rpg_game/logic/cubits/map_levels/map_level_state.dart';
 import 'package:rpg_game/presentation/widgets/buildings/blacksmith_overlay.dart';
 import 'package:rpg_game/presentation/widgets/buildings/castle_overlay.dart';
 import 'package:rpg_game/presentation/widgets/buildings/portal_overlay.dart';
 import 'package:rpg_game/presentation/widgets/buildings/shop_overlay.dart';
 
-class MyGameWidget extends StatefulWidget {
-  const MyGameWidget({Key key}) : super(key: key);
+class MyGameScreen extends StatefulWidget {
+  const MyGameScreen({Key key}) : super(key: key);
 
   @override
-  State<MyGameWidget> createState() {
-    return _MyGameWidgetState();
+  State<MyGameScreen> createState() {
+    return _MyGameScreenState();
   }
 }
 
-class _MyGameWidgetState extends State<MyGameWidget> {
+class _MyGameScreenState extends State<MyGameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
