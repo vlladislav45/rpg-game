@@ -1,4 +1,4 @@
-package com.jrpg_game_server.database;
+package com.jrpg_game_server.cli.database;
 
 import org.apache.log4j.Logger;
 

@@ -2,12 +2,13 @@ package com.jrpg_game_server.cli.commands.database;
 
 import com.jrpg_game_server.cli.commands.AbstractCommand;
 import com.jrpg_game_server.cli.config.Config;
-import com.jrpg_game_server.cli.dao.AbstractDatabaseCliDAO;
-import com.jrpg_game_server.cli.dao.GameServerDatabaseCliDAO;
+import com.jrpg_game_server.cli.dao.AbstractFileSystemDatabaseCliDAO;
+import com.jrpg_game_server.cli.dao.GameServerFileSystemDatabaseCliDAO;
 import org.aeonbits.owner.Mutable;
 import picocli.CommandLine;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 
@@ -37,7 +38,7 @@ public class DatabaseInstallCommand extends AbstractCommand {
             return;
         }
 
-        final AbstractDatabaseCliDAO databaseDAO = databaseDAO();
+        final AbstractFileSystemDatabaseCliDAO databaseDAO = databaseDAO();
 
         try {
             databaseDAO.createDatabase();
@@ -58,9 +59,9 @@ public class DatabaseInstallCommand extends AbstractCommand {
         System.out.println("Database installation complete.");
     }
 
-    private AbstractDatabaseCliDAO databaseDAO() {
+    private AbstractFileSystemDatabaseCliDAO databaseDAO() {
         overrideConfigs(Config.gameServer());
-        return new GameServerDatabaseCliDAO();
+        return new GameServerFileSystemDatabaseCliDAO();
     }
 
     private void overrideConfigs(Mutable databaseConfiguration) {

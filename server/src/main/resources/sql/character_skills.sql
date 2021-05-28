@@ -1,0 +1,5 @@
+
+CREATE TABLE IF NOT EXISTS public.character_skills(
+    FOREIGN KEY skill_id REFERENCES skills(id) ON UPDATE NO ACTION ON DELETE NO ACTION,
+    FOREIGN KEY character_id REFERENCES characters(id) ON UPDATE NO ACTION ON DELETE NO ACTION
+);

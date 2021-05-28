@@ -1,4 +1,4 @@
-package com.jrpg_game_server.models.binding;
+package com.jrpg_game_server.cli.models.binding;
 
 public class AuthenticationRequestBindingModel {
     private String username;

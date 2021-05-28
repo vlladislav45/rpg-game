@@ -5,14 +5,16 @@ import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
 
 import com.jrpg_game_server.cli.commands.DatabaseCommand;
+import com.jrpg_game_server.cli.commands.ServerStartCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "RPG Server CLI",
+@Command(name = "Daily Wars JRPG Server CLI",
         mixinStandardHelpOptions = true,
-        version = "RPG server 1.0",
+        version = "JRPG server 1.0",
         subcommands = {
                 DatabaseCommand.class,
+                ServerStartCommand.class,
 })
 public class ServerCLI implements Callable<Void> {
 
@@ -22,7 +24,7 @@ public class ServerCLI implements Callable<Void> {
     public Void call() {
         System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         System.out.println("~                                     ~");
-        System.out.println("~ (>^_^)> Welcome to JRPG server  <(^_^<) ~");
+        System.out.println("~ (>^_^)> Welcome to Daily Wars Java Server <(^_^<) ~");
         System.out.println("~                                     ~");
         System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         System.out.println();
