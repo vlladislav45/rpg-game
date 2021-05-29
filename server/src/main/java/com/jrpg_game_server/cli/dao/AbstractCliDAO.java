@@ -38,7 +38,7 @@ public class AbstractCliDAO {
     }
 
     public void createDatabase() throws SQLException {
-        try (var con = connectionFactory.getPlainConnection(); //
+        try (var con = connectionFactory.getConnection(); //
              var st = con.createStatement()) {
             st.executeUpdate(CREATE_DATABASE + database);
         }

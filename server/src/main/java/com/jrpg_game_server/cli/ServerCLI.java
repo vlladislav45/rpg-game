@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
 
 import com.jrpg_game_server.cli.commands.DatabaseCommand;
+import com.jrpg_game_server.cli.commands.ExitCommand;
 import com.jrpg_game_server.cli.commands.ServerStartCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -15,6 +16,7 @@ import picocli.CommandLine.Command;
         subcommands = {
                 DatabaseCommand.class,
                 ServerStartCommand.class,
+                ExitCommand.class,
 })
 public class ServerCLI implements Callable<Void> {
 

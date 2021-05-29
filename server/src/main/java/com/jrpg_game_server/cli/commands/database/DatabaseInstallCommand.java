@@ -4,12 +4,11 @@ import com.jrpg_game_server.cli.commands.AbstractCommand;
 import com.jrpg_game_server.cli.config.Config;
 import com.jrpg_game_server.cli.dao.AbstractFileSystemDatabaseCliDAO;
 import com.jrpg_game_server.cli.dao.GameServerFileSystemDatabaseCliDAO;
+import com.jrpg_game_server.cli.utils.CloseShieldInputStreamReader;
 import org.aeonbits.owner.Mutable;
 import picocli.CommandLine;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Scanner;
 
 @CommandLine.Command(name = "install", aliases = "i")
@@ -44,7 +43,7 @@ public class DatabaseInstallCommand extends AbstractCommand {
             databaseDAO.createDatabase();
         } catch (Exception ex) {
             System.out.print("Seems database already exists, do you want to continue installing? (y/N): ");
-            try (var reader = new Scanner(new InputStreamReader(System.in))) {
+            try (var reader = new Scanner(new CloseShieldInputStreamReader(System.in))) {
                 final var input = reader.next();
                 if (!"y".equalsIgnoreCase(input) && !"yes".equalsIgnoreCase(input)) {
                     return;

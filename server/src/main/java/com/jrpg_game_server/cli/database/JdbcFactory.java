@@ -23,8 +23,9 @@ public class JdbcFactory {
 
     public Connection getPlainConnection() {
         try {
+            Class.forName("org.postgresql.Driver");
             return DriverManager.getConnection(url, properties);
-        } catch (SQLException ex) {
+        } catch (SQLException | ClassNotFoundException ex) {
             ex.printStackTrace();
         }
         return null;
@@ -32,10 +33,11 @@ public class JdbcFactory {
 
     public Connection getConnection() {
         try {
+            Class.forName("org.postgresql.Driver");
             final var con = DriverManager.getConnection(url + "/" + databaseName, properties);
             con.setCatalog(databaseName);
             return con;
-        } catch (SQLException ex) {
+        } catch (SQLException | ClassNotFoundException ex) {
             ex.printStackTrace();
         }
         return null;
