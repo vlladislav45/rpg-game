@@ -38,6 +38,8 @@ class OnlineBloc extends Bloc<OnlineEvent, OnlineState> {
       });
     }else if (event is OnlineAuthenticatedEvent) {
       yield OnlineAuthenticatedState(
+          id: event.id,
+          email: event.email,
           username: event.username,
       );
     }

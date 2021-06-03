@@ -68,14 +68,20 @@ class OnlineAuthenticationEvent extends OnlineEvent {
 }
 
 class OnlineAuthenticatedEvent extends OnlineEvent {
+  final String id;
   final String username;
+  final String email;
 
   OnlineAuthenticatedEvent({
+    @required this.id,
+    @required this.email,
     @required this.username,
   });
 
   factory OnlineAuthenticatedEvent.fromJson(Map<String, dynamic> json) {
     return OnlineAuthenticatedEvent(
+      id: json['id'],
+      email: json['email'],
       username: json['username'],
     );
   }
