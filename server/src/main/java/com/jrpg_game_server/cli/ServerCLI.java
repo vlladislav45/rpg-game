@@ -24,16 +24,16 @@ public class ServerCLI implements Callable<Void> {
 
     @Override
     public Void call() {
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        System.out.println("~                                     ~");
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println("~                                                   ~");
         System.out.println("~ (>^_^)> Welcome to Daily Wars Java Server <(^_^<) ~");
-        System.out.println("~                                     ~");
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println("~                                                   ~");
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         System.out.println();
         try (InputStreamReader isr = new InputStreamReader(System.in); //
              BufferedReader br = new BufferedReader(isr)) {
             while (true) {
-                System.out.print(">>> ");
+                System.out.print("Input>>> ");
                 final var args = br.readLine().split(" ");
                 new CommandLine(new ServerCLI()).execute(args);
             }
