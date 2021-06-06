@@ -39,9 +39,17 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Column(
         children: <Widget>[
+          Container(
+            child: AutoSizeText(
+              'Welcome to Daily Wars',
+              minFontSize: 15,
+              maxFontSize: 25,
+              style: Theme.of(context).textTheme.headline1,
+            ),
+          ),
+
           TextField(
             controller: _usernameController,
-            obscureText: true,
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               labelText: 'Username',
@@ -66,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
             if (state is OnlineConnectErrorState) {
               return Column(
                 children: [
-                  Text('Failed to connect'),
+                  Text('No internet connection, failed to connect'),
                 ],
               );
             }
@@ -100,7 +108,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       username: _usernameController.text.toString(),
                       password: _passwordController.text.toString(),
                     ));
-                    // Navigator.of(context).pushNamed('/game');
+
+                    if(state is OnlineAuthenticatedState)
+                      Navigator.of(context).pushNamed('/game');
                   },
                   child: Container(
                     child: AutoSizeText(
