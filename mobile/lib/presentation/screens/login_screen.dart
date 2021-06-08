@@ -150,6 +150,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      width: MediaQuery.of(context).size.width / 7,
+                      height: MediaQuery.of(context).size.width / 16,
+                      alignment: Alignment.center,
                     ),
                   ),
                   Builder(builder: (context) {

@@ -89,3 +89,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+  fonts:
+    - family: Vecna
+      fonts:
+        - asset: assets/fonts/vecna-font/Vecna-oppx.ttf
+        - asset: assets/fonts/vecna-font/VecnaBold-4YY4.ttf
+        - asset: assets/fonts/vecna-font/VecnaBoldItalic-011d.ttf
+        - asset: assets/fonts/vecna-font/VecnaItalic-e44p.ttf
+          weight: 700
