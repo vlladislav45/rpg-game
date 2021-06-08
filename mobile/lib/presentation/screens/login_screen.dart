@@ -52,8 +52,9 @@ class _LoginScreenState extends State<LoginScreen> {
               children: <Widget>[
                 InkWell(
                   child: Container(
-                    width: 50,
-                    height: 50,
+                    margin: EdgeInsets.only(right: 15, top: 15),
+                    width: 25,
+                    height: 25,
                     decoration: BoxDecoration(
                       image: DecorationImage(
                           image: AssetImage('assets/images/login/exit.png'),
@@ -77,7 +78,14 @@ class _LoginScreenState extends State<LoginScreen> {
             Container(
               width: MediaQuery.of(context).size.width / 2.5,
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-              child: TextField(
+              child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Username cannot be empty';
+                  }else if(value.length >= 15)
+                    return 'Username cannot be more than 15 symbols';
+                  return null;
+                },
                 controller: _usernameController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
@@ -88,7 +96,14 @@ class _LoginScreenState extends State<LoginScreen> {
             Container(
               width: MediaQuery.of(context).size.width / 2.5,
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-              child: TextField(
+              child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Password cannot be empty';
+                  }else if(value.length >= 15)
+                    return 'Password cannot be more than 15 symbols';
+                  return null;
+                },
                 controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
@@ -108,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
               if (state is OnlineConnectErrorState) {
                 return Column(
                   children: [
-                    Text('No internet connection, failed to connect'),
+                    Text('No internet connection, try again later..'),
                   ],
                 );
               }
