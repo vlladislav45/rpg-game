@@ -2,15 +2,16 @@ package com.jrpg_game_server.cli.dao;
 
 import com.jrpg_game_server.cli.config.ServerConfig;
 import com.jrpg_game_server.cli.filters.SQLFilter;
-import com.jrpg_game_server.database.JdbcFactory;
+import com.jrpg_game_server.cli.database.JdbcFactory;
+import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.sql.*;
+import java.util.*;
 
 public class AbstractCliDAO {
+    public static final Logger logger = Logger.getLogger(AbstractCliDAO.class);
+
     private static final String CREATE_DATABASE = "CREATE DATABASE ";
 
     private final JdbcFactory connectionFactory;
@@ -37,12 +38,15 @@ public class AbstractCliDAO {
     }
 
     public void createDatabase() throws SQLException {
-        try (var con = connectionFactory.getPlainConnection(); //
+        try (var con = connectionFactory.getConnection(); //
              var st = con.createStatement()) {
             st.executeUpdate(CREATE_DATABASE + database);
         }
     }
 
+    /**
+     * ##################! Work with SQL files !##################
+     */
     public void executeSQLScript(File file) {
         String line = "";
         try (var con = getConnection(); //

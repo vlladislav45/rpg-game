@@ -1,11 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-CREATE TABLE IF NOT EXISTS public.users (
-  id uuid UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
-  email VARCHAR(50) UNIQUE NOT NULL,
-  username VARCHAR(12) UNIQUE,
-  password VARCHAR NOT NULL,
-  FOREIGN KEY (id) REFERENCES characters (id)
-      DEFERRABLE INITIALLY DEFERRED,
-  PRIMARY KEY (id)
-);
+INSERT INTO users (username, password, time_created, role_id) VALUES
+('vladislavl2a', '123456', '2016-06-22 19:10:25-07', 1),
+('vladislavl3', '123456', '2017-06-22 19:10:25-07', 1);

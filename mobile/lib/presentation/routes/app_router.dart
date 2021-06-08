@@ -1,28 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rpg_game/logic/cubits/map_level_cubit.dart';
-import 'package:rpg_game/presentation/widgets/game_widget.dart';
-import 'package:rpg_game/presentation/widgets/buildings/castle_overlay.dart';
+import 'package:rpg_game/logic/blocs/online/online_bloc.dart';
+import 'package:rpg_game/logic/cubits/map_levels/map_level_cubit.dart';
+import 'package:rpg_game/presentation/screens/game_screen.dart';
+import 'package:rpg_game/presentation/screens/login_screen.dart';
 
 class AppRouter {
   MapLevelCubit _mapLevelCubit = MapLevelCubit();
+  OnlineBloc _onlineBloc = OnlineBloc();
 
   Route onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
       case '/':
         return MaterialPageRoute(
+            settings: RouteSettings(name: '/'),
+            builder: (_) => MultiBlocProvider(providers: [
+                  BlocProvider.value(
+                    value: _mapLevelCubit,
+                  ),
+                  BlocProvider.value(
+                    value: _onlineBloc,
+                  ),
+                ], child: LoginScreen()));
+      case '/game':
+        return MaterialPageRoute(
           settings: RouteSettings(name: '/'),
           builder: (_) => BlocProvider.value(
             value: _mapLevelCubit,
-            child: MyGameWidget(),
-          ),
-        );
-      case '/castle':
-        return MaterialPageRoute(
-          settings: RouteSettings(name: '/castle'),
-          builder: (_) => BlocProvider.value(
-            value: _mapLevelCubit,
-            child: CastleOverlay(),
+            child: MyGameScreen(),
           ),
         );
       default:
@@ -32,5 +37,6 @@ class AppRouter {
 
   void dispose() {
     _mapLevelCubit.close();
+    _onlineBloc.close();
   }
 }

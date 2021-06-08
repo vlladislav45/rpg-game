@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rpg_game/presentation/routes/app_router.dart';
+import 'package:rpg_game/utils/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +31,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: CustomTheme.theme,
       onGenerateRoute: _appRouter.onGenerateRoute,
     );
   }
