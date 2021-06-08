@@ -23,7 +23,7 @@ class OnlineBloc extends Bloc<OnlineEvent, OnlineState> {
     _socket.onConnectTimeout((data) => add(OnlineConnectTimeoutEvent(data)));
     _socket.onDisconnect((data) => add(OnlineDisconnectEvent()));
     _socket.onError((data) => add(OnlineErrorEvent(data)));
-    _socket.on('authentication', (data) => add(OnlineAuthenticatedEvent.fromJson(data)));
+    _socket.on('authenticated', (data) => add(OnlineAuthenticatedEvent.fromJson(data)));
   }
 
   @override

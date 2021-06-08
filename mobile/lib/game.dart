@@ -13,7 +13,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:rpg_game/components/portal.dart';
 import 'package:rpg_game/maps/maps/map.dart';
-import 'package:rpg_game/components/player.dart';
+import 'package:rpg_game/components/character.dart';
 import 'package:rpg_game/components/selector.dart';
 import 'package:rpg_game/maps/town.dart';
 
@@ -35,7 +35,7 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
   
   // Components
   Map map;
-  Player _player = Player();
+  Character _character = Character();
   Selector _selector;
   Portal _portal;
   
@@ -68,17 +68,33 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
   }
 
   void spawnCharacter() async {
-    final playerSpriteSheet = await images.load('sprites/characters/goblin_lumberjack_black.png');
-    final spriteSize = Vector2(65, 45);
-    SpriteAnimationData spriteData = SpriteAnimationData.sequenced(
-        amount: 6, stepTime: 0.80, textureSize: Vector2(65.0, 45.0));
+    List<Sprite> characterSprites = [];
+    int countIdleSprites = 84;
+    for(var i = 0; i <= countIdleSprites; i+=4) {
+      if(i >= 10) characterSprites.add(await Sprite.load('sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
+      else characterSprites.add(await Sprite.load(
+          'sprites/characters/knights/seq_antlerKnight/A_right000${i}.png'));
+    }
+    final idle = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
-    _player = Player.fromFrameData(playerSpriteSheet, spriteData)
-      ..size = spriteSize;
+    // running
+    countIdleSprites = 124;
+    for(var i = 88; i < countIdleSprites; i+=4)
+      if(i >= 100) characterSprites.add(await Sprite.load('sprites/characters/knights/seq_antlerKnight/A_right0${i}.png'));
+      else characterSprites.add(await Sprite.load('sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
+    final hit = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
-    final playerSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150));
-    _player.position.setFrom(map.getBlockPosition(playerSpawnPosition));
-    add(_player);
+    final characterSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150));
+    _character = Character(
+      size: Vector2(200,200),
+      position: map.getBlockPosition(characterSpawnPosition),
+    )
+    ..animations = {
+      CharacterState.idle: idle,
+      CharacterState.hit: hit,
+    }
+    ..current = CharacterState.idle;
+    add(_character);
   }
 
   void spawnTown() async {
@@ -95,7 +111,7 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
     mapLevel == null ? spawnTown() : loadMapLevel();
 
     //camera.cameraSpeed = 1;
-    // camera.followComponent(_player);
+    // camera.followComponent(_character);
 
     //Add walls around the town
     //map.setWalls();
@@ -120,14 +136,20 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
   void onKeyEvent(RawKeyEvent e) async {
     final isKeyDown = e is RawKeyDownEvent;
 
+    if(e is RawKeyUpEvent) {
+      print('Up');
+      _character.current = CharacterState.idle;
+    }
     if (e.data.keyLabel == 'a') {
-      _player.velocity.x = isKeyDown ? -1 : 0;
+      _character.velocity.x = isKeyDown ? -1 : 0;
     } else if (e.data.keyLabel == 'd') {
-      _player.velocity.x = isKeyDown ? 1 : 0;
+      _character.velocity.x = isKeyDown ? 1 : 0;
     } else if (e.data.keyLabel == 'w') {
-      _player.velocity.y = isKeyDown ? -1 : 0;
+      _character.velocity.y = isKeyDown ? -1 : 0;
     } else if (e.data.keyLabel == 's') {
-      _player.velocity.y = isKeyDown ? 1 : 0;
+      _character.velocity.y = isKeyDown ? 1 : 0;
+    } else if (e.data.keyLabel == '1') {
+      _character.current = CharacterState.hit;
     }
   }
 
@@ -135,16 +157,16 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
   void update(double dt) {
     super.update(dt);
 
-    // Block block = map.getBlock(_player.position);
+    // Block block = map.getBlock(_character.position);
     //
     // if (!map.containsBlock(block)) {
     //   if (block.y <= 0)
-    //     _player.y += 15;
+    //     _character.y += 15;
     //   else if (block.y >= map.matrix.length)
-    //     _player.y -= 15;
+    //     _character.y -= 15;
     //   else if (block.x <= 0)
-    //     _player.x += 15;
-    //   else if (block.x >= map.matrix[block.y].length) _player.x -= 15;
+    //     _character.x += 15;
+    //   else if (block.x >= map.matrix[block.y].length) _character.x -= 15;
     // }
   }
 

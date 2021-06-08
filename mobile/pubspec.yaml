@@ -59,6 +59,8 @@ flutter:
    - assets/images/sprites/buildings/
    - assets/images/sprites/buildings/portal/
    - assets/images/sprites/characters/
+   - assets/images/sprites/characters/knights/
+   - assets/images/sprites/characters/knights/seq_antlerKnight/
    - assets/images/sprites/resources/
    - assets/images/sprites/tile_maps/
    - assets/images/sprites/walls/

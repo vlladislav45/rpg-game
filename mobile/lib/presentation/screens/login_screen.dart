@@ -20,6 +20,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   OnlineBloc _onlineBloc;
 
+  // Create a global key that uniquely identifies the Form widget
+  // and allows validation of the form.
+  //
+  // Note: This is a `GlobalKey<FormState>`,
+  // not a GlobalKey<MyCustomFormState>.
+  final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Container(
         width: double.infinity,
+        height: MediaQuery.of(context).size.height,
         color: Color(HexColor.convertHexColor('#31572c')),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -75,112 +83,135 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: Theme.of(context).textTheme.headline1,
               ),
             ),
-            Container(
-              width: MediaQuery.of(context).size.width / 2.5,
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-              child: TextFormField(
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Username cannot be empty';
-                  }else if(value.length >= 15)
-                    return 'Username cannot be more than 15 symbols';
-                  return null;
-                },
-                controller: _usernameController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter Your Username',
-                ),
-              ),
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width / 2.5,
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-              child: TextFormField(
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Password cannot be empty';
-                  }else if(value.length >= 15)
-                    return 'Password cannot be more than 15 symbols';
-                  return null;
-                },
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter Your Password',
-                ),
-              ),
-            ),
-            BlocBuilder<OnlineBloc, OnlineState>(builder: (context, state) {
-              print(state);
-              if (state is OnlineInitialState) {
-                return Container();
-              }
-              if (state is OnlineConnectingState) {
-                return CircularProgressIndicator();
-              }
-              if (state is OnlineConnectErrorState) {
-                return Column(
-                  children: [
-                    Text('No internet connection, try again later..'),
-                  ],
-                );
-              }
-              if (state is OnlineConnectTimeoutState) {
-                return Column(
-                  children: [
-                    Text('Connection timed out'),
-                  ],
-                );
-              }
-              if (state is OnlineDisconnectedState) {
-                return Column(
-                  children: [
-                    Text('Disconnected'),
-                  ],
-                );
-              }
-              if (state is OnlineErrorState) {
-                return Column(
-                  children: [
-                    Text('An error occurred'),
-                  ],
-                );
-              }
-              return Column(
+            Form(
+              key: _formKey,
+              child: Column(
                 children: <Widget>[
-                  Text('Connected!'),
-                  ElevatedButton(
-                    onPressed: () {
-                      _onlineBloc.add(OnlineAuthenticationEvent(
-                        username: _usernameController.text.toString(),
-                        password: _passwordController.text.toString(),
-                      ));
-                    },
-                    child: Container(
-                      child: AutoSizeText(
-                        'Login',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                  Container(
+                    width: MediaQuery.of(context).size.width / 2.5,
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                    child: TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Username cannot be empty';
+                        } else if (value.length >= 15)
+                          return 'Username cannot be more than 15 symbols';
+                        return null;
+                      },
+                      controller: _usernameController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter Your Username',
                       ),
-                      width: MediaQuery.of(context).size.width / 7,
-                      height: MediaQuery.of(context).size.width / 16,
-                      alignment: Alignment.center,
                     ),
                   ),
-                  Builder(builder: (context) {
-                    if (state is OnlineAuthenticatedState) {
-                      Navigator.of(context).pushNamed('/game');
-                    } else {
-                      return Text('The user is not authenticated');
-                    }
-                    return Container();
-                  })
+                  Container(
+                    width: MediaQuery.of(context).size.width / 2.5,
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                    child: TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Password cannot be empty';
+                        } else if (value.length >= 15)
+                          return 'Password cannot be more than 15 symbols';
+                        return null;
+                      },
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter Your Password',
+                      ),
+                      onFieldSubmitted: (value) {
+                        //If enter is pressed after user is entered his password AND
+                        // Validate returns true if the form is valid, or false otherwise.
+                        if (_formKey.currentState.validate()) {
+                          _onlineBloc.add(OnlineAuthenticationEvent(
+                            username: _usernameController.text.toString(),
+                            password: _passwordController.text.toString(),
+                          ));
+                        }
+                      },
+                    ),
+                  ),
                 ],
-              );
-            }),
+              ),
+            ),
+            BlocListener<OnlineBloc, OnlineState>(
+                listener: (context, state) {
+              if (state is OnlineAuthenticatedState) {
+                Navigator.of(context).pushNamed('/character-select');
+                return Text('Logged In');
+              }
+            },
+              child: BlocBuilder<OnlineBloc, OnlineState>(
+                builder: (context, state) {
+                  print(state);
+                  if (state is OnlineInitialState) {
+                    return Container();
+                  }
+                  if (state is OnlineConnectingState) {
+                    return CircularProgressIndicator();
+                  }
+                  if (state is OnlineConnectErrorState) {
+                    return Column(
+                      children: [
+                        Text('No internet connection, try again later..'),
+                      ],
+                    );
+                  }
+                  if (state is OnlineConnectTimeoutState) {
+                    return Column(
+                      children: [
+                        Text('Connection timed out'),
+                      ],
+                    );
+                  }
+                  if (state is OnlineDisconnectedState) {
+                    return Column(
+                      children: [
+                        Text('Disconnected'),
+                      ],
+                    );
+                  }
+                  if (state is OnlineErrorState) {
+                    return Column(
+                      children: [
+                        Text('An error occurred'),
+                      ],
+                    );
+                  }
+                  return Column(
+                    children: <Widget>[
+                      Text('Connected to Main Server!'),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Validate returns true if the form is valid, or false otherwise.
+                          if (_formKey.currentState.validate()) {
+
+                            _onlineBloc.add(OnlineAuthenticationEvent(
+                              username: _usernameController.text.toString(),
+                              password: _passwordController.text.toString(),
+                            ));
+                          }
+                        },
+                        child: Container(
+                          child: AutoSizeText(
+                            'Login',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          width: MediaQuery.of(context).size.width / 7,
+                          height: MediaQuery.of(context).size.width / 16,
+                          alignment: Alignment.center,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
