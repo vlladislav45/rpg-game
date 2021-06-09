@@ -23,8 +23,7 @@ final topLeft = Vector2(x, y);
 
 typedef VoidCallback = void Function();
 
-class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCollidables, HasTapableComponents,
-    ScrollDetector {
+class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCollidables, HasTapableComponents, ScrollDetector {
   //Properties
   String jsonMap;
   int mapLevel;
@@ -68,33 +67,155 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
   }
 
   void spawnCharacter() async {
+    /// Right direction
     List<Sprite> characterSprites = [];
-    int countIdleSprites = 84;
-    for(var i = 0; i <= countIdleSprites; i+=4) {
-      if(i >= 10) characterSprites.add(await Sprite.load('sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
-      else characterSprites.add(await Sprite.load(
-          'sprites/characters/knights/seq_antlerKnight/A_right000${i}.png'));
-    }
-    final idle = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    int countSprites = 76;
+    for (var i = 12; i <= countSprites; i += 4)
+      characterSprites.add(await Sprite.load('sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
+    final idleRight = SpriteAnimation.spriteList(
+        characterSprites, stepTime: 0.20);
 
-    // running
-    countIdleSprites = 124;
-    for(var i = 88; i < countIdleSprites; i+=4)
-      if(i >= 100) characterSprites.add(await Sprite.load('sprites/characters/knights/seq_antlerKnight/A_right0${i}.png'));
-      else characterSprites.add(await Sprite.load('sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
-    final hit = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
+    // right hit
+    countSprites = 124;
+    characterSprites = [];
+    for (var i = 88; i < countSprites; i += 4)
+      if (i >= 100)
+        characterSprites.add(await Sprite.load(
+            'sprites/characters/knights/seq_antlerKnight/A_right0${i}.png'));
+      else
+        characterSprites.add(await Sprite.load(
+            'sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
+    final hitRight = SpriteAnimation.spriteList(
+        characterSprites, stepTime: 0.20);
 
-    final characterSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150));
-    _character = Character(
-      size: Vector2(200,200),
-      position: map.getBlockPosition(characterSpawnPosition),
-    )
-    ..animations = {
-      CharacterState.idle: idle,
-      CharacterState.hit: hit,
-    }
-    ..current = CharacterState.idle;
-    add(_character);
+    // right running
+    countSprites = 264;
+    characterSprites = [];
+    for (var i = 204; i < countSprites; i += 4)
+      characterSprites.add(await Sprite.load(
+          'sprites/characters/knights/seq_antlerKnight/A_right0${i}.png'));
+    final runningRight = SpriteAnimation.spriteList(
+        characterSprites, stepTime: 0.10);
+
+    /// Down direction
+    // Idle down
+    countSprites = 76;
+    characterSprites = [];
+    for (var i = 12; i < countSprites; i += 4)
+      characterSprites.add(await Sprite.load(
+          'sprites/characters/knights/seq_antlerKnight/C_Front00${i}.png'));
+    final idleDown = SpriteAnimation.spriteList(
+        characterSprites, stepTime: 0.20);
+
+    // Hit down
+    countSprites = 120;
+    characterSprites = [];
+    for (var i = 80; i < countSprites; i += 4)
+      if (i >= 100)
+        characterSprites.add(await Sprite.load(
+            'sprites/characters/knights/seq_antlerKnight/C_Front0${i}.png'));
+      else
+        characterSprites.add(await Sprite.load(
+            'sprites/characters/knights/seq_antlerKnight/C_Front00${i}.png'));
+      final hitDown = SpriteAnimation.spriteList(
+          characterSprites, stepTime: 0.20);
+
+      // Running down
+      countSprites = 264;
+      characterSprites = [];
+      for (var i = 204; i < countSprites; i += 4)
+        characterSprites.add(await Sprite.load(
+            'sprites/characters/knights/seq_antlerKnight/C_Front0${i}.png'));
+      final runningDown = SpriteAnimation.spriteList(
+          characterSprites, stepTime: 0.10);
+
+      /// Left direction
+      // Idle left
+      countSprites = 76;
+      characterSprites = [];
+      for (var i = 12; i < countSprites; i += 4)
+        characterSprites.add(await Sprite.load(
+            'sprites/characters/knights/seq_antlerKnight/E_Left00${i}.png'));
+      final idleLeft = SpriteAnimation.spriteList(
+          characterSprites, stepTime: 0.20);
+
+      // Hit left
+      countSprites = 120;
+      characterSprites = [];
+      for (var i = 80; i < countSprites; i += 4)
+        if (i >= 100)
+          characterSprites.add(await Sprite.load(
+              'sprites/characters/knights/seq_antlerKnight/E_Left0${i}.png'));
+        else
+          characterSprites.add(await Sprite.load(
+              'sprites/characters/knights/seq_antlerKnight/E_Left00${i}.png'));
+        final hitLeft = SpriteAnimation.spriteList(
+            characterSprites, stepTime: 0.20);
+
+        // Running left
+        countSprites = 264;
+        characterSprites = [];
+        for (var i = 204; i < countSprites; i += 4)
+          characterSprites.add(await Sprite.load(
+              'sprites/characters/knights/seq_antlerKnight/E_Left0${i}.png'));
+        final runningLeft = SpriteAnimation.spriteList(
+            characterSprites, stepTime: 0.10);
+
+        /// Up direction
+        // Idle up
+        countSprites = 76;
+        characterSprites = [];
+        for (var i = 12; i < countSprites; i += 4)
+          characterSprites.add(await Sprite.load(
+              'sprites/characters/knights/seq_antlerKnight/G_Back00${i}.png'));
+        final idleUp = SpriteAnimation.spriteList(
+            characterSprites, stepTime: 0.20);
+
+        // Hit left
+        countSprites = 120;
+        characterSprites = [];
+        for (var i = 80; i < countSprites; i += 4)
+          if (i >= 100)
+            characterSprites.add(await Sprite.load(
+                'sprites/characters/knights/seq_antlerKnight/G_Back0${i}.png'));
+          else
+            characterSprites.add(await Sprite.load(
+                'sprites/characters/knights/seq_antlerKnight/G_Back00${i}.png'));
+          final hitUp = SpriteAnimation.spriteList(
+              characterSprites, stepTime: 0.20);
+
+          // Running left
+          countSprites = 264;
+          characterSprites = [];
+          for (var i = 204; i < countSprites; i += 4)
+            characterSprites.add(await Sprite.load(
+                'sprites/characters/knights/seq_antlerKnight/G_Back0${i}.png'));
+          final runningUp = SpriteAnimation.spriteList(
+              characterSprites, stepTime: 0.10);
+
+          /// Spawn the character
+          final characterSpawnPosition = map.getBlock(
+              Vector2(x, y) + topLeft + Vector2(0, 150));
+          _character = Character(
+            size: Vector2(200, 200),
+            position: map.getBlockPosition(characterSpawnPosition),
+          )
+            ..animations = {
+              CharacterState.idleRight: idleRight,
+              CharacterState.hitRight: hitRight,
+              CharacterState.runningRight: runningRight,
+              CharacterState.idleDown: idleDown,
+              CharacterState.hitDown: hitDown,
+              CharacterState.runningDown: runningDown,
+              CharacterState.idleLeft: idleLeft,
+              CharacterState.hitLeft: hitLeft,
+              CharacterState.runningLeft: runningLeft,
+              CharacterState.idleUp: idleUp,
+              CharacterState.hitUp: hitUp,
+              CharacterState.runningUp: runningUp,
+            }
+            ..current = CharacterState.idleRight;
+          add(_character);
   }
 
   void spawnTown() async {
@@ -133,23 +254,23 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
   }
 
   @override
-  void onKeyEvent(RawKeyEvent e) async {
+  void onKeyEvent(RawKeyEvent e) {
     final isKeyDown = e is RawKeyDownEvent;
 
-    if(e is RawKeyUpEvent) {
-      print('Up');
-      _character.current = CharacterState.idle;
-    }
     if (e.data.keyLabel == 'a') {
+      _character.current = isKeyDown ? CharacterState.runningLeft : CharacterState.idleLeft;
       _character.velocity.x = isKeyDown ? -1 : 0;
     } else if (e.data.keyLabel == 'd') {
+      _character.current = isKeyDown ? CharacterState.runningRight : CharacterState.idleRight;
       _character.velocity.x = isKeyDown ? 1 : 0;
     } else if (e.data.keyLabel == 'w') {
+      _character.current = isKeyDown ? CharacterState.runningUp : CharacterState.idleUp;
       _character.velocity.y = isKeyDown ? -1 : 0;
     } else if (e.data.keyLabel == 's') {
+      _character.current = isKeyDown ? CharacterState.runningDown : CharacterState.idleDown;
       _character.velocity.y = isKeyDown ? 1 : 0;
     } else if (e.data.keyLabel == '1') {
-      _character.current = CharacterState.hit;
+        _character.current = isKeyDown ? CharacterState.hitRight : CharacterState.idleRight;
     }
   }
 

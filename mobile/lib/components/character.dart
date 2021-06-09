@@ -5,8 +5,18 @@ import 'package:flame/extensions.dart';
 import 'package:rpg_game/game.dart';
 
 enum CharacterState {
-  idle,
-  hit,
+  idleRight,
+  hitRight,
+  runningRight,
+  idleDown,
+  hitDown,
+  runningDown,
+  idleLeft,
+  hitLeft,
+  runningLeft,
+  idleUp,
+  hitUp,
+  runningUp,
 }
 
 class Character extends SpriteAnimationGroupComponent<CharacterState> with HasGameRef<MyGame>, Hitbox {
@@ -16,6 +26,7 @@ class Character extends SpriteAnimationGroupComponent<CharacterState> with HasGa
   Character({
     Vector2 position,
     Vector2 size,
+  // ignore: missing_required_param
   }) : super(
     position: position,
     size: size,
@@ -26,6 +37,7 @@ class Character extends SpriteAnimationGroupComponent<CharacterState> with HasGa
     Map<CharacterState, SpriteAnimationData> data, {
     Vector2 position,
     Vector2 size
+  // ignore: missing_required_param
   }) : super(
     position: position,
     size: size,
