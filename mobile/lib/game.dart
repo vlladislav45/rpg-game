@@ -67,18 +67,23 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
   }
 
   void spawnCharacter() async {
+    int lengthOfIdleSprites = 80; // 10 - 80
+    int lengthOfAttack1Sprites = 120; // 88 - 120
+    int lengthOfWalkSprites = 200; // 140 - 200
+    int lengthOfRunSprites = 264; // 220 - 264
+    int lengthOfIdle2Sprites = 320; // 268 - 320 When the character is heated or he is hitting
+    int lengthOfAttack2Sprites = 400; // 328 - 400
     /// Right direction
+    // right idle
     List<Sprite> characterSprites = [];
-    int countSprites = 76;
-    for (var i = 12; i <= countSprites; i += 4)
+    for (var i = 12; i <= lengthOfIdleSprites; i += 4)
       characterSprites.add(await Sprite.load('sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
     final idleRight = SpriteAnimation.spriteList(
         characterSprites, stepTime: 0.20);
 
-    // right hit
-    countSprites = 124;
+    // right attack1
     characterSprites = [];
-    for (var i = 88; i < countSprites; i += 4)
+    for (var i = 88; i < lengthOfAttack1Sprites; i += 4)
       if (i >= 100)
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/A_right0${i}.png'));
@@ -89,9 +94,8 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
         characterSprites, stepTime: 0.20);
 
     // right running
-    countSprites = 264;
     characterSprites = [];
-    for (var i = 204; i < countSprites; i += 4)
+    for (var i = 220; i < lengthOfRunSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/A_right0${i}.png'));
     final runningRight = SpriteAnimation.spriteList(
@@ -99,18 +103,16 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
 
     /// Down direction
     // Idle down
-    countSprites = 76;
     characterSprites = [];
-    for (var i = 12; i < countSprites; i += 4)
+    for (var i = 12; i < lengthOfIdleSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/C_Front00${i}.png'));
     final idleDown = SpriteAnimation.spriteList(
         characterSprites, stepTime: 0.20);
 
     // Hit down
-    countSprites = 120;
     characterSprites = [];
-    for (var i = 80; i < countSprites; i += 4)
+    for (var i = 88; i < lengthOfAttack1Sprites; i += 4)
       if (i >= 100)
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/C_Front0${i}.png'));
@@ -121,9 +123,8 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
           characterSprites, stepTime: 0.20);
 
       // Running down
-      countSprites = 264;
       characterSprites = [];
-      for (var i = 204; i < countSprites; i += 4)
+      for (var i = 220; i < lengthOfRunSprites; i += 4)
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/C_Front0${i}.png'));
       final runningDown = SpriteAnimation.spriteList(
@@ -131,18 +132,16 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
 
       /// Left direction
       // Idle left
-      countSprites = 76;
       characterSprites = [];
-      for (var i = 12; i < countSprites; i += 4)
+      for (var i = 12; i < lengthOfIdleSprites; i += 4)
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/E_Left00${i}.png'));
       final idleLeft = SpriteAnimation.spriteList(
           characterSprites, stepTime: 0.20);
 
       // Hit left
-      countSprites = 120;
       characterSprites = [];
-      for (var i = 80; i < countSprites; i += 4)
+      for (var i = 88; i < lengthOfAttack1Sprites; i += 4)
         if (i >= 100)
           characterSprites.add(await Sprite.load(
               'sprites/characters/knights/seq_antlerKnight/E_Left0${i}.png'));
@@ -153,9 +152,8 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
             characterSprites, stepTime: 0.20);
 
         // Running left
-        countSprites = 264;
         characterSprites = [];
-        for (var i = 204; i < countSprites; i += 4)
+        for (var i = 220; i < lengthOfRunSprites; i += 4)
           characterSprites.add(await Sprite.load(
               'sprites/characters/knights/seq_antlerKnight/E_Left0${i}.png'));
         final runningLeft = SpriteAnimation.spriteList(
@@ -163,18 +161,16 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
 
         /// Up direction
         // Idle up
-        countSprites = 76;
         characterSprites = [];
-        for (var i = 12; i < countSprites; i += 4)
+        for (var i = 12; i < lengthOfIdleSprites; i += 4)
           characterSprites.add(await Sprite.load(
               'sprites/characters/knights/seq_antlerKnight/G_Back00${i}.png'));
         final idleUp = SpriteAnimation.spriteList(
             characterSprites, stepTime: 0.20);
 
         // Hit left
-        countSprites = 120;
         characterSprites = [];
-        for (var i = 80; i < countSprites; i += 4)
+        for (var i = 88; i < lengthOfAttack1Sprites; i += 4)
           if (i >= 100)
             characterSprites.add(await Sprite.load(
                 'sprites/characters/knights/seq_antlerKnight/G_Back0${i}.png'));
@@ -185,9 +181,8 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
               characterSprites, stepTime: 0.20);
 
           // Running left
-          countSprites = 264;
           characterSprites = [];
-          for (var i = 204; i < countSprites; i += 4)
+          for (var i = 220; i < lengthOfRunSprites; i += 4)
             characterSprites.add(await Sprite.load(
                 'sprites/characters/knights/seq_antlerKnight/G_Back0${i}.png'));
           final runningUp = SpriteAnimation.spriteList(
@@ -270,7 +265,7 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
       _character.current = isKeyDown ? CharacterState.runningDown : CharacterState.idleDown;
       _character.velocity.y = isKeyDown ? 1 : 0;
     } else if (e.data.keyLabel == '1') {
-        _character.current = isKeyDown ? CharacterState.hitRight : CharacterState.idleRight;
+      _character.current = CharacterState.hitRight;
     }
   }
 
