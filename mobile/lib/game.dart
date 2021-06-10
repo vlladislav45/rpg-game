@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'dart:async';
 
@@ -11,6 +12,7 @@ import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
+import 'package:rpg_game/components/character_directionals.dart';
 import 'package:rpg_game/components/portal.dart';
 import 'package:rpg_game/maps/maps/map.dart';
 import 'package:rpg_game/components/character.dart';
@@ -21,9 +23,14 @@ const x = 750.0;
 const y = 150.0;
 final topLeft = Vector2(x, y);
 
-typedef VoidCallback = void Function();
-
-class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCollidables, HasTapableComponents, ScrollDetector {
+class MyGame extends BaseGame
+    with
+        MouseMovementDetector,
+        KeyboardEvents,
+        HasCollidables,
+        HasTapableComponents,
+        ScrollDetector,
+        HasDraggableComponents {
   //Properties
   String jsonMap;
   int mapLevel;
@@ -31,15 +38,12 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
 
   //Town
   Town _town;
-  
+
   // Components
   Map map;
   Character _character = Character();
   Selector _selector;
   Portal _portal;
-  
-  //Functions
-  VoidCallback selectMapLevel;
 
   MyGame({this.jsonMap, this.mapLevel});
 
@@ -49,8 +53,9 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
   }
 
   void loadMapLevel() async {
-    final tilesetImage = await images.load('sprites/tile_maps/grass_default.png');
-    final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2(151,71));
+    final tilesetImage =
+        await images.load('sprites/tile_maps/grass_default.png');
+    final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2(151, 71));
     final matrix = Map.toList(this.jsonMap);
 
     // Add main town
@@ -64,153 +69,78 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
     );
 
     spawnCharacter();
+    if (overlays.isActive('CharacterOverlay')) {
+      overlays.remove('CharacterOverlay');
+    } else {
+      overlays.add('CharacterOverlay');
+    }
   }
 
   void spawnCharacter() async {
-    int lengthOfIdleSprites = 80; // 10 - 80
-    int lengthOfAttack1Sprites = 120; // 88 - 120
-    int lengthOfWalkSprites = 200; // 140 - 200
-    int lengthOfRunSprites = 264; // 220 - 264
-    int lengthOfIdle2Sprites = 320; // 268 - 320 When the character is heated or he is hitting
-    int lengthOfAttack2Sprites = 400; // 328 - 400
-    /// Right direction
-    // right idle
-    List<Sprite> characterSprites = [];
-    for (var i = 12; i <= lengthOfIdleSprites; i += 4)
-      characterSprites.add(await Sprite.load('sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
-    final idleRight = SpriteAnimation.spriteList(
-        characterSprites, stepTime: 0.20);
+    /// Load Character Sprite Direction Animations
+    final characterDirectionals = CharacterDirectionals();
+    /// Spawn the character
+    final characterSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150));
+    _character = Character(
+      size: Vector2(200, 200),
+      position: map.getBlockPosition(characterSpawnPosition),
+    )
+    ..animations = await characterDirectionals.loadDirectionals()
+    ..current = CharacterState.idleRight;
+    print(_character.animations);
 
-    // right attack1
-    characterSprites = [];
-    for (var i = 88; i < lengthOfAttack1Sprites; i += 4)
-      if (i >= 100)
-        characterSprites.add(await Sprite.load(
-            'sprites/characters/knights/seq_antlerKnight/A_right0${i}.png'));
-      else
-        characterSprites.add(await Sprite.load(
-            'sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
-    final hitRight = SpriteAnimation.spriteList(
-        characterSprites, stepTime: 0.20);
+    if (Platform.isAndroid || Platform.isIOS) {
+      final joystick = await getJoystick();
+      joystick.addObserver(_character);
+      add(joystick);
+      add(_character);
+    }else {
+      add(_character);
+    }
+  }
 
-    // right running
-    characterSprites = [];
-    for (var i = 220; i < lengthOfRunSprites; i += 4)
-      characterSprites.add(await Sprite.load(
-          'sprites/characters/knights/seq_antlerKnight/A_right0${i}.png'));
-    final runningRight = SpriteAnimation.spriteList(
-        characterSprites, stepTime: 0.10);
+  Future<JoystickComponent> getJoystick() async {
+    final joystick = JoystickComponent(
+      gameRef: this,
+      directional: JoystickDirectional(
+        background: JoystickElement.sprite(await loadJoystick(0)),
+        knob: JoystickElement.sprite(await loadJoystick(1)),
+      ),
+      actions: [
+        JoystickAction(
+          actionId: 1,
+          margin: const EdgeInsets.all(50),
+          action: JoystickElement.sprite(await loadJoystick(2)),
+          actionPressed: JoystickElement.sprite(await loadJoystick(4)),
+        ),
+        JoystickAction(
+          actionId: 2,
+          action: JoystickElement.sprite(await loadJoystick(3)),
+          actionPressed: JoystickElement.sprite(await loadJoystick(5)),
+          margin: const EdgeInsets.only(
+            right: 50,
+            bottom: 120,
+          ),
+        ),
+        JoystickAction(
+          actionId: 3,
+          margin: const EdgeInsets.only(bottom: 50, right: 120),
+          enableDirection: true,
+          color: const Color(0xFFFF00FF),
+          opacityBackground: 0.1,
+          opacityKnob: 0.9,
+        ),
+      ],
+    );
+    return joystick;
+  }
 
-    /// Down direction
-    // Idle down
-    characterSprites = [];
-    for (var i = 12; i < lengthOfIdleSprites; i += 4)
-      characterSprites.add(await Sprite.load(
-          'sprites/characters/knights/seq_antlerKnight/C_Front00${i}.png'));
-    final idleDown = SpriteAnimation.spriteList(
-        characterSprites, stepTime: 0.20);
-
-    // Hit down
-    characterSprites = [];
-    for (var i = 88; i < lengthOfAttack1Sprites; i += 4)
-      if (i >= 100)
-        characterSprites.add(await Sprite.load(
-            'sprites/characters/knights/seq_antlerKnight/C_Front0${i}.png'));
-      else
-        characterSprites.add(await Sprite.load(
-            'sprites/characters/knights/seq_antlerKnight/C_Front00${i}.png'));
-      final hitDown = SpriteAnimation.spriteList(
-          characterSprites, stepTime: 0.20);
-
-      // Running down
-      characterSprites = [];
-      for (var i = 220; i < lengthOfRunSprites; i += 4)
-        characterSprites.add(await Sprite.load(
-            'sprites/characters/knights/seq_antlerKnight/C_Front0${i}.png'));
-      final runningDown = SpriteAnimation.spriteList(
-          characterSprites, stepTime: 0.10);
-
-      /// Left direction
-      // Idle left
-      characterSprites = [];
-      for (var i = 12; i < lengthOfIdleSprites; i += 4)
-        characterSprites.add(await Sprite.load(
-            'sprites/characters/knights/seq_antlerKnight/E_Left00${i}.png'));
-      final idleLeft = SpriteAnimation.spriteList(
-          characterSprites, stepTime: 0.20);
-
-      // Hit left
-      characterSprites = [];
-      for (var i = 88; i < lengthOfAttack1Sprites; i += 4)
-        if (i >= 100)
-          characterSprites.add(await Sprite.load(
-              'sprites/characters/knights/seq_antlerKnight/E_Left0${i}.png'));
-        else
-          characterSprites.add(await Sprite.load(
-              'sprites/characters/knights/seq_antlerKnight/E_Left00${i}.png'));
-        final hitLeft = SpriteAnimation.spriteList(
-            characterSprites, stepTime: 0.20);
-
-        // Running left
-        characterSprites = [];
-        for (var i = 220; i < lengthOfRunSprites; i += 4)
-          characterSprites.add(await Sprite.load(
-              'sprites/characters/knights/seq_antlerKnight/E_Left0${i}.png'));
-        final runningLeft = SpriteAnimation.spriteList(
-            characterSprites, stepTime: 0.10);
-
-        /// Up direction
-        // Idle up
-        characterSprites = [];
-        for (var i = 12; i < lengthOfIdleSprites; i += 4)
-          characterSprites.add(await Sprite.load(
-              'sprites/characters/knights/seq_antlerKnight/G_Back00${i}.png'));
-        final idleUp = SpriteAnimation.spriteList(
-            characterSprites, stepTime: 0.20);
-
-        // Hit left
-        characterSprites = [];
-        for (var i = 88; i < lengthOfAttack1Sprites; i += 4)
-          if (i >= 100)
-            characterSprites.add(await Sprite.load(
-                'sprites/characters/knights/seq_antlerKnight/G_Back0${i}.png'));
-          else
-            characterSprites.add(await Sprite.load(
-                'sprites/characters/knights/seq_antlerKnight/G_Back00${i}.png'));
-          final hitUp = SpriteAnimation.spriteList(
-              characterSprites, stepTime: 0.20);
-
-          // Running left
-          characterSprites = [];
-          for (var i = 220; i < lengthOfRunSprites; i += 4)
-            characterSprites.add(await Sprite.load(
-                'sprites/characters/knights/seq_antlerKnight/G_Back0${i}.png'));
-          final runningUp = SpriteAnimation.spriteList(
-              characterSprites, stepTime: 0.10);
-
-          /// Spawn the character
-          final characterSpawnPosition = map.getBlock(
-              Vector2(x, y) + topLeft + Vector2(0, 150));
-          _character = Character(
-            size: Vector2(200, 200),
-            position: map.getBlockPosition(characterSpawnPosition),
-          )
-            ..animations = {
-              CharacterState.idleRight: idleRight,
-              CharacterState.hitRight: hitRight,
-              CharacterState.runningRight: runningRight,
-              CharacterState.idleDown: idleDown,
-              CharacterState.hitDown: hitDown,
-              CharacterState.runningDown: runningDown,
-              CharacterState.idleLeft: idleLeft,
-              CharacterState.hitLeft: hitLeft,
-              CharacterState.runningLeft: runningLeft,
-              CharacterState.idleUp: idleUp,
-              CharacterState.hitUp: hitUp,
-              CharacterState.runningUp: runningUp,
-            }
-            ..current = CharacterState.idleRight;
-          add(_character);
+  Future<Sprite> loadJoystick(int idx) async {
+    return loadSprite(
+      'joystick.png',
+      srcPosition: Vector2(idx * 16.0, 0),
+      srcSize: Vector2.all(16),
+    );
   }
 
   void spawnTown() async {
@@ -226,8 +156,8 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
     print('MY MAP LEVEL: $mapLevel');
     mapLevel == null ? spawnTown() : loadMapLevel();
 
-    //camera.cameraSpeed = 1;
-    // camera.followComponent(_character);
+    // camera.cameraSpeed = 1;
+    //  camera.followComponent(_character);
 
     //Add walls around the town
     //map.setWalls();
@@ -245,7 +175,6 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-
   }
 
   @override
@@ -253,16 +182,20 @@ class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCol
     final isKeyDown = e is RawKeyDownEvent;
 
     if (e.data.keyLabel == 'a') {
-      _character.current = isKeyDown ? CharacterState.runningLeft : CharacterState.idleLeft;
+      _character.current =
+          isKeyDown ? CharacterState.runningLeft : CharacterState.idleLeft;
       _character.velocity.x = isKeyDown ? -1 : 0;
     } else if (e.data.keyLabel == 'd') {
-      _character.current = isKeyDown ? CharacterState.runningRight : CharacterState.idleRight;
+      _character.current =
+          isKeyDown ? CharacterState.runningRight : CharacterState.idleRight;
       _character.velocity.x = isKeyDown ? 1 : 0;
     } else if (e.data.keyLabel == 'w') {
-      _character.current = isKeyDown ? CharacterState.runningUp : CharacterState.idleUp;
+      _character.current =
+          isKeyDown ? CharacterState.runningUp : CharacterState.idleUp;
       _character.velocity.y = isKeyDown ? -1 : 0;
     } else if (e.data.keyLabel == 's') {
-      _character.current = isKeyDown ? CharacterState.runningDown : CharacterState.idleDown;
+      _character.current =
+          isKeyDown ? CharacterState.runningDown : CharacterState.idleDown;
       _character.velocity.y = isKeyDown ? 1 : 0;
     } else if (e.data.keyLabel == '1') {
       _character.current = CharacterState.hitRight;

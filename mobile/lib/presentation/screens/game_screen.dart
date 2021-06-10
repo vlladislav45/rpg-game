@@ -10,6 +10,7 @@ import 'package:rpg_game/presentation/widgets/buildings/blacksmith_overlay.dart'
 import 'package:rpg_game/presentation/widgets/buildings/castle_overlay.dart';
 import 'package:rpg_game/presentation/widgets/buildings/portal_overlay.dart';
 import 'package:rpg_game/presentation/widgets/buildings/shop_overlay.dart';
+import 'package:rpg_game/presentation/widgets/character/character_overlay.dart';
 
 class MyGameScreen extends StatefulWidget {
   const MyGameScreen({Key key}) : super(key: key);
@@ -48,6 +49,7 @@ class _MyGameScreenState extends State<MyGameScreen> {
                       'CastleMenu': castleOverlayBuilder,
                       'BlacksmithMenu': blacksmithOverlayBuilder,
                       'ShopMenu': shopOverlayBuilder,
+                      'CharacterOverlay': characterOverlayBuilder,
                     },
                   );
                 },

@@ -26,7 +26,7 @@ public class ServerStartCommand extends AbstractCommand {
         initialize();
 
         Configuration config = new Configuration();
-        config.setHostname("localhost");
+        config.setHostname("192.168.0.50");
         config.setPort(9092);
 
         final SocketIOServer server = new SocketIOServer(config);
@@ -38,7 +38,7 @@ public class ServerStartCommand extends AbstractCommand {
                 if (isAuthenticated) {
                     //TODO: Send message for new screen
                     UserViewModel userViewModel = UserViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser());
-                    client.sendEvent("authentication", userViewModel);
+                    client.sendEvent("authenticated", userViewModel);
                 } else {
                     //TODO: Send error message: WRONG CREDENTIALS!
                 }
