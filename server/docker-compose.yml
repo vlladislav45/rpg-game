@@ -1,0 +1,29 @@
+# The main development stack of containers that includes everything for local development
+
+version: '3'
+
+services:
+  db:
+    container_name: jrpg-game-server
+    image: postgres:12
+    command: postgres -c 'max_connections=5000' -c 'shared_buffers=256MB'
+    restart: on-failure
+    ports:
+      # Example on how to manage PostgreSQL from the host machine on localhost:5432
+      - ${DEV_DB_PORT:-5432}:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: rpg_game
+    volumes:
+      - /var/lib/postgresql
+#  jrpgserver:
+#    container_name: jrpg-server-docker
+#    image: jrpgserver/jrpg-server-docker:latest
+#    restart: on-failure
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#      args:
+#        branch_gs: "develop"
+#        branch_dp: "develop"

@@ -11,6 +11,7 @@ hs_err_pid*
 ##########################
 ## Maven
 ##########################
+output/
 target/
 release.properties
 
@@ -65,3 +66,8 @@ application.properties
 ## Logger
 ##########################
 log/
+
+##########################
+## Environment variables .env
+##########################
+.env
