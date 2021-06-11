@@ -59,8 +59,8 @@ class OnlineAuthenticationEvent extends OnlineEvent {
   final String password;
 
   OnlineAuthenticationEvent({
-    @required this.username,
-    @required this.password,
+    required this.username,
+    required this.password,
   });
 
   @override
@@ -73,9 +73,9 @@ class OnlineAuthenticatedEvent extends OnlineEvent {
   final String email;
 
   OnlineAuthenticatedEvent({
-    @required this.id,
-    @required this.email,
-    @required this.username,
+    required this.id,
+    required this.email,
+    required this.username,
   });
 
   factory OnlineAuthenticatedEvent.fromJson(Map<String, dynamic> json) {

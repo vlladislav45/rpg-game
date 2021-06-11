@@ -10,7 +10,7 @@ class AppRouter {
   MapLevelCubit _mapLevelCubit = MapLevelCubit();
   OnlineBloc _onlineBloc = OnlineBloc();
 
-  Route onGenerateRoute(RouteSettings routeSettings) {
+  Route? onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
       case '/':
         return MaterialPageRoute(

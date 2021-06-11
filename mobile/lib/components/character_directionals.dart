@@ -3,18 +3,18 @@ import 'package:flame/components.dart';
 import 'package:rpg_game/components/character.dart';
 
 class CharacterDirectionals {
-  SpriteAnimation _idleRight;
-  SpriteAnimation _hitRight;
-  SpriteAnimation _runningRight;
-  SpriteAnimation _idleDown;
-  SpriteAnimation _hitDown;
-  SpriteAnimation _runningDown;
-  SpriteAnimation _idleLeft;
-  SpriteAnimation _hitLeft;
-  SpriteAnimation _runningLeft;
-  SpriteAnimation _idleUp;
-  SpriteAnimation _hitUp;
-  SpriteAnimation _runningUp;
+  late SpriteAnimation _idleRight;
+  late SpriteAnimation _hitRight;
+  late SpriteAnimation _runningRight;
+  late SpriteAnimation _idleDown;
+  late SpriteAnimation _hitDown;
+  late SpriteAnimation _runningDown;
+  late SpriteAnimation _idleLeft;
+  late SpriteAnimation _hitLeft;
+  late SpriteAnimation _runningLeft;
+  late SpriteAnimation _idleUp;
+  late SpriteAnimation _hitUp;
+  late SpriteAnimation _runningUp;
 
   CharacterDirectionals();
 

@@ -13,6 +13,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:rpg_game/components/character_directionals.dart';
+import 'package:rpg_game/components/npc.dart';
+import 'package:rpg_game/components/npc_directionals.dart';
 import 'package:rpg_game/components/portal.dart';
 import 'package:rpg_game/maps/maps/map.dart';
 import 'package:rpg_game/components/character.dart';
@@ -29,23 +31,30 @@ class MyGame extends BaseGame
         KeyboardEvents,
         HasCollidables,
         HasTapableComponents,
-        ScrollDetector,
         HasDraggableComponents {
   //Properties
-  String jsonMap;
-  int mapLevel;
-  Vector2 screenMousePosition;
+  Vector2? screenMousePosition;
+  String? jsonMap;
+  int? mapLevel;
 
   //Town
-  Town _town;
+  Town? _town;
 
   // Components
-  Map map;
-  Character _character = Character();
-  Selector _selector;
-  Portal _portal;
+  Map? map;
+  late Character _character;
+  late Npc _npc;
+  Vector2 viewportResolution;
+  Selector? _selector;
+  Portal? _portal;
 
-  MyGame({this.jsonMap, this.mapLevel});
+  MyGame({String? jsonMap,
+      int? mapLevel,
+      required this.viewportResolution,
+    }) {
+    this.mapLevel = mapLevel;
+    this.jsonMap = jsonMap;
+  }
 
   @override
   Color backgroundColor() {
@@ -53,10 +62,12 @@ class MyGame extends BaseGame
   }
 
   void loadMapLevel() async {
-    final tilesetImage =
-        await images.load('sprites/tile_maps/grass_default.png');
+    viewport = FixedResolutionViewport(viewportResolution);
+    print('ViewPort: ${viewport.canvasSize}');
+
+    final tilesetImage = await images.load('sprites/tile_maps/grass_default.png');
     final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2(151, 71));
-    final matrix = Map.toList(this.jsonMap);
+    final matrix = Map.toList(this.jsonMap.toString());
 
     // Add main town
     add(
@@ -69,34 +80,48 @@ class MyGame extends BaseGame
     );
 
     spawnCharacter();
-    if (overlays.isActive('CharacterOverlay')) {
-      overlays.remove('CharacterOverlay');
-    } else {
-      overlays.add('CharacterOverlay');
-    }
+    //spawnNpcs();
+  }
+
+  void spawnNpcs() async {
+    /// Load npc Sprite Direction Animations
+    final npcDirectionals = NpcDirectionals();
+
+    _npc = Npc(
+      {
+        await npcDirectionals.loadDirectionals(),
+      },
+      size: Vector2(79, 63),
+      position: map!.getBlockPosition(map!.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150))),
+    )
+      ..current = NpcState.idleDown;
+
+    add(_npc);
   }
 
   void spawnCharacter() async {
     /// Load Character Sprite Direction Animations
     final characterDirectionals = CharacterDirectionals();
     /// Spawn the character
-    final characterSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150));
-    _character = Character(
+    final characterSpawnPosition = map!.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150));
+    var a = await characterDirectionals.loadDirectionals();
+    _character = Character({a},
       size: Vector2(200, 200),
-      position: map.getBlockPosition(characterSpawnPosition),
+      position: map!.getBlockPosition(characterSpawnPosition),
     )
-    ..animations = await characterDirectionals.loadDirectionals()
-    ..current = CharacterState.idleRight;
-    print(_character.animations);
+    ..animations = a;
 
     if (Platform.isAndroid || Platform.isIOS) {
       final joystick = await getJoystick();
       joystick.addObserver(_character);
       add(joystick);
-      add(_character);
-    }else {
-      add(_character);
     }
+
+    add(_character);
+    if (!overlays.isActive('CharacterOverlay')) overlays.add('CharacterOverlay');
+
+    camera.cameraSpeed = 1;
+    camera.followComponent(_character);
   }
 
   Future<JoystickComponent> getJoystick() async {
@@ -147,17 +172,14 @@ class MyGame extends BaseGame
     //Spawn town
     final townSprite = await Sprite.load('bg/Background_3_3840x2160.jpg');
     _town = Town(size: size, position: Vector2(0, 0))..sprite = townSprite;
-    add(_town);
-    _town.spawnTown();
+    add(_town!);
+    _town!.spawnTown();
   }
 
   @override
   Future<void> onLoad() async {
-    print('MY MAP LEVEL: $mapLevel');
-    mapLevel == null ? spawnTown() : loadMapLevel();
-
-    // camera.cameraSpeed = 1;
-    //  camera.followComponent(_character);
+    print('Map Level: $mapLevel');
+    mapLevel == 0 ? spawnTown() : loadMapLevel();
 
     //Add walls around the town
     //map.setWalls();
@@ -217,12 +239,5 @@ class MyGame extends BaseGame
     //     _character.x += 15;
     //   else if (block.x >= map.matrix[block.y].length) _character.x -= 15;
     // }
-  }
-
-  static const _zoomPerScrollUnit = 0.001;
-
-  @override
-  void onScroll(PointerScrollInfo event) {
-    // camera.zoom += event.scrollDelta.game.y * _zoomPerScrollUnit;
   }
 }

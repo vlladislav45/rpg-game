@@ -8,7 +8,7 @@ Widget shopOverlayBuilder(BuildContext context, MyGame myGame) {
 
 class ShopOverlay extends StatefulWidget {
 
-  const ShopOverlay({Key key}): super(key: key);
+  const ShopOverlay({Key? key}): super(key: key);
 
   @override
   _ShopOverlayState createState() => _ShopOverlayState();

@@ -8,14 +8,14 @@ import 'package:rpg_game/game.dart';
 
 class Town extends SpriteComponent with HasGameRef<MyGame> {
   //Each building component
-  Portal _portal;
-  Castle _castle;
-  Blacksmith _blacksmith;
-  Shop _shop;
+  late Portal _portal;
+  late Castle _castle;
+  late Blacksmith _blacksmith;
+  late Shop _shop;
 
   Town({
-    Vector2 position,
-    Vector2 size,
+    Vector2? position,
+    Vector2? size,
   }): super(position: position, size: size);
 
   Future<void> spawnTown() async {

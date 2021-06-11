@@ -15,10 +15,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController _usernameController;
-  TextEditingController _passwordController;
+  late TextEditingController _usernameController;
+  late TextEditingController _passwordController;
 
-  OnlineBloc _onlineBloc;
+  late OnlineBloc _onlineBloc;
 
   // Create a global key that uniquely identifies the Form widget
   // and allows validation of the form.
@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onFieldSubmitted: (value) {
                         //If enter is pressed after user is entered his password AND
                         // Validate returns true if the form is valid, or false otherwise.
-                        if (_formKey.currentState.validate()) {
+                        if (_formKey.currentState!.validate()) {
                           _onlineBloc.add(OnlineAuthenticationEvent(
                             username: _usernameController.text.toString(),
                             password: _passwordController.text.toString(),
@@ -141,7 +141,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 listener: (context, state) {
               if (state is OnlineAuthenticatedState) {
                 Navigator.of(context).pushNamed('/character-select');
-                return Text('Logged In');
               }
             },
               child: BlocBuilder<OnlineBloc, OnlineState>(
@@ -187,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ElevatedButton(
                         onPressed: () {
                           // Validate returns true if the form is valid, or false otherwise.
-                          if (_formKey.currentState.validate()) {
+                          if (_formKey.currentState!.validate()) {
 
                             _onlineBloc.add(OnlineAuthenticationEvent(
                               username: _usernameController.text.toString(),

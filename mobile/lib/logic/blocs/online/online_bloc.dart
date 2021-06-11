@@ -4,7 +4,7 @@ import 'package:rpg_game/logic/blocs/online/online_state.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
 class OnlineBloc extends Bloc<OnlineEvent, OnlineState> {
-  Socket _socket;
+  late Socket _socket;
 
   OnlineBloc([String address = 'ws://192.168.0.50:9092'])
       : super(OnlineInitialState()) {
