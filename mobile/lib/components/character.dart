@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
-import 'package:flame/palette.dart';
 import 'package:rpg_game/components/npc.dart';
 import 'package:rpg_game/game.dart';
 import 'package:flame/joystick.dart';
@@ -35,15 +34,20 @@ class Character extends SpriteAnimationGroupComponent<CharacterState>
   late Rect rect;
   late Timer timer;
 
-  Character(animations, {
+  Character(Map<CharacterState, SpriteAnimation> animations, {
     Vector2? position,
     Vector2? size,
   }) : super(
           position: position,
           size: size,
           animations: animations,
-          current: CharacterState.idleRight
-        );
+        ) {
+    timer = Timer(3.0)
+      ..stop()
+      ..callback = () {
+        gameRef.camera.setRelativeOffset(Anchor.center);
+      };
+  }
 
   Character.fromFrameData(
       animations,
@@ -65,6 +69,7 @@ class Character extends SpriteAnimationGroupComponent<CharacterState>
         ),
       );
     });
+
     timer = Timer(3.0)
       ..stop()
       ..callback = () {
@@ -81,7 +86,6 @@ class Character extends SpriteAnimationGroupComponent<CharacterState>
   @override
   void update(double dt) {
     super.update(dt);
-    print(timer);
     timer.update(dt);
 
     final displacement = velocity * (speed * dt);

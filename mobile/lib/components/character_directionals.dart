@@ -1,6 +1,5 @@
 
 import 'package:flame/components.dart';
-import 'package:rpg_game/components/character.dart';
 
 class CharacterDirectionals {
   late SpriteAnimation _idleRight;
@@ -18,7 +17,7 @@ class CharacterDirectionals {
 
   CharacterDirectionals();
 
-  Future<Map<CharacterState, SpriteAnimation>> loadDirectionals() async {
+  Future<void> loadDirectionals() async {
     int lengthOfIdleSprites = 80; // 10 - 80
     int lengthOfAttack1Sprites = 120; // 88 - 120
     int lengthOfWalkSprites = 200; // 140 - 200
@@ -129,21 +128,6 @@ class CharacterDirectionals {
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/G_Back0${i}.png'));
     this._runningUp = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
-
-    return {
-      CharacterState.idleRight: this._idleRight,
-      CharacterState.hitRight: this._hitRight,
-      CharacterState.runningRight: this._runningRight,
-      CharacterState.idleDown:this._idleDown,
-      CharacterState.hitDown: this._hitDown,
-      CharacterState.runningDown: this._runningDown,
-      CharacterState.idleLeft: this._idleLeft,
-      CharacterState.hitLeft: this._hitLeft,
-      CharacterState.runningLeft: this._runningLeft,
-      CharacterState.idleUp: this._idleUp,
-      CharacterState.hitUp: this._hitUp,
-      CharacterState.runningUp: this._runningUp,
-    };
   }
 
   SpriteAnimation get runningUp => _runningUp;

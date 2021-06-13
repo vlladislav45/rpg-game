@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
             BlocListener<OnlineBloc, OnlineState>(
                 listener: (context, state) {
               if (state is OnlineAuthenticatedState) {
-                Navigator.of(context).pushNamed('/character-select');
+                Navigator.of(context).pushNamed('/game');
               }
             },
               child: BlocBuilder<OnlineBloc, OnlineState>(

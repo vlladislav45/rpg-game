@@ -80,16 +80,17 @@ class MyGame extends BaseGame
     );
 
     spawnCharacter();
-    //spawnNpcs();
+    spawnNpcs();
   }
 
   void spawnNpcs() async {
     /// Load npc Sprite Direction Animations
     final npcDirectionals = NpcDirectionals();
+    await npcDirectionals.loadDirectionals();
 
     _npc = Npc(
       {
-        await npcDirectionals.loadDirectionals(),
+        NpcState.idleDown: npcDirectionals.idleDown,
       },
       size: Vector2(79, 63),
       position: map!.getBlockPosition(map!.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150))),
@@ -104,12 +105,25 @@ class MyGame extends BaseGame
     final characterDirectionals = CharacterDirectionals();
     /// Spawn the character
     final characterSpawnPosition = map!.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150));
-    var a = await characterDirectionals.loadDirectionals();
-    _character = Character({a},
+    await characterDirectionals.loadDirectionals();
+    _character = Character({
+      CharacterState.idleRight: characterDirectionals.idleRight,
+      CharacterState.hitRight: characterDirectionals.hitRight,
+      CharacterState.runningRight: characterDirectionals.runningRight,
+      CharacterState.idleDown:characterDirectionals.idleDown,
+      CharacterState.hitDown: characterDirectionals.hitDown,
+      CharacterState.runningDown: characterDirectionals.runningDown,
+      CharacterState.idleLeft: characterDirectionals.idleLeft,
+      CharacterState.hitLeft: characterDirectionals.hitLeft,
+      CharacterState.runningLeft: characterDirectionals.runningLeft,
+      CharacterState.idleUp: characterDirectionals.idleUp,
+      CharacterState.hitUp: characterDirectionals.hitUp,
+      CharacterState.runningUp: characterDirectionals.runningUp,
+    },
       size: Vector2(200, 200),
       position: map!.getBlockPosition(characterSpawnPosition),
     )
-    ..animations = a;
+    ..current = CharacterState.idleRight;
 
     if (Platform.isAndroid || Platform.isIOS) {
       final joystick = await getJoystick();
@@ -204,20 +218,16 @@ class MyGame extends BaseGame
     final isKeyDown = e is RawKeyDownEvent;
 
     if (e.data.keyLabel == 'a') {
-      _character.current =
-          isKeyDown ? CharacterState.runningLeft : CharacterState.idleLeft;
+      _character.current = isKeyDown ? CharacterState.runningLeft : CharacterState.idleLeft;
       _character.velocity.x = isKeyDown ? -1 : 0;
     } else if (e.data.keyLabel == 'd') {
-      _character.current =
-          isKeyDown ? CharacterState.runningRight : CharacterState.idleRight;
+      _character.current = isKeyDown ? CharacterState.runningRight : CharacterState.idleRight;
       _character.velocity.x = isKeyDown ? 1 : 0;
     } else if (e.data.keyLabel == 'w') {
-      _character.current =
-          isKeyDown ? CharacterState.runningUp : CharacterState.idleUp;
+      _character.current = isKeyDown ? CharacterState.runningUp : CharacterState.idleUp;
       _character.velocity.y = isKeyDown ? -1 : 0;
     } else if (e.data.keyLabel == 's') {
-      _character.current =
-          isKeyDown ? CharacterState.runningDown : CharacterState.idleDown;
+      _character.current = isKeyDown ? CharacterState.runningDown : CharacterState.idleDown;
       _character.velocity.y = isKeyDown ? 1 : 0;
     } else if (e.data.keyLabel == '1') {
       _character.current = CharacterState.hitRight;

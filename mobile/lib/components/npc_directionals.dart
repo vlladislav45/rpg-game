@@ -1,6 +1,5 @@
 
 import 'package:flame/components.dart';
-import 'package:rpg_game/components/npc.dart';
 
 class NpcDirectionals {
   late SpriteAnimation _idleRight;
@@ -18,7 +17,7 @@ class NpcDirectionals {
 
   NpcDirectionals();
 
-  Future<Map<NpcState, SpriteAnimation>> loadDirectionals() async {
+  Future<void> loadDirectionals() async {
     /// Down direction
     // down idle
     List<Sprite> npcsSprites = [];
@@ -26,10 +25,6 @@ class NpcDirectionals {
       if(i >= 10) npcsSprites.add(await Sprite.load('sprites/npcs/crusader/idle/crusader_idle_000${i}.png'));
       else npcsSprites.add(await Sprite.load('sprites/npcs/crusader/idle/crusader_idle_0000${i}.png'));
     this._idleDown = SpriteAnimation.spriteList(npcsSprites, stepTime: 0.20);
-
-    return {
-      NpcState.idleDown: this._idleDown,
-    };
   }
 
   SpriteAnimation get runningUp => _runningUp;
