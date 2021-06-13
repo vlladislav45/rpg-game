@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 abstract class OnlineState {
   const OnlineState();
 
@@ -64,9 +62,9 @@ class OnlineAuthenticatedState extends OnlineState {
   final String email;
 
   OnlineAuthenticatedState({
-    @required this.id,
-    @required this.username,
-    @required this.email,
+    required this.id,
+    required this.username,
+    required this.email,
   });
 
   @override

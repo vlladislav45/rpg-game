@@ -13,7 +13,7 @@ import 'package:rpg_game/presentation/widgets/buildings/shop_overlay.dart';
 import 'package:rpg_game/presentation/widgets/character/character_overlay.dart';
 
 class MyGameScreen extends StatefulWidget {
-  const MyGameScreen({Key key}) : super(key: key);
+  const MyGameScreen({Key? key}) : super(key: key);
 
   @override
   State<MyGameScreen> createState() {
@@ -43,7 +43,8 @@ class _MyGameScreenState extends State<MyGameScreen> {
               return BlocBuilder<MapLevelCubit, MapLevelState>(
                 builder: (context, state) {
                   return GameWidget<MyGame>(
-                    game: MyGame(jsonMap: jsonMap, mapLevel: state.mapLevel),
+                    game: MyGame(jsonMap: jsonMap.toString(), mapLevel: state.mapLevel, viewportResolution: Vector2(MediaQuery.of(context).size.width,
+                        MediaQuery.of(context).size.height)),
                     overlayBuilderMap: {
                       'PortalMenu': portalOverlayBuilder,
                       'CastleMenu': castleOverlayBuilder,

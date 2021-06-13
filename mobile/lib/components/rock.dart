@@ -2,14 +2,14 @@ import 'package:flame/components.dart';
 import 'package:rpg_game/game.dart';
 
 class Rock extends SpriteComponent with HasGameRef<MyGame>, Hitbox, Collidable {
-  Sprite sprite;
+  Sprite? sprite;
   bool _isWallHit = false;
   bool _isCollision = false;
 
   Rock({
     this.sprite,
-    Vector2 position,
-    Vector2 size,
+    Vector2? position,
+    Vector2? size,
   }) : super(position: position, size: size);
   
    @override

@@ -8,7 +8,7 @@ Widget portalOverlayBuilder(BuildContext context, MyGame myGame) {
 
 class PortalOverlay extends StatefulWidget {
 
-  const PortalOverlay({Key key}): super(key: key);
+  const PortalOverlay({Key? key}): super(key: key);
 
   @override
   _PortalOverlayState createState() => _PortalOverlayState();

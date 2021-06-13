@@ -18,7 +18,7 @@ class CharacterOverlay extends StatefulWidget {
 }
 
 class CharacterOverlayState extends State<CharacterOverlay> with TickerProviderStateMixin {
-  AnimationController controller;
+  AnimationController? controller;
 
   @override
   void initState() {
@@ -28,7 +28,7 @@ class CharacterOverlayState extends State<CharacterOverlay> with TickerProviderS
     )..addListener(() {
       setState(() {});
     });
-    controller.repeat(reverse: true);
+    controller!.repeat(reverse: true);
     super.initState();
   }
 
@@ -57,13 +57,14 @@ class CharacterOverlayState extends State<CharacterOverlay> with TickerProviderS
             )
           ),
           FAProgressBar(
-            currentValue: 80,
-            displayText: '%',
+            maxValue: 2000,
+            currentValue: 800,
+            displayText: 'Hp',
           ),
-          LinearProgressIndicator(
-            value: controller.value,
-            backgroundColor: Colors.red,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+          FAProgressBar(
+            currentValue: 1564,
+            displayText: 'Mana',
+            progressColor: Colors.blue,
           ),
         ],
       ),

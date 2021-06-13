@@ -26,7 +26,7 @@ public class ServerStartCommand extends AbstractCommand {
         initialize();
 
         Configuration config = new Configuration();
-        config.setHostname("192.168.0.50");
+        config.setHostname("localhost");
         config.setPort(9092);
 
         final SocketIOServer server = new SocketIOServer(config);

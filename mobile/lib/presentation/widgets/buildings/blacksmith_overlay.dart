@@ -7,7 +7,7 @@ Widget blacksmithOverlayBuilder(BuildContext context, MyGame myGame) {
 
 class BlacksmithOverlay extends StatefulWidget {
 
-  const BlacksmithOverlay({Key key}): super(key: key);
+  const BlacksmithOverlay({Key? key}): super(key: key);
 
   @override
   _BlacksmithOverlayState createState() => _BlacksmithOverlayState();

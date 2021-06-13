@@ -8,8 +8,8 @@ class Shop extends SpriteComponent with HasGameRef<MyGame>, Tapable {
   static final String _overlay = 'ShopMenu';
 
   Shop({
-    Vector2 position,
-    Vector2 size,
+    Vector2? position,
+    Vector2? size,
   }): super(position: position, size: size);
 
   @override

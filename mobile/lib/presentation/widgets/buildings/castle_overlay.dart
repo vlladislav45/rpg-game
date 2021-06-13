@@ -11,7 +11,7 @@ Widget castleOverlayBuilder(BuildContext context, MyGame myGame) {
 class CastleOverlay extends StatefulWidget {
   final MyGame myGame;
 
-  CastleOverlay({Key key, this.myGame}) : super(key: key);
+  CastleOverlay({Key? key, required this.myGame}) : super(key: key);
 
   @override
   _CastleOverlayState createState() => _CastleOverlayState();
