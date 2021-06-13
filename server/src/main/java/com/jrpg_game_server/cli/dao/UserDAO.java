@@ -1,18 +1,24 @@
 package com.jrpg_game_server.cli.dao;
 
 import com.jrpg_game_server.cli.config.Config;
+import com.jrpg_game_server.cli.entities.Character;
 import com.jrpg_game_server.cli.entities.User;
 import com.jrpg_game_server.cli.entities.UserRole;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO {
     private static final String USER_TABLE_NAME = "users";
     private static final String USER_ROLE_TABLE_NAME = "user_roles";
 
-    public UserDAO() {
+    private final CharacterDAO characterDAO;
+
+    public UserDAO(CharacterDAO characterDAO) {
         super(Config.gameServer());
+        this.characterDAO = characterDAO;
     }
 
     @Override
@@ -30,15 +36,20 @@ public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO {
     }
 
     @Override
-    public Object getById(int id) {
-        String query = "SELECT * FROM " + USER_TABLE_NAME + " WHERE id =" + id;
+    public Object getById(UUID id) {
+        String query = "SELECT * FROM " + USER_TABLE_NAME + " WHERE id = '" + id + "'";
         Map<String,Object> result = executeQueryWithSingleResult(query);
 
+        // Get role of the user
         int roleId = (int) result.get("role_id");
         UserRole userRole = this.getRoleById(roleId);
 
+        // Get characters of the user
+        Set<Character> characterSet = characterDAO.getCharactersByUserId(id);
+
         User user = User.map(result);
         user.setUserRole(userRole);
+        user.setCharacters(characterSet);
 
         return user;
     }
@@ -66,14 +77,18 @@ public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO {
                 " AND password='" + password + "'";
 
         Map<String,Object> result = executeQueryWithSingleResult(query);
-
         if(result.isEmpty()) {
             return null;
         }
+
         User user = User.map(result);
+        // Get characters of the user
+        Set<Character> characterSet = characterDAO.getCharactersByUserId(user.getId());
+
         int roleId = Integer.parseInt(String.valueOf(result.get("role_id")));
         UserRole role = getRoleById(roleId);
         user.setUserRole(role);
+        user.setCharacters(characterSet);
 
         return user;
     }
@@ -82,8 +97,7 @@ public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO {
 
         String query = "SELECT * FROM " + USER_TABLE_NAME;
 
-        List<Map<String, Object>> result = executeQueryWithMultipleResult(query);
-        return result;
+        return executeQueryWithMultipleResult(query);
     }
 
     /**
@@ -100,7 +114,6 @@ public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO {
         String query = "SELECT * FROM " + USER_ROLE_TABLE_NAME + " WHERE id = " + roleId;
         Map<String, Object> resultMap = executeQueryWithSingleResult(query);
 
-        final UserRole userRole = UserRole.map(resultMap);
-        return userRole;
+        return UserRole.map(resultMap);
     }
 }

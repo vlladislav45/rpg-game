@@ -20,6 +20,7 @@ import 'package:rpg_game/maps/maps/map.dart';
 import 'package:rpg_game/components/character.dart';
 import 'package:rpg_game/components/selector.dart';
 import 'package:rpg_game/maps/town.dart';
+import 'package:rpg_game/utils/directional_helper.dart';
 
 const x = 750.0;
 const y = 150.0;
@@ -36,13 +37,15 @@ class MyGame extends BaseGame
   Vector2? screenMousePosition;
   String? jsonMap;
   int? mapLevel;
+  String? _facing;
 
   //Town
   Town? _town;
 
   // Components
-  Map? map;
+  late Map map;
   late Character _character;
+  bool _isCharacterSpawned = false;
   late Npc _npc;
   Vector2 viewportResolution;
   Selector? _selector;
@@ -61,7 +64,7 @@ class MyGame extends BaseGame
     return Colors.transparent;
   }
 
-  void loadMapLevel() async {
+  Future<void> loadMapLevel() async {
     viewport = FixedResolutionViewport(viewportResolution);
     print('ViewPort: ${viewport.canvasSize}');
 
@@ -93,7 +96,7 @@ class MyGame extends BaseGame
         NpcState.idleDown: npcDirectionals.idleDown,
       },
       size: Vector2(79, 63),
-      position: map!.getBlockPosition(map!.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150))),
+      position: map.getBlockPosition(map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150))),
     )
       ..current = NpcState.idleDown;
 
@@ -104,26 +107,38 @@ class MyGame extends BaseGame
     /// Load Character Sprite Direction Animations
     final characterDirectionals = CharacterDirectionals();
     /// Spawn the character
-    final characterSpawnPosition = map!.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150));
+    final characterSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150));
     await characterDirectionals.loadDirectionals();
     _character = Character({
-      CharacterState.idleRight: characterDirectionals.idleRight,
-      CharacterState.hitRight: characterDirectionals.hitRight,
-      CharacterState.runningRight: characterDirectionals.runningRight,
-      CharacterState.idleDown:characterDirectionals.idleDown,
-      CharacterState.hitDown: characterDirectionals.hitDown,
-      CharacterState.runningDown: characterDirectionals.runningDown,
-      CharacterState.idleLeft: characterDirectionals.idleLeft,
-      CharacterState.hitLeft: characterDirectionals.hitLeft,
-      CharacterState.runningLeft: characterDirectionals.runningLeft,
-      CharacterState.idleUp: characterDirectionals.idleUp,
-      CharacterState.hitUp: characterDirectionals.hitUp,
-      CharacterState.runningUp: characterDirectionals.runningUp,
+      NpcState.idleRight: characterDirectionals.idleRight,
+      NpcState.hitRight: characterDirectionals.hitRight,
+      NpcState.runningRight: characterDirectionals.runningRight,
+      NpcState.idleDown:characterDirectionals.idleDown,
+      NpcState.hitDown: characterDirectionals.hitDown,
+      NpcState.runningDown: characterDirectionals.runningDown,
+      NpcState.idleLeft: characterDirectionals.idleLeft,
+      NpcState.hitLeft: characterDirectionals.hitLeft,
+      NpcState.runningLeft: characterDirectionals.runningLeft,
+      NpcState.idleUp: characterDirectionals.idleUp,
+      NpcState.hitUp: characterDirectionals.hitUp,
+      NpcState.runningUp: characterDirectionals.runningUp,
+      NpcState.idleBottomRight: characterDirectionals.idleBottomRight,
+      NpcState.hitBottomRight: characterDirectionals.hitBottomRight,
+      NpcState.runningBottomRight: characterDirectionals.runningBottomRight,
+      NpcState.idleBottomLeft:characterDirectionals.idleBottomLeft,
+      NpcState.hitBottomLeft: characterDirectionals.hitBottomLeft,
+      NpcState.runningBottomLeft: characterDirectionals.runningBottomLeft,
+      NpcState.idleUpperLeft: characterDirectionals.idleUpperLeft,
+      NpcState.hitUpperLeft: characterDirectionals.hitUpperLeft,
+      NpcState.runningUpperLeft: characterDirectionals.runningUpperLeft,
+      NpcState.idleUpperRight: characterDirectionals.idleUpperRight,
+      NpcState.hitUpperRight: characterDirectionals.hitUpperRight,
+      NpcState.runningUpperRight: characterDirectionals.runningUpperRight,
     },
       size: Vector2(200, 200),
-      position: map!.getBlockPosition(characterSpawnPosition),
+      position: map.getBlockPosition(characterSpawnPosition),
     )
-    ..current = CharacterState.idleRight;
+    ..current = NpcState.idleRight;
 
     if (Platform.isAndroid || Platform.isIOS) {
       final joystick = await getJoystick();
@@ -136,6 +151,7 @@ class MyGame extends BaseGame
 
     camera.cameraSpeed = 1;
     camera.followComponent(_character);
+    _isCharacterSpawned = true;
   }
 
   Future<JoystickComponent> getJoystick() async {
@@ -193,7 +209,7 @@ class MyGame extends BaseGame
   @override
   Future<void> onLoad() async {
     print('Map Level: $mapLevel');
-    mapLevel == 0 ? spawnTown() : loadMapLevel();
+    mapLevel == 0 ? spawnTown() : await loadMapLevel();
 
     //Add walls around the town
     //map.setWalls();
@@ -217,20 +233,81 @@ class MyGame extends BaseGame
   void onKeyEvent(RawKeyEvent e) {
     final isKeyDown = e is RawKeyDownEvent;
 
-    if (e.data.keyLabel == 'a') {
-      _character.current = isKeyDown ? CharacterState.runningLeft : CharacterState.idleLeft;
-      _character.velocity.x = isKeyDown ? -1 : 0;
-    } else if (e.data.keyLabel == 'd') {
-      _character.current = isKeyDown ? CharacterState.runningRight : CharacterState.idleRight;
-      _character.velocity.x = isKeyDown ? 1 : 0;
-    } else if (e.data.keyLabel == 'w') {
-      _character.current = isKeyDown ? CharacterState.runningUp : CharacterState.idleUp;
+    print(_character.velocity);
+    if (e.data.keyLabel == 'w') {
+      _character.current = NpcState.runningUpperRight;
       _character.velocity.y = isKeyDown ? -1 : 0;
-    } else if (e.data.keyLabel == 's') {
-      _character.current = isKeyDown ? CharacterState.runningDown : CharacterState.idleDown;
+    }
+    else if (e.data.keyLabel == 's') {
+      _character.current = NpcState.runningBottomLeft;
       _character.velocity.y = isKeyDown ? 1 : 0;
-    } else if (e.data.keyLabel == '1') {
-      _character.current = CharacterState.hitRight;
+    }
+    else
+    {
+      _character.velocity.y = 0;
+    }
+    if (e.data.keyLabel == 'd')
+    {
+      _character.velocity.x = 1;
+      if (_character.velocity.y == 0)
+      {
+        _character.current = NpcState.runningBottomRight;
+
+        _facing = 'east';
+      }
+      else if (_character.velocity.y == 1)
+      {
+        _character.current = NpcState.runningBottomRight;
+        _character.setNewDirection(Vector2(1, 1));
+
+        _facing = "south-east";
+      }
+      else
+      {
+        _character.current = NpcState.runningUpperRight;
+        _character.setNewDirection(Vector2(1, -1));
+
+        _facing = "north-east";
+      }
+    }
+    else if (e.data.keyLabel == 'a')
+    {
+      _character.velocity.x = -1;
+      if (_character.velocity.y == 0)
+      {
+        _character.current = NpcState.runningUpperLeft;
+
+        _facing = "west";
+      }
+      else if (_character.velocity.y == 1)
+      {
+        print('VELOCITY Y is 1');
+        _character.current = NpcState.runningBottomLeft;
+        _character.setNewDirection(Vector2(1,-1));
+
+        _facing = "south-west";
+      }
+      else
+      {
+        _character.current = NpcState.runningUpperLeft;
+        _character.setNewDirection(Vector2(-1,-1));
+
+        _facing = "northwest";
+      }
+    }
+    else
+    {
+     _character.velocity.x = 0;
+     if (_character.velocity.y == 1) {
+        _facing = "south";
+      }
+      else if(_character.velocity.y == -1) {
+        _facing = "north";
+      }
+    }
+    if (_character.velocity.y == 0 && _character.velocity.x == 0)
+    {
+      _character.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing!, StateAction.Idle);
     }
   }
 
@@ -238,16 +315,20 @@ class MyGame extends BaseGame
   void update(double dt) {
     super.update(dt);
 
-    // Block block = map.getBlock(_character.position);
-    //
-    // if (!map.containsBlock(block)) {
-    //   if (block.y <= 0)
-    //     _character.y += 15;
-    //   else if (block.y >= map.matrix.length)
-    //     _character.y -= 15;
-    //   else if (block.x <= 0)
-    //     _character.x += 15;
-    //   else if (block.x >= map.matrix[block.y].length) _character.x -= 15;
-    // }
+    if(_isCharacterSpawned) {
+      // if(map.containsBlock(map.getBlock(map.cartToIso(_character.position)))) {
+      //   _character.update(dt);
+      // }
+      Block block = map.getBlock(_character.position);
+      if (map.containsBlock(block)) {
+        if (block.y <= 0)
+          _character.velocity.y = 1;
+        else if (block.y >= map.matrix.length)
+          _character.velocity.y = -1;
+        else if (block.x <= 0)
+          _character.velocity.x = 1;
+        else if (block.x >= map.matrix[block.y].length) _character.velocity.x = -1;
+      }
+    }
   }
 }

@@ -5,7 +5,9 @@ import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.DataListener;
+import com.jrpg_game_server.cli.dao.CharacterDAO;
 import com.jrpg_game_server.cli.dao.UserDAO;
+import com.jrpg_game_server.cli.entities.Character;
 import com.jrpg_game_server.cli.models.binding.AuthenticationRequestBindingModel;
 import com.jrpg_game_server.cli.models.views.UserViewModel;
 import com.jrpg_game_server.cli.services.ServiceWrapper;
@@ -33,10 +35,11 @@ public class ServerStartCommand extends AbstractCommand {
         server.addEventListener("authentication", AuthenticationRequestBindingModel.class, new DataListener<AuthenticationRequestBindingModel>() {
             @Override
             public void onData(SocketIOClient client, AuthenticationRequestBindingModel data, AckRequest ackRequest) {
-                System.out.println(data.getUsername());
                 boolean isAuthenticated = loginCheck(data.getUsername(), data.getPassword());
                 if (isAuthenticated) {
-                    //TODO: Send message for new screen
+                    for(Character character : serviceWrapper.getUserServices().getLoggedUser().getCharacters()) {
+                        System.out.println(character.getNickname());
+                    }
                     UserViewModel userViewModel = UserViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser());
                     client.sendEvent("authenticated", userViewModel);
                 } else {
@@ -61,10 +64,12 @@ public class ServerStartCommand extends AbstractCommand {
 
     private void initialize() {
         //Init Database access objects
-        UserDAO userDAO = new UserDAO();
+        CharacterDAO characterDAO = new CharacterDAO();
+        UserDAO userDAO = new UserDAO(characterDAO);
 
         //Init service layer
-        UserServices userServices = new UserServicesImpl(userDAO);
+        UserServices userServices = new UserServicesImpl(userDAO,
+                characterDAO);
 
         serviceWrapper = new ServiceWrapper();
         serviceWrapper.setServices(userServices);

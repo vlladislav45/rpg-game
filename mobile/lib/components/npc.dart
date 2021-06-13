@@ -3,28 +3,19 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
+import 'package:flame/geometry.dart';
+import 'package:rpg_game/components/character.dart';
 import 'package:rpg_game/game.dart';
+import 'package:rpg_game/utils/directional_helper.dart';
 
-enum NpcState {
-  idleRight,
-  hitRight,
-  runningRight,
-  idleDown,
-  hitDown,
-  runningDown,
-  idleLeft,
-  hitLeft,
-  runningLeft,
-  idleUp,
-  hitUp,
-  runningUp,
-}
-
-class Npc extends SpriteAnimationGroupComponent<NpcState> with HasGameRef<MyGame> {
+class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidable, HasGameRef<MyGame> {
   static const speed = 80;
   final Vector2 velocity = Vector2(0, 0);
+
   static const double S = 1500;
   static final R = Random();
+
+  bool _isCollision = false;
 
   Npc(animations, {
     Vector2? position,
@@ -35,26 +26,21 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with HasGameRef<MyGame
     animations: animations
   );
 
-  Npc.fromFrameData(
-      animations,
-      Image image,
-      Map<NpcState, SpriteAnimationData> data, {
-        Vector2? position,
-        Vector2? size,
-      }) : super(
-    position: position,
-    size: size,
-    animations: animations
-  ) {
-    animations = data.map((key, value) {
-      return MapEntry(
-        key,
-        SpriteAnimation.fromFrameData(
-          image,
-          value,
-        ),
-      );
-    });
+
+  @override
+  void onMount() {
+    super.onMount();
+
+    final shape = HitboxCircle(definition: 0.6);
+    addShape(shape);
+  }
+
+  @override
+  void onCollision(Set<Vector2> points, Collidable other) {
+    if (other is Character && other.current == NpcState.hitUp) {
+      _isCollision = true;
+      print('My NPC is hitted');
+    }
   }
 
   @override
@@ -68,7 +54,8 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with HasGameRef<MyGame
     super.update(dt);
 
     final displacement = velocity * (speed * dt);
-    position += displacement;
+    position.add(displacement);
+    _isCollision = false;
   }
 
   // Generate random coordinates

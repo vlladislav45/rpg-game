@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/src/spritesheet.dart';
@@ -13,6 +14,13 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
   // Constructor
   Map(SpriteSheet tileset, List<List<int>> matrix, {Vector2? destTileSize})
       : super(tileset, matrix);
+
+
+  @override
+  void render(Canvas c) {
+    super.render(c);
+    debugMode = true;
+  }
 
   static List<List<int>> fromJson(List<dynamic> list1) => [
     for (final list2 in list1) [for (final number in list2) number as int]
