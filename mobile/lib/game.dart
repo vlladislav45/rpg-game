@@ -261,20 +261,27 @@ class MyGame extends BaseGame
     final isKeyDown = e is RawKeyDownEvent;
 
     print(_character.velocity);
-    if (e.data.keyLabel == 'w') {
-      _character.current = NpcState.runTopRight;
-      _character.velocity.y = isKeyDown ? -1 : 0;
-    }
-    else if (e.data.keyLabel == 's') {
-      _character.current = NpcState.runBottomLeft;
-      _character.velocity.y = isKeyDown ? 1 : 0;
-    }
-    else
-    {
-      _character.velocity.y = 0;
-    }
-    if (e.data.keyLabel == 'd')
-    {
+    if (e.data.keyLabel == 'a') {
+      _character.velocity.x = isKeyDown ? -1 : 0;
+      if (_character.velocity.y == 0) {
+        _character.current = NpcState.runTopLeft;
+        _facing = "west";
+      }
+      else if (_character.velocity.y == 1) {
+        _character.current = NpcState.runBottomLeft;
+        if(isKeyDown) _character.setNewDirection(Vector2(1,-1));
+        else _character.velocity.x = _character.velocity.y = 0;
+
+        _facing = "south-west";
+      }
+      else
+      {
+        _character.current = NpcState.runTopLeft;
+        _character.setNewDirection(Vector2(-1,-1));
+
+        _facing = "northwest";
+      }
+    } else if (e.data.keyLabel == 'd') {
       _character.velocity.x = isKeyDown ? 1 : 0;
       if (_character.velocity.y == 0)
       {
@@ -296,44 +303,23 @@ class MyGame extends BaseGame
 
         _facing = "north-east";
       }
-    }
-    else if (e.data.keyLabel == 'a')
-    {
-      _character.velocity.x = isKeyDown ? -1 : 0;
-      if (_character.velocity.y == 0)
-      {
-        _character.current = NpcState.runTopLeft;
-
-        _facing = "west";
-      }
-      else if (_character.velocity.y == 1)
-      {
-        print('VELOCITY Y is 1');
-        _character.current = NpcState.runBottomLeft;
-        _character.setNewDirection(Vector2(1,-1));
-
-        _facing = "south-west";
-      }
-      else
-      {
-        _character.current = NpcState.runTopLeft;
-        _character.setNewDirection(Vector2(-1,-1));
-
-        _facing = "northwest";
-      }
-    }
-    else
-    {
-     _character.velocity.x = 0;
-     if (_character.velocity.y == 1) {
+    } else if (e.data.keyLabel == 'w') {
+      _character.current = NpcState.runTopRight;
+      _character.velocity.y = isKeyDown ? -1 : 0;
+    } else if (e.data.keyLabel == 's') {
+      _character.current = NpcState.runBottomLeft;
+      _character.velocity.y = isKeyDown ? 1 : 0;
+    } else {
+      _character.velocity.x = 0;
+      if (_character.velocity.y == 1) {
         _facing = "south";
       }
       else if(_character.velocity.y == -1) {
         _facing = "north";
       }
     }
-    if (_character.velocity.y == 0 && _character.velocity.x == 0)
-    {
+    if (_character.velocity.y == 0 && _character.velocity.x == 0) {
+      print(_facing);
       _character.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing!, StateAction.Idle);
     }
   }
