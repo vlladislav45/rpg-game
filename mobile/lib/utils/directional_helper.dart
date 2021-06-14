@@ -7,28 +7,28 @@ enum StateAction {
 enum NpcState {
   idleRight,
   hitRight,
-  runningRight,
+  runRight,
   idleDown,
   hitDown,
-  runningDown,
+  runDown,
   idleLeft,
   hitLeft,
-  runningLeft,
-  idleUp,
-  hitUp,
-  runningUp,
+  runLeft,
+  idleTop,
+  hitTop,
+  runTop,
   idleBottomRight,
   hitBottomRight,
-  runningBottomRight,
+  runBottomRight,
   idleBottomLeft,
   hitBottomLeft,
-  runningBottomLeft,
-  idleUpperLeft,
-  hitUpperLeft,
-  runningUpperLeft,
-  idleUpperRight,
-  hitUpperRight,
-  runningUpperRight,
+  runBottomLeft,
+  idleTopLeft,
+  hitTopLeft,
+  runTopLeft,
+  idleTopRight,
+  hitTopRight,
+  runTopRight,
 }
 
 class DirectionalHelper {
@@ -37,8 +37,8 @@ class DirectionalHelper {
   static NpcState? getDirectionalSpriteAnimation(String direction, StateAction action) {
     switch(direction) {
       case 'north': {
-        if(action == StateAction.Idle) return NpcState.idleUp;
-        else if(action == StateAction.Attack) return NpcState.hitUp;
+        if(action == StateAction.Idle) return NpcState.idleTop;
+        else if(action == StateAction.Attack) return NpcState.hitTop;
       }break;
       case 'south': {
         if(action == StateAction.Idle) return NpcState.idleDown;
@@ -53,12 +53,12 @@ class DirectionalHelper {
         else if(action == StateAction.Attack) return NpcState.hitRight;
       }break;
       case 'north-east': {
-        if(action == StateAction.Idle) return NpcState.idleUpperRight;
-        else if(action == StateAction.Attack) return NpcState.hitUpperRight;
+        if(action == StateAction.Idle) return NpcState.idleTopRight;
+        else if(action == StateAction.Attack) return NpcState.hitTopRight;
       }break;
       case 'north-west': {
-        if(action == StateAction.Idle) return NpcState.idleUpperLeft;
-        else if(action == StateAction.Attack) return NpcState.hitUpperLeft;
+        if(action == StateAction.Idle) return NpcState.idleTopLeft;
+        else if(action == StateAction.Attack) return NpcState.hitTopLeft;
       }break;
       case 'south-east': {
         if(action == StateAction.Idle) return NpcState.idleBottomRight;

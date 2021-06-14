@@ -12,19 +12,27 @@ import 'package:rpg_game/utils/directional_helper.dart';
 class Character extends SpriteAnimationGroupComponent<NpcState>
     with Hitbox, Collidable, HasGameRef<MyGame>
     implements JoystickListener {
+  // character properties
+  int hp = 100;
+
+  // Directionals and speed
   static const speed = 100;
   late Vector2 _velocity = Vector2.zero();
-  int hp = 100;
-  double currentSpeed = 0;
+
+  // Joystick
   bool move = false;
+
+  // Camera
   late Rect rect;
   late Timer timer;
+
+  // Collisions
   final _collisionColor = Colors.amber;
   final _defaultColor = Colors.cyan;
   bool _isCollision = false;
 
-  /// north, south, east, west, north-east, north-west, south-east, south-west
-  /// Where is facing of the character
+  // Where is facing of the character
+  // north, south, east, west, north-east, north-west, south-east, south-west
   late String _facing;
 
   Character(Map<NpcState, SpriteAnimation> animations, {
@@ -110,7 +118,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   @override
   void joystickAction(JoystickActionEvent event) {
     if (event.id == 1) {
-      this.current = NpcState.hitUp;
+      this.current = NpcState.hitTop;
     }
     // if (event.event == ActionEvent.down) {
     //   // if (event.id == 1) {
@@ -131,35 +139,35 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     move = event.directional != JoystickMoveDirectional.idle;
     if (move) {
       if (event.directional == JoystickMoveDirectional.moveLeft) {
-        this.current = NpcState.runningLeft;
+        this.current = NpcState.runLeft;
         this.velocity.x = -1;
         this._facing = 'west';
       } else if (event.directional == JoystickMoveDirectional.moveRight) {
-        this.current = NpcState.runningRight;
+        this.current = NpcState.runRight;
         this.velocity.x = 1;
         this._facing = 'east';
       } else if (event.directional == JoystickMoveDirectional.moveUp) {
-        this.current = NpcState.runningUp;
+        this.current = NpcState.runTop;
         this.velocity.y = -1;
         this._facing = 'north';
       } else if (event.directional == JoystickMoveDirectional.moveDown) {
-        this.current = NpcState.runningDown;
+        this.current = NpcState.runDown;
         this.velocity.y = 1;
         this._facing = 'south';
       } else if (event.directional == JoystickMoveDirectional.moveDownLeft) {
-        this.current = NpcState.runningBottomLeft;
+        this.current = NpcState.runBottomLeft;
         this.setNewDirection(Vector2(-1, 1));
         this._facing = 'south-west';
       } else if (event.directional == JoystickMoveDirectional.moveDownRight) {
-        this.current = NpcState.runningBottomRight;
+        this.current = NpcState.runBottomRight;
         this.setNewDirection(Vector2(1, 1));
         this._facing = 'south-east';
       } else if (event.directional == JoystickMoveDirectional.moveUpLeft) {
-        this.current = NpcState.runningUpperLeft;
+        this.current = NpcState.runTopLeft;
         this.setNewDirection(Vector2(-1, -1));
         this._facing = 'north-west';
       } else if (event.directional == JoystickMoveDirectional.moveUpRight) {
-        this.current = NpcState.runningUpperRight;
+        this.current = NpcState.runTopRight;
         this.setNewDirection(Vector2(1, -1));
         this._facing = 'north-east';
       }

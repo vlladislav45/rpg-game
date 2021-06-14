@@ -12,9 +12,9 @@ import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
-import 'package:rpg_game/components/character_directionals.dart';
+import 'package:rpg_game/animations/character_sprite_animation.dart';
+import 'package:rpg_game/animations/npc_sprite_animation.dart';
 import 'package:rpg_game/components/npc.dart';
-import 'package:rpg_game/components/npc_directionals.dart';
 import 'package:rpg_game/components/portal.dart';
 import 'package:rpg_game/maps/maps/map.dart';
 import 'package:rpg_game/components/character.dart';
@@ -22,7 +22,7 @@ import 'package:rpg_game/components/selector.dart';
 import 'package:rpg_game/maps/town.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
 
-const x = 750.0;
+const x = 500.0;
 const y = 150.0;
 final topLeft = Vector2(x, y);
 
@@ -37,19 +37,23 @@ class MyGame extends BaseGame
   Vector2? screenMousePosition;
   String? jsonMap;
   int? mapLevel;
-  String? _facing;
 
-  //Town
-  Town? _town;
+  // Facing of the character, it is use in keyboard movement
+  String? _facing;
 
   // Components
   late Map map;
+  Town? _town;
   late Character _character;
-  bool _isCharacterSpawned = false;
   late Npc _npc;
-  Vector2 viewportResolution;
   Selector? _selector;
   Portal? _portal;
+
+  // Useful properties
+  bool _isCharacterSpawned = false;
+
+  // Screen Resolution
+  Vector2 viewportResolution;
 
   MyGame({String? jsonMap,
       int? mapLevel,
@@ -88,12 +92,35 @@ class MyGame extends BaseGame
 
   void spawnNpcs() async {
     /// Load npc Sprite Direction Animations
-    final npcDirectionals = NpcDirectionals();
-    await npcDirectionals.loadDirectionals();
+    final npcSpriteAnimation = NpcSpriteAnimation();
+    await npcSpriteAnimation.loadSpriteAnimations();
 
     _npc = Npc(
       {
-        NpcState.idleDown: npcDirectionals.idleDown,
+        NpcState.idleRight: npcSpriteAnimation.idleRight,
+        NpcState.hitRight: npcSpriteAnimation.hitRight,
+        NpcState.runRight: npcSpriteAnimation.runRight,
+        NpcState.idleDown:npcSpriteAnimation.idleDown,
+        NpcState.hitDown: npcSpriteAnimation.hitDown,
+        NpcState.runDown: npcSpriteAnimation.runDown,
+        NpcState.idleLeft: npcSpriteAnimation.idleLeft,
+        NpcState.hitLeft: npcSpriteAnimation.hitLeft,
+        NpcState.runLeft: npcSpriteAnimation.runLeft,
+        NpcState.idleTop: npcSpriteAnimation.idleTop,
+        NpcState.hitTop: npcSpriteAnimation.hitTop,
+        NpcState.runTop: npcSpriteAnimation.runTop,
+        NpcState.idleBottomRight: npcSpriteAnimation.idleBottomRight,
+        NpcState.hitBottomRight: npcSpriteAnimation.hitBottomRight,
+        NpcState.runBottomRight: npcSpriteAnimation.runBottomRight,
+        NpcState.idleBottomLeft:npcSpriteAnimation.idleBottomLeft,
+        NpcState.hitBottomLeft: npcSpriteAnimation.hitBottomLeft,
+        NpcState.runBottomLeft: npcSpriteAnimation.runBottomLeft,
+        NpcState.idleTopLeft: npcSpriteAnimation.idleTopLeft,
+        NpcState.hitTopLeft: npcSpriteAnimation.hitTopLeft,
+        NpcState.runTopLeft: npcSpriteAnimation.runTopLeft,
+        NpcState.idleTopRight: npcSpriteAnimation.idleTopRight,
+        NpcState.hitTopRight: npcSpriteAnimation.hitTopRight,
+        NpcState.runTopRight: npcSpriteAnimation.runTopRight,
       },
       size: Vector2(79, 63),
       position: map.getBlockPosition(map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150))),
@@ -105,35 +132,35 @@ class MyGame extends BaseGame
 
   void spawnCharacter() async {
     /// Load Character Sprite Direction Animations
-    final characterDirectionals = CharacterDirectionals();
+    final characterSpriteAnimation = CharacterSpriteAnimation();
     /// Spawn the character
     final characterSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150));
-    await characterDirectionals.loadDirectionals();
+    await characterSpriteAnimation.loadSpriteAnimations();
     _character = Character({
-      NpcState.idleRight: characterDirectionals.idleRight,
-      NpcState.hitRight: characterDirectionals.hitRight,
-      NpcState.runningRight: characterDirectionals.runningRight,
-      NpcState.idleDown:characterDirectionals.idleDown,
-      NpcState.hitDown: characterDirectionals.hitDown,
-      NpcState.runningDown: characterDirectionals.runningDown,
-      NpcState.idleLeft: characterDirectionals.idleLeft,
-      NpcState.hitLeft: characterDirectionals.hitLeft,
-      NpcState.runningLeft: characterDirectionals.runningLeft,
-      NpcState.idleUp: characterDirectionals.idleUp,
-      NpcState.hitUp: characterDirectionals.hitUp,
-      NpcState.runningUp: characterDirectionals.runningUp,
-      NpcState.idleBottomRight: characterDirectionals.idleBottomRight,
-      NpcState.hitBottomRight: characterDirectionals.hitBottomRight,
-      NpcState.runningBottomRight: characterDirectionals.runningBottomRight,
-      NpcState.idleBottomLeft:characterDirectionals.idleBottomLeft,
-      NpcState.hitBottomLeft: characterDirectionals.hitBottomLeft,
-      NpcState.runningBottomLeft: characterDirectionals.runningBottomLeft,
-      NpcState.idleUpperLeft: characterDirectionals.idleUpperLeft,
-      NpcState.hitUpperLeft: characterDirectionals.hitUpperLeft,
-      NpcState.runningUpperLeft: characterDirectionals.runningUpperLeft,
-      NpcState.idleUpperRight: characterDirectionals.idleUpperRight,
-      NpcState.hitUpperRight: characterDirectionals.hitUpperRight,
-      NpcState.runningUpperRight: characterDirectionals.runningUpperRight,
+      NpcState.idleRight: characterSpriteAnimation.idleRight,
+      NpcState.hitRight: characterSpriteAnimation.hitRight,
+      NpcState.runRight: characterSpriteAnimation.runRight,
+      NpcState.idleDown:characterSpriteAnimation.idleDown,
+      NpcState.hitDown: characterSpriteAnimation.hitDown,
+      NpcState.runDown: characterSpriteAnimation.runDown,
+      NpcState.idleLeft: characterSpriteAnimation.idleLeft,
+      NpcState.hitLeft: characterSpriteAnimation.hitLeft,
+      NpcState.runLeft: characterSpriteAnimation.runLeft,
+      NpcState.idleTop: characterSpriteAnimation.idleTop,
+      NpcState.hitTop: characterSpriteAnimation.hitTop,
+      NpcState.runTop: characterSpriteAnimation.runTop,
+      NpcState.idleBottomRight: characterSpriteAnimation.idleBottomRight,
+      NpcState.hitBottomRight: characterSpriteAnimation.hitBottomRight,
+      NpcState.runBottomRight: characterSpriteAnimation.runBottomRight,
+      NpcState.idleBottomLeft:characterSpriteAnimation.idleBottomLeft,
+      NpcState.hitBottomLeft: characterSpriteAnimation.hitBottomLeft,
+      NpcState.runBottomLeft: characterSpriteAnimation.runBottomLeft,
+      NpcState.idleTopLeft: characterSpriteAnimation.idleTopLeft,
+      NpcState.hitTopLeft: characterSpriteAnimation.hitTopLeft,
+      NpcState.runTopLeft: characterSpriteAnimation.runTopLeft,
+      NpcState.idleTopRight: characterSpriteAnimation.idleTopRight,
+      NpcState.hitTopRight: characterSpriteAnimation.hitTopRight,
+      NpcState.runTopRight: characterSpriteAnimation.runTopRight,
     },
       size: Vector2(200, 200),
       position: map.getBlockPosition(characterSpawnPosition),
@@ -235,11 +262,11 @@ class MyGame extends BaseGame
 
     print(_character.velocity);
     if (e.data.keyLabel == 'w') {
-      _character.current = NpcState.runningUpperRight;
+      _character.current = NpcState.runTopRight;
       _character.velocity.y = isKeyDown ? -1 : 0;
     }
     else if (e.data.keyLabel == 's') {
-      _character.current = NpcState.runningBottomLeft;
+      _character.current = NpcState.runBottomLeft;
       _character.velocity.y = isKeyDown ? 1 : 0;
     }
     else
@@ -248,23 +275,23 @@ class MyGame extends BaseGame
     }
     if (e.data.keyLabel == 'd')
     {
-      _character.velocity.x = 1;
+      _character.velocity.x = isKeyDown ? 1 : 0;
       if (_character.velocity.y == 0)
       {
-        _character.current = NpcState.runningBottomRight;
+        _character.current = NpcState.runBottomRight;
 
         _facing = 'east';
       }
       else if (_character.velocity.y == 1)
       {
-        _character.current = NpcState.runningBottomRight;
+        _character.current = NpcState.runBottomRight;
         _character.setNewDirection(Vector2(1, 1));
 
         _facing = "south-east";
       }
       else
       {
-        _character.current = NpcState.runningUpperRight;
+        _character.current = NpcState.runTopRight;
         _character.setNewDirection(Vector2(1, -1));
 
         _facing = "north-east";
@@ -272,24 +299,24 @@ class MyGame extends BaseGame
     }
     else if (e.data.keyLabel == 'a')
     {
-      _character.velocity.x = -1;
+      _character.velocity.x = isKeyDown ? -1 : 0;
       if (_character.velocity.y == 0)
       {
-        _character.current = NpcState.runningUpperLeft;
+        _character.current = NpcState.runTopLeft;
 
         _facing = "west";
       }
       else if (_character.velocity.y == 1)
       {
         print('VELOCITY Y is 1');
-        _character.current = NpcState.runningBottomLeft;
+        _character.current = NpcState.runBottomLeft;
         _character.setNewDirection(Vector2(1,-1));
 
         _facing = "south-west";
       }
       else
       {
-        _character.current = NpcState.runningUpperLeft;
+        _character.current = NpcState.runTopLeft;
         _character.setNewDirection(Vector2(-1,-1));
 
         _facing = "northwest";

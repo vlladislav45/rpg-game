@@ -30,7 +30,7 @@ class _MyGameScreenState extends State<MyGameScreen> {
           margin: EdgeInsets.all(0.0),
           child: FutureBuilder(
             future: DefaultAssetBundle.of(context)
-                .loadString('assets/maps/main-map.json'),
+                .loadString('assets/maps/level1.json'),
             builder: (context, snapshot) {
               if (!snapshot.hasData ||
                   snapshot.connectionState == ConnectionState.waiting)

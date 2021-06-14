@@ -65,10 +65,13 @@ flutter:
    - assets/images/sprites/npcs/
    - assets/images/sprites/npcs/crusader/
    - assets/images/sprites/npcs/crusader/idle/
+   - assets/images/sprites/npcs/crusader/attack/
+   - assets/images/sprites/npcs/crusader/run/
+   - assets/images/sprites/npcs/crusader/death/
    - assets/images/sprites/resources/
    - assets/images/sprites/tile_maps/
    - assets/images/sprites/walls/
-   - assets/maps/main-map.json
+   - assets/maps/level1.json
 
   fonts:
     - family: Vecna

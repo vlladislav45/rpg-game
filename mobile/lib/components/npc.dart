@@ -12,10 +12,13 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   static const speed = 80;
   final Vector2 velocity = Vector2(0, 0);
 
+  // Random spawn
   static const double S = 1500;
   static final R = Random();
 
   bool _isCollision = false;
+
+  static final int _range = 50; // 50 x and y from the players
 
   Npc(animations, {
     Vector2? position,
@@ -37,9 +40,9 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
 
   @override
   void onCollision(Set<Vector2> points, Collidable other) {
-    if (other is Character && other.current == NpcState.hitUp) {
+    if (other is Character && other.current == NpcState.hitTop) {
       _isCollision = true;
-      print('My NPC is hitted');
+      print('My NPC is hitted and it is dead');
     }
   }
 

@@ -29,25 +29,22 @@ public class ServerStartCommand extends AbstractCommand {
 
         Configuration config = new Configuration();
         config.setHostname("localhost");
-        config.setPort(9092);
+        config.setPort(9098);
 
         final SocketIOServer server = new SocketIOServer(config);
-        server.addEventListener("authentication", AuthenticationRequestBindingModel.class, new DataListener<AuthenticationRequestBindingModel>() {
-            @Override
-            public void onData(SocketIOClient client, AuthenticationRequestBindingModel data, AckRequest ackRequest) {
-                boolean isAuthenticated = loginCheck(data.getUsername(), data.getPassword());
-                if (isAuthenticated) {
-                    for(Character character : serviceWrapper.getUserServices().getLoggedUser().getCharacters()) {
-                        System.out.println(character.getNickname());
-                    }
-                    UserViewModel userViewModel = UserViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser());
-                    client.sendEvent("authenticated", userViewModel);
-                } else {
-                    //TODO: Send error message: WRONG CREDENTIALS!
+        server.addEventListener("authentication", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {
+            boolean isAuthenticated = loginCheck(data.getUsername(), data.getPassword());
+            if (isAuthenticated) {
+                for(Character character : serviceWrapper.getUserServices().getLoggedUser().getCharacters()) {
+                    System.out.println(character.getNickname());
                 }
-                // broadcast messages to all clients
-//                server.getBroadcastOperations().sendEvent("authentication", data);
+                UserViewModel userViewModel = UserViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser());
+                client.sendEvent("authenticated", userViewModel);
+            } else {
+                //TODO: Send error message: WRONG CREDENTIALS!
             }
+            // broadcast messages to all clients
+//                server.getBroadcastOperations().sendEvent("authentication", data);
         });
 
         server.start();

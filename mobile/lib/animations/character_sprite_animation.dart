@@ -1,54 +1,71 @@
 
 import 'package:flame/components.dart';
+import 'sprite_animation_action.dart';
 
-class CharacterDirectionals {
+class CharacterSpriteAnimation extends SpriteAnimationAction {
+  /// Right direction
   late SpriteAnimation _idleRight;
   late SpriteAnimation _hitRight;
-  late SpriteAnimation _runningRight;
+  late SpriteAnimation _runRight;
+
+  /// Down direction
   late SpriteAnimation _idleDown;
   late SpriteAnimation _hitDown;
-  late SpriteAnimation _runningDown;
+  late SpriteAnimation _runDown;
+
+  /// Left direction
   late SpriteAnimation _idleLeft;
   late SpriteAnimation _hitLeft;
-  late SpriteAnimation _runningLeft;
-  late SpriteAnimation _idleUp;
-  late SpriteAnimation _hitUp;
-  late SpriteAnimation _runningUp;
+  late SpriteAnimation _runLeft;
+
+  /// Top direction
+  late SpriteAnimation _idleTop;
+  late SpriteAnimation _hitTop;
+  late SpriteAnimation _runTop;
+
+  /// Bottom Right direction
   late SpriteAnimation _idleBottomRight;
   late SpriteAnimation _hitBottomRight;
-  late SpriteAnimation _runningBottomRight;
+  late SpriteAnimation _runBottomRight;
+
+  /// Bottom Left direction
   late SpriteAnimation _idleBottomLeft;
   late SpriteAnimation _hitBottomLeft;
-  late SpriteAnimation _runningBottomLeft;
-  late SpriteAnimation _idleUpperLeft;
-  late SpriteAnimation _hitUpperLeft;
-  late SpriteAnimation _runningUpperLeft;
-  late SpriteAnimation _idleUpperRight;
-  late SpriteAnimation _hitUpperRight;
-  late SpriteAnimation _runningUpperRight;
+  late SpriteAnimation _runBottomLeft;
 
-  CharacterDirectionals();
+  /// Top Left direction
+  late SpriteAnimation _idleTopLeft;
+  late SpriteAnimation _hitTopLeft;
+  late SpriteAnimation _runTopLeft;
 
-  Future<void> loadDirectionals() async {
-    int lengthOfIdleSprites = 80; // 10 - 80
-    int lengthOfAttack1Sprites = 120; // 88 - 120
-    int lengthOfWalkSprites = 200; // 140 - 200
-    int lengthOfRunSprites = 264; // 220 - 264
-    int lengthOfIdle2Sprites =
-    320; // 268 - 320 When the character is heated or he is hitting
-    int lengthOfAttack2Sprites = 400; // 328 - 400
+  /// Top Right direction
+  late SpriteAnimation _idleTopRight;
+  late SpriteAnimation _hitTopRight;
+  late SpriteAnimation _runTopRight;
 
+  /// Length of sprite direction animations
+  static const int _lengthOfIdleSprites = 80; // 10 - 80
+  static const int _lengthOfAttack1Sprites = 120; // 88 - 120
+  static const int _lengthOfWalkSprites = 200; // 140 - 200
+  static const int _lengthOfRunSprites = 264; // 220 - 264
+  static const int _lengthOfIdle2Sprites = 320; // 268 - 320 When the character is heated or he is hitting
+  static const int _lengthOfAttack2Sprites = 400; // 328 - 400
+
+  CharacterSpriteAnimation();
+
+  @override
+  Future<void> loadSpriteAnimations() async {
     /// Right direction
-    // right idle
+    // idle
     List<Sprite> characterSprites = [];
-    for (int i = 12; i <= lengthOfIdleSprites; i += 4)
+    for (int i = 12; i <= _lengthOfIdleSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
     this._idleRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
-    // right attack1
+    // attack1
     characterSprites = [];
-    for (int i = 88; i < lengthOfAttack1Sprites; i += 4)
+    for (int i = 88; i < _lengthOfAttack1Sprites; i += 4)
       if (i >= 100)
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/A_right0${i}.png'));
@@ -57,24 +74,24 @@ class CharacterDirectionals {
             'sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
     this._hitRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
-    // right running
+    // running
     characterSprites = [];
-    for (int i = 220; i < lengthOfRunSprites; i += 4)
+    for (int i = 220; i < _lengthOfRunSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/A_right0${i}.png'));
-    this._runningRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
+    this._runRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
     /// Bottom right direction
-    // idle
+    // Idle
     characterSprites = [];
-    for (int i = 12; i <= lengthOfIdleSprites; i += 4)
+    for (int i = 12; i <= _lengthOfIdleSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/B_F_right00${i}.png'));
     this._idleBottomRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
-    // attack1
+    // Attack1
     characterSprites = [];
-    for (int i = 88; i < lengthOfAttack1Sprites; i += 4)
+    for (int i = 88; i < _lengthOfAttack1Sprites; i += 4)
       if (i >= 100)
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/B_F_right0${i}.png'));
@@ -83,24 +100,24 @@ class CharacterDirectionals {
             'sprites/characters/knights/seq_antlerKnight/B_F_right00${i}.png'));
     this._hitBottomRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
-    // running
+    // Run
     characterSprites = [];
-    for (int i = 220; i < lengthOfRunSprites; i += 4)
+    for (int i = 220; i < _lengthOfRunSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/B_F_right0${i}.png'));
-    this._runningBottomRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
+    this._runBottomRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
     /// Down direction
     // Idle
     characterSprites = [];
-    for (int i = 12; i < lengthOfIdleSprites; i += 4)
+    for (int i = 12; i < _lengthOfIdleSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/C_Front00${i}.png'));
     this._idleDown = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
-    // Hit
+    // Attack1
     characterSprites = [];
-    for (int i = 88; i < lengthOfAttack1Sprites; i += 4)
+    for (int i = 88; i < _lengthOfAttack1Sprites; i += 4)
       if (i >= 100)
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/C_Front0${i}.png'));
@@ -109,24 +126,24 @@ class CharacterDirectionals {
             'sprites/characters/knights/seq_antlerKnight/C_Front00${i}.png'));
     this._hitDown = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
-    // Running
+    // Run
     characterSprites = [];
-    for (int i = 220; i < lengthOfRunSprites; i += 4)
+    for (int i = 220; i < _lengthOfRunSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/C_Front0${i}.png'));
-    this._runningDown = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
+    this._runDown = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
     /// Bottom left direction
     // Idle
     characterSprites = [];
-    for (int i = 12; i < lengthOfIdleSprites; i += 4)
+    for (int i = 12; i < _lengthOfIdleSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/D_FrontLeft00${i}.png'));
     this._idleBottomLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
-    // Hit
+    // Attack1
     characterSprites = [];
-    for (int i = 88; i < lengthOfAttack1Sprites; i += 4)
+    for (int i = 88; i < _lengthOfAttack1Sprites; i += 4)
       if (i >= 100)
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/D_FrontLeft0${i}.png'));
@@ -135,24 +152,24 @@ class CharacterDirectionals {
             'sprites/characters/knights/seq_antlerKnight/D_FrontLeft00${i}.png'));
     this._hitBottomLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
-    // Running
+    // Run
     characterSprites = [];
-    for (int i = 220; i < lengthOfRunSprites; i += 4)
+    for (int i = 220; i < _lengthOfRunSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/D_FrontLeft0${i}.png'));
-    this._runningBottomLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
+    this._runBottomLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
     /// Left direction
     // Idle
     characterSprites = [];
-    for (int i = 12; i < lengthOfIdleSprites; i += 4)
+    for (int i = 12; i < _lengthOfIdleSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/E_Left00${i}.png'));
     this._idleLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
     // Attack1
     characterSprites = [];
-    for (int i = 88; i < lengthOfAttack1Sprites; i += 4)
+    for (int i = 88; i < _lengthOfAttack1Sprites; i += 4)
       if (i >= 100)
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/E_Left0${i}.png'));
@@ -161,137 +178,121 @@ class CharacterDirectionals {
             'sprites/characters/knights/seq_antlerKnight/E_Left00${i}.png'));
     this._hitLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
-    // Running
+    // Run
     characterSprites = [];
-    for (int i = 220; i < lengthOfRunSprites; i += 4)
+    for (int i = 220; i < _lengthOfRunSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/E_Left0${i}.png'));
-    this._runningLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
+    this._runLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
-    /// Upper left direction
+    /// Top left direction
     // Idle
     characterSprites = [];
-    for (int i = 12; i < lengthOfIdleSprites; i += 4)
+    for (int i = 12; i < _lengthOfIdleSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/F_BackLeft00${i}.png'));
-    this._idleUpperLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._idleTopLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
     // Attack1
     characterSprites = [];
-    for (int i = 88; i < lengthOfAttack1Sprites; i += 4)
+    for (int i = 88; i < _lengthOfAttack1Sprites; i += 4)
       if (i >= 100)
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/F_BackLeft0${i}.png'));
       else
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/F_BackLeft00${i}.png'));
-    this._hitUpperLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._hitTopLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
-    // Running
+    // Run
     characterSprites = [];
-    for (int i = 220; i < lengthOfRunSprites; i += 4)
+    for (int i = 220; i < _lengthOfRunSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/F_BackLeft0${i}.png'));
-    this._runningUpperLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
+    this._runTopLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
-    /// Upper direction
+    /// Top direction
     // Idle
     characterSprites = [];
-    for (int i = 12; i < lengthOfIdleSprites; i += 4)
+    for (int i = 12; i < _lengthOfIdleSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/G_Back00${i}.png'));
-    this._idleUp = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._idleTop = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
     // Attack1
     characterSprites = [];
-    for (int i = 88; i < lengthOfAttack1Sprites; i += 4)
+    for (int i = 88; i < _lengthOfAttack1Sprites; i += 4)
       if (i >= 100)
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/G_Back0${i}.png'));
       else
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/G_Back00${i}.png'));
-    this._hitUp = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._hitTop = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
-    // Running
+    // Run
     characterSprites = [];
-    for (int i = 220; i < lengthOfRunSprites; i += 4)
+    for (int i = 220; i < _lengthOfRunSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/G_Back0${i}.png'));
-    this._runningUp = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
+    this._runTop = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
-    /// Upper right direction
+    /// Top Right direction
     // Idle
     characterSprites = [];
-    for (int i = 12; i < lengthOfIdleSprites; i += 4)
+    for (int i = 12; i < _lengthOfIdleSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/H_BackRight00${i}.png'));
-    this._idleUpperRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._idleTopRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
     // Attack1
     characterSprites = [];
-    for (int i = 88; i < lengthOfAttack1Sprites; i += 4)
+    for (int i = 88; i < _lengthOfAttack1Sprites; i += 4)
       if (i >= 100)
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/H_BackRight0${i}.png'));
       else
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/H_BackRight00${i}.png'));
-    this._hitUpperRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._hitTopRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
 
-    // Running
+    // Run
     characterSprites = [];
-    for (int i = 220; i < lengthOfRunSprites; i += 4)
+    for (int i = 220; i < _lengthOfRunSprites; i += 4)
       characterSprites.add(await Sprite.load(
           'sprites/characters/knights/seq_antlerKnight/H_BackRight0${i}.png'));
-    this._runningUpperRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
+    this._runTopRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
   }
 
-  SpriteAnimation get runningUp => _runningUp;
-
-  SpriteAnimation get hitUp => _hitUp;
-
-  SpriteAnimation get idleUp => _idleUp;
-
-  SpriteAnimation get runningLeft => _runningLeft;
-
-  SpriteAnimation get hitLeft => _hitLeft;
-
-  SpriteAnimation get idleLeft => _idleLeft;
-
-  SpriteAnimation get runningDown => _runningDown;
-
-  SpriteAnimation get hitDown => _hitDown;
+  SpriteAnimation get idleRight => _idleRight;
+  SpriteAnimation get hitRight => _hitRight;
+  SpriteAnimation get runRight => _runRight;
 
   SpriteAnimation get idleDown => _idleDown;
+  SpriteAnimation get hitDown => _hitDown;
+  SpriteAnimation get runDown => _runDown;
 
-  SpriteAnimation get runningRight => _runningRight;
+  SpriteAnimation get idleLeft => _idleLeft;
+  SpriteAnimation get hitLeft => _hitLeft;
+  SpriteAnimation get runLeft => _runLeft;
 
-  SpriteAnimation get hitRight => _hitRight;
-
-  SpriteAnimation get idleRight => _idleRight;
-
-  SpriteAnimation get runningUpperRight => _runningUpperRight;
-
-  SpriteAnimation get hitUpperRight => _hitUpperRight;
-
-  SpriteAnimation get idleUpperRight => _idleUpperRight;
-
-  SpriteAnimation get runningUpperLeft => _runningUpperLeft;
-
-  SpriteAnimation get hitUpperLeft => _hitUpperLeft;
-
-  SpriteAnimation get idleUpperLeft => _idleUpperLeft;
-
-  SpriteAnimation get runningBottomLeft => _runningBottomLeft;
-
-  SpriteAnimation get hitBottomLeft => _hitBottomLeft;
-
-  SpriteAnimation get idleBottomLeft => _idleBottomLeft;
-
-  SpriteAnimation get runningBottomRight => _runningBottomRight;
-
-  SpriteAnimation get hitBottomRight => _hitBottomRight;
+  SpriteAnimation get idleTop => _idleTop;
+  SpriteAnimation get hitTop => _hitTop;
+  SpriteAnimation get runTop => _runTop;
 
   SpriteAnimation get idleBottomRight => _idleBottomRight;
+  SpriteAnimation get hitBottomRight => _hitBottomRight;
+  SpriteAnimation get runBottomRight => _runBottomRight;
+
+  SpriteAnimation get idleBottomLeft => _idleBottomLeft;
+  SpriteAnimation get hitBottomLeft => _hitBottomLeft;
+  SpriteAnimation get runBottomLeft => _runBottomLeft;
+
+  SpriteAnimation get idleTopLeft => _idleTopLeft;
+  SpriteAnimation get hitTopLeft => _hitTopLeft;
+  SpriteAnimation get runTopLeft => _runTopLeft;
+
+  SpriteAnimation get idleTopRight => _idleTopRight;
+  SpriteAnimation get hitTopRight => _hitTopRight;
+  SpriteAnimation get runTopRight => _runTopRight;
 }
