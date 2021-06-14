@@ -29,7 +29,7 @@ public class ServerStartCommand extends AbstractCommand {
 
         Configuration config = new Configuration();
         config.setHostname("localhost");
-        config.setPort(9098);
+        config.setPort(9096);
 
         final SocketIOServer server = new SocketIOServer(config);
         server.addEventListener("authentication", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {

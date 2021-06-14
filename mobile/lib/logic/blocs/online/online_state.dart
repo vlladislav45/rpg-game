@@ -1,3 +1,6 @@
+import 'package:rpg_game/models/views/character_view_model.dart';
+import 'package:rpg_game/models/views/user_view_model.dart';
+
 abstract class OnlineState {
   const OnlineState();
 
@@ -57,16 +60,12 @@ class OnlineAuthenticationState extends OnlineState {
 }
 
 class OnlineAuthenticatedState extends OnlineState {
-  final String id;
-  final String username;
-  final String email;
+  final UserViewModel userViewModel;
 
   OnlineAuthenticatedState({
-    required this.id,
-    required this.username,
-    required this.email,
+    required this.userViewModel,
   });
 
   @override
-  List<Object> get props => [id, email, username];
+  List<Object> get props => [userViewModel];
 }

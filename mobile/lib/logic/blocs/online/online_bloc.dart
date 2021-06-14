@@ -6,7 +6,7 @@ import 'package:socket_io_client/socket_io_client.dart';
 class OnlineBloc extends Bloc<OnlineEvent, OnlineState> {
   late Socket _socket;
 
-  OnlineBloc([String address = 'ws://localhost:9098'])
+  OnlineBloc([String address = 'ws://localhost:9096'])
       : super(OnlineInitialState()) {
     _socket = io(
       address,
@@ -38,9 +38,7 @@ class OnlineBloc extends Bloc<OnlineEvent, OnlineState> {
       });
     }else if (event is OnlineAuthenticatedEvent) {
       yield OnlineAuthenticatedState(
-          id: event.id,
-          email: event.email,
-          username: event.username,
+          userViewModel: event.userViewModel,
       );
     }
     else if (event is OnlineConnectingEvent) {
