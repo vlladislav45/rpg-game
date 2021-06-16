@@ -27,9 +27,13 @@ class AppRouter {
       case '/game':
         return MaterialPageRoute(
           settings: RouteSettings(name: '/game'),
-          builder: (_) => BlocProvider.value(
-            value: _mapLevelCubit,
-            child: MyGameScreen(),
+          builder: (_) => MultiBlocProvider(providers: [
+              BlocProvider.value(
+              value: _mapLevelCubit,),
+            BlocProvider.value(
+              value: _onlineBloc,
+            ),
+          ], child: MyGameScreen(),
           ),
         );
       default:

@@ -12,9 +12,6 @@ import 'package:rpg_game/utils/directional_helper.dart';
 class Character extends SpriteAnimationGroupComponent<NpcState>
     with Hitbox, Collidable, HasGameRef<MyGame>
     implements JoystickListener {
-  // character properties
-  int hp = 100;
-
   // Directionals and speed
   static const speed = 100;
   late Vector2 _velocity = Vector2.zero();
