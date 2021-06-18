@@ -1,13 +1,9 @@
 package com.jrpg_game_server.cli.commands;
 
-import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.Configuration;
-import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import com.corundumstudio.socketio.listener.DataListener;
 import com.jrpg_game_server.cli.dao.CharacterDAO;
 import com.jrpg_game_server.cli.dao.UserDAO;
-import com.jrpg_game_server.cli.entities.Character;
 import com.jrpg_game_server.cli.models.binding.AuthenticationRequestBindingModel;
 import com.jrpg_game_server.cli.models.views.UserViewModel;
 import com.jrpg_game_server.cli.services.ServiceWrapper;
@@ -39,10 +35,6 @@ public class ServerStartCommand extends AbstractCommand {
             if (isAuthenticated) {
                 UserViewModel userViewModel = UserViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser());
                 client.sendEvent("authenticated", userViewModel);
-
-//                server.addEventListener("loggedPlayer", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {
-//                    client.sendEvent("authenticated", userViewModel);
-//                });
             } else {
                 // Wrong credentials
                 client.sendEvent("authenticationError", new HashMap<String, String>(){{
@@ -53,6 +45,9 @@ public class ServerStartCommand extends AbstractCommand {
 
         if(serviceWrapper.getUserServices().getLoggedUser() != null) {
             System.out.println(serviceWrapper.getUserServices().getLoggedUser().getUsername());
+            server.addEventListener("loggedPlayer", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {
+
+            });
         }
 
         server.start();

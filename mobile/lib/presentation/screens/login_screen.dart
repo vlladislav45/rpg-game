@@ -44,6 +44,38 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  Widget _loginButton(BuildContext context, String message) {
+    return Column(
+      children: <Widget>[
+        message != '' ? Text('$message') : Container(),
+        ElevatedButton(
+          onPressed: () {
+            // Validate returns true if the form is valid, or false otherwise.
+            if (_formKey.currentState!.validate()) {
+
+              _onlineBloc.add(OnlineAuthenticationEvent(
+                username: _usernameController.text.toString(),
+                password: _passwordController.text.toString(),
+              ));
+            }
+          },
+          child: Container(
+            child: AutoSizeText(
+              'Login',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            width: MediaQuery.of(context).size.width / 7,
+            height: MediaQuery.of(context).size.width / 16,
+            alignment: Alignment.center,
+          ),
+        ),
+        Text('Connected to Main Server!'),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,39 +204,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     );
                   }
-                  // if (state is OnlineErrorState) {
-                  //   return Text('${state.error}');
-                  // }
-                  return Column(
-                    children: <Widget>[
-                      state is OnlineConnectErrorState ?
-                      Text('${state.error}') :
-                      Text('Connected to Main Server!'),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Validate returns true if the form is valid, or false otherwise.
-                          if (_formKey.currentState!.validate()) {
-
-                            _onlineBloc.add(OnlineAuthenticationEvent(
-                              username: _usernameController.text.toString(),
-                              password: _passwordController.text.toString(),
-                            ));
-                          }
-                        },
-                        child: Container(
-                          child: AutoSizeText(
-                            'Login',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          width: MediaQuery.of(context).size.width / 7,
-                          height: MediaQuery.of(context).size.width / 16,
-                          alignment: Alignment.center,
-                        ),
-                      ),
-                    ],
-                  );
+                  if (state is OnlineErrorState) {
+                    return _loginButton(context, '${state.error}');
+                  }
+                  return _loginButton(context, '');
                 },
               ),
           ],

@@ -58,51 +58,51 @@ class CharacterOverlayState extends State<CharacterOverlay>
       height: MediaQuery.of(context).size.width / 12,
       child: BlocBuilder<GameBloc, GameState>(
           builder: (context, state) {
-          print(state);
           if(state is GamePlayerState) {
-            print(state.userModel.characters[0].hp);
-            return Column(
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Container(
-                    width: double.infinity,
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(right: 10.0, bottom: 5.0),
-                          child: AutoSizeText(
-                            'Lv. ${state.userModel.characters[0].level}',
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                  Container(
+                    child: Container(
+                      margin: EdgeInsets.only(right: 10.0, bottom: 5.0),
+                      child: CircleAvatar(
+                        maxRadius: 25.0,
+                        backgroundColor: Colors.brown.shade800,
+                        child: AutoSizeText(
+                          'Lv. ${state.userModel.characters[0].level}',
+                          style: TextStyle(
+                            color: Colors.white,
                           ),
                         ),
-
-                        Container(
-                          child: AutoSizeText(
-                            '${state.userModel.username}',
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-
-                      ],
-                    )),
-                Container(
-                  margin: EdgeInsets.only(bottom: 5.0),
-                  child: FAProgressBar(
-                    maxValue: state.userModel.characters[0].hp,
-                    currentValue: state.userModel.characters[0].hp - 10,
-                    displayText: '',
-                    progressColor: Color(HexColor.convertHexColor('#A42324')),
+                      ),
+                    ),
                   ),
-                ),
-                FAProgressBar(
-                  maxValue: state.userModel.characters[0].mana,
-                  currentValue: state.userModel.characters[0].mana,
-                  displayText: '${state.userModel.characters[0].mana} / ',
-                  progressColor: Color(HexColor.convertHexColor('#106FB5')),
-                ),
+                ],),
+
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text('hello'),
+                  Container(
+                    margin: EdgeInsets.only(bottom: 5.0),
+                    child: FAProgressBar(
+                      maxValue: state.userModel.characters[0].hp,
+                      currentValue: state.userModel.characters[0].hp,
+                      displayText: ' / ${state.userModel.characters[0].hp} HP',
+                      progressColor: Color(HexColor.convertHexColor('#A42324')),
+                    ),
+                  ),
+                  // FAProgressBar(
+                  //   maxValue: state.userModel.characters[0].mana,
+                  //   currentValue: state.userModel.characters[0].mana,
+                  //   displayText: ' / ${state.userModel.characters[0].mana} MANA',
+                  //   progressColor: Color(HexColor.convertHexColor('#106FB5')),
+                  // ),
+                ],),
+
               ],
             );
           }

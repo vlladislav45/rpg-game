@@ -3,11 +3,15 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/geometry.dart';
+import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:rpg_game/components/npc.dart';
 import 'package:rpg_game/game.dart';
 import 'package:flame/joystick.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
+
+final _regularTextConfig = TextPaintConfig(color: BasicPalette.white.color);
+final _regular = TextPaint(config: _regularTextConfig);
 
 class Character extends SpriteAnimationGroupComponent<NpcState>
     with Hitbox, Collidable, HasGameRef<MyGame>
@@ -45,6 +49,35 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
       ..callback = () {
         gameRef.camera.setRelativeOffset(Anchor.center);
       };
+  }
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+
+    // gameRef.add(
+    //     _renderNickName(),
+    // );
+    //
+    // await gameRef.add(
+    //     TextComponent(
+    //       'my',
+    //       textRenderer: _regular,
+    //     )
+    //       ..anchor = Anchor.topCenter
+    //       ..x = 200
+    //       ..y = 200,
+    // );
+  }
+
+  TextComponent _renderNickName() {
+    return TextComponent(
+      'my',
+      textRenderer: _regular,
+    )
+    ..anchor = Anchor.topCenter
+    ..x = position.x + ((width - (position.length * (width / 13))) / 2)
+    ..y = position.y - 20;
   }
 
   @override
