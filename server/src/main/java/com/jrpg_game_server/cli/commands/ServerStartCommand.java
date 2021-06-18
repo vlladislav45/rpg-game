@@ -15,6 +15,8 @@ import com.jrpg_game_server.cli.services.UserServices;
 import com.jrpg_game_server.cli.services.impl.UserServicesImpl;
 import picocli.CommandLine;
 
+import java.util.HashMap;
+
 @CommandLine.Command(name = "start server", aliases = "ss")
 
 public class ServerStartCommand extends AbstractCommand {
@@ -35,17 +37,23 @@ public class ServerStartCommand extends AbstractCommand {
         server.addEventListener("authentication", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {
             boolean isAuthenticated = loginCheck(data.getUsername(), data.getPassword());
             if (isAuthenticated) {
-                for(Character character : serviceWrapper.getUserServices().getLoggedUser().getCharacters()) {
-                    System.out.println(character.getNickname());
-                }
                 UserViewModel userViewModel = UserViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser());
                 client.sendEvent("authenticated", userViewModel);
+
+//                server.addEventListener("loggedPlayer", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {
+//                    client.sendEvent("authenticated", userViewModel);
+//                });
             } else {
-                //TODO: Send error message: WRONG CREDENTIALS!
+                // Wrong credentials
+                client.sendEvent("authenticationError", new HashMap<String, String>(){{
+                    put("error", "WRONG CREDENTIALS");
+                }});
             }
-            // broadcast messages to all clients
-//                server.getBroadcastOperations().sendEvent("authentication", data);
         });
+
+        if(serviceWrapper.getUserServices().getLoggedUser() != null) {
+            System.out.println(serviceWrapper.getUserServices().getLoggedUser().getUsername());
+        }
 
         server.start();
 

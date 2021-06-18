@@ -1,38 +1,36 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:rpg_game/logic/blocs/online/online_event.dart';
 import 'package:rpg_game/logic/blocs/online/online_state.dart';
+import 'package:rpg_game/network/socket_manager.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
 class OnlineBloc extends Bloc<OnlineEvent, OnlineState> {
-  late Socket _socket;
+  static const String url = 'localhost';
+  static const String port = '9096';
 
-  OnlineBloc([String address = 'ws://localhost:9096'])
+  OnlineBloc()
       : super(OnlineInitialState()) {
-    _socket = io(
-      address,
-      OptionBuilder()
-          .setTransports(['websocket'])
-          .setTimeout(3000)
-          .disableAutoConnect()
-          .disableReconnection()
-          .build(),
-    );
-    _socket.onConnecting((data) => add(OnlineConnectingEvent()));
-    _socket.onConnect((data) => add(OnlineConnectedEvent()));
-    _socket.onConnectError((data) => add(OnlineConnectErrorEvent(data)));
-    _socket.onConnectTimeout((data) => add(OnlineConnectTimeoutEvent(data)));
-    _socket.onDisconnect((data) => add(OnlineDisconnectEvent()));
-    _socket.onError((data) => add(OnlineErrorEvent(data)));
-    _socket.on('authenticated', (data) => add(OnlineAuthenticatedEvent.fromJson(data)));
+    SocketManager.configure(url, port);
+
+    SocketManager.socket.onConnecting((data) => add(OnlineConnectingEvent()));
+    SocketManager.socket.onConnect((data) => add(OnlineConnectedEvent()));
+    SocketManager.socket.onConnectError((data) => add(OnlineConnectErrorEvent(data)));
+    SocketManager.socket.onConnectTimeout((data) => add(OnlineConnectTimeoutEvent(data)));
+    SocketManager.socket.onDisconnect((data) => add(OnlineDisconnectEvent()));
+    SocketManager.socket.onError((data) => add(OnlineErrorEvent(data)));
+    SocketManager.socket.on('authenticated', (data) => add(OnlineAuthenticatedEvent.fromJson(data)));
+    SocketManager.socket.on('authenticationError', (data) => add(OnlineAuthenticationErrorEvent.fromJson(data)));
   }
 
   @override
   Stream<OnlineState> mapEventToState(OnlineEvent event) async* {
     if (event is OnlineConnectEvent) {
       yield OnlineConnectingState();
-      _socket.connect();
+      SocketManager.socket.connect();
     }else if (event is OnlineAuthenticationEvent) {
-      _socket.emit('authentication', {
+      SocketManager.socket.emit('authentication', {
         'username': event.username,
         'password': event.password
       });
@@ -40,8 +38,11 @@ class OnlineBloc extends Bloc<OnlineEvent, OnlineState> {
       yield OnlineAuthenticatedState(
           userViewModel: event.userViewModel,
       );
-    }
-    else if (event is OnlineConnectingEvent) {
+    }else if(event is OnlineAuthenticationErrorEvent) {
+      yield OnlineErrorState(
+        event.error,
+      );
+    } else if (event is OnlineConnectingEvent) {
       yield OnlineConnectingState();
     } else if (event is OnlineConnectedEvent) {
       yield OnlineConnectedState();
@@ -58,7 +59,7 @@ class OnlineBloc extends Bloc<OnlineEvent, OnlineState> {
 
   @override
   Future<void> close() {
-    _socket.dispose();
+    SocketManager.socket.dispose();
     return super.close();
   }
 }

@@ -1,5 +1,5 @@
-import 'package:rpg_game/models/views/character_view_model.dart';
-import 'package:rpg_game/models/views/user_view_model.dart';
+import 'package:rpg_game/models/character_model.dart';
+import 'package:rpg_game/models/user_model.dart';
 
 abstract class OnlineEvent {
   const OnlineEvent();
@@ -69,7 +69,7 @@ class OnlineAuthenticationEvent extends OnlineEvent {
 }
 
 class OnlineAuthenticatedEvent extends OnlineEvent {
-  final UserViewModel userViewModel;
+  final UserModel userViewModel;
 
   OnlineAuthenticatedEvent({
     required this.userViewModel,
@@ -77,10 +77,27 @@ class OnlineAuthenticatedEvent extends OnlineEvent {
 
   factory OnlineAuthenticatedEvent.fromJson(Map<String, dynamic> json) {
     return OnlineAuthenticatedEvent(
-      userViewModel: UserViewModel.fromJson(json),
+      userViewModel: UserModel.fromJson(json),
     );
   }
 
   @override
   List<Object> get props => [userViewModel];
+}
+
+class OnlineAuthenticationErrorEvent extends OnlineEvent {
+  final String error;
+
+  OnlineAuthenticationErrorEvent({
+    required this.error,
+  });
+
+  factory OnlineAuthenticationErrorEvent.fromJson(Map<String, dynamic> json) {
+    return OnlineAuthenticationErrorEvent(
+      error: json['error'],
+    );
+  }
+
+  @override
+  List<Object> get props => [error];
 }

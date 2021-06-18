@@ -1,20 +1,27 @@
 
-import 'character_view_model.dart';
+import 'character_model.dart';
 
-class UserViewModel {
+class UserModel {
   late final String _id;
   late final String _username;
   late final String _email;
-  late final List<CharacterViewModel> _characters;
+  late final List<CharacterModel> _characters;
   late final String _userRole;
 
-  UserViewModel(this._id, this._username, this._email, this._characters);
+  UserModel(this._id, this._username, this._email, this._characters);
 
-  UserViewModel.fromJson(Map<String, dynamic>? json) {
+  UserModel.clear() {
+    this._id = '';
+    this._username = '';
+    this._email = '';
+    this._characters = [];
+  }
+
+  UserModel.fromJson(Map<String, dynamic>? json) {
     this._id = json!['id'];
     this._username = json['username'];
     this._email = json['email'];
-    this._characters = CharacterViewModel.fromJson(json['characters']);
+    this._characters = CharacterModel.fromJson(json['characters']);
     this._userRole = json['userRole'];
   }
 
@@ -24,9 +31,9 @@ class UserViewModel {
     _userRole = value;
   }
 
-  List<CharacterViewModel> get characters => _characters;
+  List<CharacterModel> get characters => _characters;
 
-  set characters(List<CharacterViewModel> value) {
+  set characters(List<CharacterModel> value) {
     _characters = value;
   }
 

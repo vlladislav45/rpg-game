@@ -1,5 +1,5 @@
-import 'package:rpg_game/models/views/character_view_model.dart';
-import 'package:rpg_game/models/views/user_view_model.dart';
+import 'package:rpg_game/models/character_model.dart';
+import 'package:rpg_game/models/user_model.dart';
 
 abstract class OnlineState {
   const OnlineState();
@@ -60,7 +60,7 @@ class OnlineAuthenticationState extends OnlineState {
 }
 
 class OnlineAuthenticatedState extends OnlineState {
-  final UserViewModel userViewModel;
+  final UserModel userViewModel;
 
   OnlineAuthenticatedState({
     required this.userViewModel,

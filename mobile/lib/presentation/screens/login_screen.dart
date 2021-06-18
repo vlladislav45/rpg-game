@@ -137,14 +137,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
-            BlocListener<OnlineBloc, OnlineState>(
+            BlocConsumer<OnlineBloc, OnlineState>(
                 listener: (context, state) {
               if (state is OnlineAuthenticatedState) {
                 Navigator.of(context).pushNamed('/game');
               }
             },
-              child: BlocBuilder<OnlineBloc, OnlineState>(
-                builder: (context, state) {
+              builder: (context, state) {
                   print(state);
                   if (state is OnlineInitialState) {
                     return Container();
@@ -173,15 +172,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     );
                   }
-                  if (state is OnlineErrorState) {
-                    return Column(
-                      children: [
-                        Text('An error occurred'),
-                      ],
-                    );
-                  }
+                  // if (state is OnlineErrorState) {
+                  //   return Text('${state.error}');
+                  // }
                   return Column(
                     children: <Widget>[
+                      state is OnlineConnectErrorState ?
+                      Text('${state.error}') :
                       Text('Connected to Main Server!'),
                       ElevatedButton(
                         onPressed: () {
@@ -210,7 +207,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 },
               ),
-            ),
           ],
         ),
       ),

@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animation_progress_bar/flutter_animation_progress_bar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
-import 'package:rpg_game/logic/blocs/online/online_bloc.dart';
-import 'package:rpg_game/logic/blocs/online/online_state.dart';
-import 'package:rpg_game/models/views/user_view_model.dart';
+import 'package:rpg_game/logic/blocs/game/game_bloc.dart';
+import 'package:rpg_game/logic/blocs/game/game_event.dart';
+import 'package:rpg_game/logic/blocs/game/game_state.dart';
 import 'package:rpg_game/utils/hex_color.dart';
 
 Widget characterOverlayBuilder(BuildContext context, MyGame myGame) {
@@ -39,6 +39,8 @@ class CharacterOverlayState extends State<CharacterOverlay>
 
   @override
   Widget build(BuildContext context) {
+    final gameBloc = BlocProvider.of<GameBloc>(context);
+
     return Container(
       padding: EdgeInsets.all(10.0),
       alignment: Alignment.topLeft,
@@ -50,58 +52,61 @@ class CharacterOverlayState extends State<CharacterOverlay>
               Colors.black.withOpacity(0.60),
               Colors.black.withOpacity(0.75),
             ],
-
           )
       ),
       width: MediaQuery.of(context).size.width / 5,
       height: MediaQuery.of(context).size.width / 12,
-      child: BlocBuilder<OnlineBloc, OnlineState>(builder: (context, state) {
-        print(state);
-          UserViewModel userViewModel = state.props[0] as UserViewModel;
-          return Column(
-            children: <Widget>[
-              Container(
-                  width: double.infinity,
-                  child: Row(
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(right: 10.0, bottom: 5.0),
-                        child: AutoSizeText(
-                            'Lv. ${userViewModel.characters[0].level}',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-
-                      Container(
-                        child: AutoSizeText(
-                            '${userViewModel.username}',
+      child: BlocBuilder<GameBloc, GameState>(
+          builder: (context, state) {
+          print(state);
+          if(state is GamePlayerState) {
+            print(state.userModel.characters[0].hp);
+            return Column(
+              children: <Widget>[
+                Container(
+                    width: double.infinity,
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(right: 10.0, bottom: 5.0),
+                          child: AutoSizeText(
+                            'Lv. ${state.userModel.characters[0].level}',
                             style: TextStyle(
                               color: Colors.white,
                             ),
+                          ),
                         ),
-                      ),
 
-                    ],
-                  )),
-              Container(
-                margin: EdgeInsets.only(bottom: 5.0),
-                child: FAProgressBar(
-                  maxValue: userViewModel.characters[0].hp,
-                  currentValue: userViewModel.characters[0].hp,
-                  displayText: '${userViewModel.characters[0].hp} / ',
-                  progressColor: Color(HexColor.convertHexColor('#A42324')),
+                        Container(
+                          child: AutoSizeText(
+                            '${state.userModel.username}',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+
+                      ],
+                    )),
+                Container(
+                  margin: EdgeInsets.only(bottom: 5.0),
+                  child: FAProgressBar(
+                    maxValue: state.userModel.characters[0].hp,
+                    currentValue: state.userModel.characters[0].hp - 10,
+                    displayText: '',
+                    progressColor: Color(HexColor.convertHexColor('#A42324')),
+                  ),
                 ),
-              ),
-              FAProgressBar(
-                maxValue: userViewModel.characters[0].mana,
-                currentValue: userViewModel.characters[0].mana,
-                displayText: '${userViewModel.characters[0].mana} / ',
-                progressColor: Color(HexColor.convertHexColor('#106FB5')),
-              ),
-            ],
-          );
+                FAProgressBar(
+                  maxValue: state.userModel.characters[0].mana,
+                  currentValue: state.userModel.characters[0].mana,
+                  displayText: '${state.userModel.characters[0].mana} / ',
+                  progressColor: Color(HexColor.convertHexColor('#106FB5')),
+                ),
+              ],
+            );
+          }
+          return CircularProgressIndicator();
       }),
     );
   }
