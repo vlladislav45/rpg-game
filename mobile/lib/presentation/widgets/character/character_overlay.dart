@@ -23,6 +23,7 @@ class CharacterOverlay extends StatefulWidget {
 class CharacterOverlayState extends State<CharacterOverlay>
     with TickerProviderStateMixin {
   AnimationController? controller;
+  late double width;
 
   @override
   void initState() {
@@ -39,7 +40,7 @@ class CharacterOverlayState extends State<CharacterOverlay>
 
   @override
   Widget build(BuildContext context) {
-    final gameBloc = BlocProvider.of<GameBloc>(context);
+    this.width = MediaQuery.of(context).size.width / 5;
 
     return Container(
       padding: EdgeInsets.all(10.0),
@@ -54,7 +55,7 @@ class CharacterOverlayState extends State<CharacterOverlay>
             ],
           )
       ),
-      width: MediaQuery.of(context).size.width / 5,
+      width: this.width,
       height: MediaQuery.of(context).size.width / 12,
       child: BlocBuilder<GameBloc, GameState>(
           builder: (context, state) {
@@ -62,11 +63,8 @@ class CharacterOverlayState extends State<CharacterOverlay>
             return Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                  Container(
-                    child: Container(
+   
+                Container(
                       margin: EdgeInsets.only(right: 10.0, bottom: 5.0),
                       child: CircleAvatar(
                         maxRadius: 25.0,
@@ -79,28 +77,30 @@ class CharacterOverlayState extends State<CharacterOverlay>
                         ),
                       ),
                     ),
-                  ),
-                ],),
+        
 
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text('hello'),
                   Container(
                     margin: EdgeInsets.only(bottom: 5.0),
                     child: FAProgressBar(
+                
                       maxValue: state.userModel.characters[0].hp,
                       currentValue: state.userModel.characters[0].hp,
                       displayText: ' / ${state.userModel.characters[0].hp} HP',
                       progressColor: Color(HexColor.convertHexColor('#A42324')),
                     ),
                   ),
-                  // FAProgressBar(
-                  //   maxValue: state.userModel.characters[0].mana,
-                  //   currentValue: state.userModel.characters[0].mana,
-                  //   displayText: ' / ${state.userModel.characters[0].mana} MANA',
-                  //   progressColor: Color(HexColor.convertHexColor('#106FB5')),
-                  // ),
+                  
+                  FAProgressBar(
+               
+                  
+                      maxValue: state.userModel.characters[0].mana,
+                      currentValue: state.userModel.characters[0].mana,
+                      displayText: ' / ${state.userModel.characters[0].mana} MANA',
+                      progressColor: Color(HexColor.convertHexColor('#106FB5')),
+                    ),
                 ],),
 
               ],

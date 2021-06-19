@@ -27,7 +27,7 @@ public class ServerStartCommand extends AbstractCommand {
 
         Configuration config = new Configuration();
         config.setHostname("localhost");
-        config.setPort(9096);
+        config.setPort(9092);
 
         final SocketIOServer server = new SocketIOServer(config);
         server.addEventListener("authentication", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {
@@ -76,7 +76,7 @@ public class ServerStartCommand extends AbstractCommand {
     }
 
     private boolean loginCheck(String username, String password) {
-        if (username == null || username.trim().isEmpty()
+        if(username == null || username.trim().isEmpty()
                 || password == null || password.isEmpty()) {
             //TODO: Send warning message that the user doesn't has entered username or password
         } else {
