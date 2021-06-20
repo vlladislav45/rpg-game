@@ -12,6 +12,7 @@ import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/animations/character_sprite_animation.dart';
 import 'package:rpg_game/animations/npc_sprite_animation.dart';
 import 'package:rpg_game/components/npc.dart';
@@ -21,6 +22,10 @@ import 'package:rpg_game/components/character.dart';
 import 'package:rpg_game/components/selector.dart';
 import 'package:rpg_game/maps/town.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
+
+import 'logic/cubits/arena/arena_cubit.dart';
+import 'utils/convert_coordinates.dart';
+import 'utils/hex_color.dart';
 
 const x = 500.0;
 const y = 150.0;
@@ -35,6 +40,7 @@ class MyGame extends BaseGame
   Vector2? screenMousePosition;
   String? jsonMap;
   int? mapLevel;
+  int? arena;
 
   // Facing of the character, it is use in keyboard movement
   String? _facing;
@@ -53,25 +59,28 @@ class MyGame extends BaseGame
   // Screen Resolution
   Vector2 viewportResolution;
 
-  MyGame({String? jsonMap,
+  MyGame({
+      String? jsonMap,
       int? mapLevel,
+      int? arena,
       required this.viewportResolution,
     }) {
     this.mapLevel = mapLevel;
     this.jsonMap = jsonMap;
+    this.arena = arena;
   }
 
   @override
   Color backgroundColor() {
-    return Colors.transparent;
+    return Color(HexColor.convertHexColor('#37B4Ba')).withOpacity(0.80);
   }
 
   Future<void> loadMapLevel() async {
     viewport = FixedResolutionViewport(viewportResolution);
     print('ViewPort: ${viewport.canvasSize}');
 
-    final tilesetImage = await images.load('sprites/tile_maps/grass_default.png');
-    final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2(151, 71));
+    final tilesetImage = await images.load('sprites/tile_maps/tileset.png');
+    final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2(151, 76));
     final matrix = Map.toList(this.jsonMap.toString());
 
     // Add main town
@@ -79,9 +88,9 @@ class MyGame extends BaseGame
       map = Map(
         tileset,
         matrix,
+        tileHeight: 25.0,
       )
-        ..x = x
-        ..y = y,
+      ..position = topLeft
     );
 
     spawnCharacter();
@@ -121,7 +130,9 @@ class MyGame extends BaseGame
         NpcState.runTopRight: npcSpriteAnimation.runTopRight,
       },
       size: Vector2(79, 63),
-      position: map.getBlockPosition(map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150))),
+      position: map.getBlockPosition(map.getBlock(Vector2(x, y)
+          + topLeft
+          + Vector2(0, 150))),
     )
       ..current = NpcState.idleDown;
 
@@ -132,7 +143,10 @@ class MyGame extends BaseGame
     /// Load Character Sprite Direction Animations
     final characterSpriteAnimation = CharacterSpriteAnimation();
     /// Spawn the character
-    final characterSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150));
+
+    final characterSpawnPosition = map.getBlock(Vector2(x, y)
+        + topLeft
+        + Vector2(0, 150));
     await characterSpriteAnimation.loadSpriteAnimations();
     _character = Character({
       NpcState.idleRight: characterSpriteAnimation.idleRight,
@@ -211,11 +225,12 @@ class MyGame extends BaseGame
     add(_town!);
     _town!.spawnTown();
   }
-
+  
   @override
   Future<void> onLoad() async {
     print('Map Level: $mapLevel');
     mapLevel == 0 ? spawnTown() : await loadMapLevel();
+    print('Arena: $arena');
 
     //Add walls around the town
     //map.setWalls();
@@ -306,15 +321,16 @@ class MyGame extends BaseGame
       //   _character.update(dt);
       // }
       Block block = map.getBlock(_character.position);
-      if (map.containsBlock(block)) {
-        if (block.y <= 0)
-          _character.velocity.y = 1;
-        else if (block.y >= map.matrix.length)
-          _character.velocity.y = -1;
-        else if (block.x <= 0)
-          _character.velocity.x = 1;
-        else if (block.x >= map.matrix[block.y].length) _character.velocity.x = -1;
-      }
+      if(map.containsBlock(block)) print(map.position);
+      // if (map.containsBlock(block)) {
+      //   if (block.y <= 0)
+      //     _character.velocity.y = 1;
+      //   else if (block.y >= map.matrix.length)
+      //     _character.velocity.y = -1;
+      //   else if (block.x <= 0)
+      //     _character.velocity.x = 1;
+      //   else if (block.x >= map.matrix[block.y].length) _character.velocity.x = -1;
+      // }
     }
   }
 }

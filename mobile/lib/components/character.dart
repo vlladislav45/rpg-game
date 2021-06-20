@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:rpg_game/components/npc.dart';
 import 'package:rpg_game/game.dart';
 import 'package:flame/joystick.dart';
+import 'package:rpg_game/utils/convert_coordinates.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
 
 final _regularTextConfig = TextPaintConfig(color: BasicPalette.white.color);
@@ -86,12 +87,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     debugMode = true;
   }
 
-  Vector2 cartToIso(Vector2 p) {
-    final x = p.x - p.y;
-    final y = (p.x + p.y) / 2;
-    return Vector2(x, y);
-  }
-
   @override
   void update(double dt) {
     super.update(dt);
@@ -105,7 +100,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     // delta time ensure that player speed remains same irrespective of the device FPS.
     final displacement = _velocity * (speed * dt);
 
-    position.add(cartToIso(displacement));
+    position.add(ConvertCoordinates.cartToIso(displacement));
     _isCollision = false;
   }
 

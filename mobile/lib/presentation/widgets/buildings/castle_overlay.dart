@@ -36,7 +36,7 @@ class _CastleOverlayState extends State<CastleOverlay> {
               },
               child: Container(
                 child: AutoSizeText(
-                  'Teleport Me',
+                  'Single player',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),

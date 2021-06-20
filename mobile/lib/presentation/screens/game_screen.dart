@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
+import 'package:rpg_game/logic/cubits/arena/arena_cubit.dart';
 import 'package:rpg_game/logic/cubits/map_levels/map_level_cubit.dart';
 import 'package:rpg_game/logic/cubits/map_levels/map_level_state.dart';
 import 'package:rpg_game/presentation/widgets/buildings/blacksmith_overlay.dart';
@@ -43,7 +44,9 @@ class _MyGameScreenState extends State<MyGameScreen> {
               return BlocBuilder<MapLevelCubit, MapLevelState>(
                 builder: (context, state) {
                   return GameWidget<MyGame>(
-                    game: MyGame(jsonMap: jsonMap.toString(), mapLevel: state.mapLevel, viewportResolution: Vector2(MediaQuery.of(context).size.width,
+                    game: MyGame(jsonMap: jsonMap.toString(), mapLevel: state.mapLevel,
+                        arena: context.read<ArenaCubit>().state.arenaIndex,
+                        viewportResolution: Vector2(MediaQuery.of(context).size.width,
                         MediaQuery.of(context).size.height)),
                     overlayBuilderMap: {
                       'PortalMenu': portalOverlayBuilder,

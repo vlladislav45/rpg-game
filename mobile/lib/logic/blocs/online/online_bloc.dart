@@ -8,7 +8,7 @@ import 'package:socket_io_client/socket_io_client.dart';
 
 class OnlineBloc extends Bloc<OnlineEvent, OnlineState> {
   static const String url = 'localhost';
-  static const String port = '9092';
+  static const String port = '9096';
 
   OnlineBloc()
       : super(OnlineInitialState()) {
