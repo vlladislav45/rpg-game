@@ -27,9 +27,7 @@ const y = 150.0;
 final topLeft = Vector2(x, y);
 
 class MyGame extends BaseGame
-    with
-        MouseMovementDetector,
-        KeyboardEvents,
+    with KeyboardEvents,
         HasCollidables,
         HasTapableComponents,
         HasDraggableComponents {
@@ -167,61 +165,44 @@ class MyGame extends BaseGame
     )
     ..current = NpcState.idleRight;
 
-    if (Platform.isAndroid || Platform.isIOS) {
-      final joystick = await getJoystick();
-      joystick.addObserver(_character);
-      add(joystick);
-    }
+    // if (Platform.isAndroid || Platform.isIOS) {
+    //   final joystick = await getJoystick();
+    //   joystick.addObserver(_character);
+    // }
+    final joystick = await getJoystick();
+    joystick.addObserver(_character);
 
     add(_character);
-    if (!overlays.isActive('CharacterOverlay')) overlays.add('CharacterOverlay');
+    add(joystick);
+    // if (!overlays.isActive('CharacterOverlay')) overlays.add('CharacterOverlay');
 
-    camera.cameraSpeed = 1;
-    camera.followComponent(_character);
-    _isCharacterSpawned = true;
+    // camera.cameraSpeed = 1;
+    // camera.followComponent(_character);
+    // _isCharacterSpawned = true;
   }
 
   Future<JoystickComponent> getJoystick() async {
     final joystick = JoystickComponent(
       gameRef: this,
       directional: JoystickDirectional(
-        background: JoystickElement.sprite(await loadJoystick(0)),
-        knob: JoystickElement.sprite(await loadJoystick(1)),
+        background: JoystickElement.sprite(await loadJoystick('joystick_background.png')),
+        knob: JoystickElement.sprite(await loadJoystick('joystick_knob.png')),
       ),
       actions: [
         JoystickAction(
           actionId: 1,
           margin: const EdgeInsets.all(50),
-          action: JoystickElement.sprite(await loadJoystick(2)),
-          actionPressed: JoystickElement.sprite(await loadJoystick(4)),
-        ),
-        JoystickAction(
-          actionId: 2,
-          action: JoystickElement.sprite(await loadJoystick(3)),
-          actionPressed: JoystickElement.sprite(await loadJoystick(5)),
-          margin: const EdgeInsets.only(
-            right: 50,
-            bottom: 120,
-          ),
-        ),
-        JoystickAction(
-          actionId: 3,
-          margin: const EdgeInsets.only(bottom: 50, right: 120),
-          enableDirection: true,
-          color: const Color(0xFFFF00FF),
-          opacityBackground: 0.1,
-          opacityKnob: 0.9,
+          action: JoystickElement.sprite(await loadJoystick('joystick_attack.png')),
+          actionPressed: JoystickElement.sprite(await loadJoystick('joystick_attack_selected.png')),
         ),
       ],
     );
     return joystick;
   }
 
-  Future<Sprite> loadJoystick(int idx) async {
+  Future<Sprite> loadJoystick(String imageName) async {
     return loadSprite(
-      'joystick.png',
-      srcPosition: Vector2(idx * 16.0, 0),
-      srcSize: Vector2.all(16),
+      imageName,
     );
   }
 
@@ -246,12 +227,6 @@ class MyGame extends BaseGame
   }
 
   @override
-  void onMouseMove(PointerHoverInfo event) {
-    final target = event.eventPosition.game;
-    // print(target);
-  }
-
-  @override
   void render(Canvas canvas) {
     super.render(canvas);
   }
@@ -260,68 +235,68 @@ class MyGame extends BaseGame
   void onKeyEvent(RawKeyEvent e) {
     final isKeyDown = e is RawKeyDownEvent;
 
-    print(_character.velocity);
-    if (e.data.keyLabel == 'a') {
-      _character.velocity.x = isKeyDown ? -1 : 0;
-      if (_character.velocity.y == 0) {
-        _character.current = NpcState.runTopLeft;
-        _facing = "west";
-      }
-      else if (_character.velocity.y == 1) {
-        _character.current = NpcState.runBottomLeft;
-        if(isKeyDown) _character.setNewDirection(Vector2(1,-1));
-        else _character.velocity.x = _character.velocity.y = 0;
-
-        _facing = "south-west";
-      }
-      else
-      {
-        _character.current = NpcState.runTopLeft;
-        _character.setNewDirection(Vector2(-1,-1));
-
-        _facing = "northwest";
-      }
-    } else if (e.data.keyLabel == 'd') {
-      _character.velocity.x = isKeyDown ? 1 : 0;
-      if (_character.velocity.y == 0)
-      {
-        _character.current = NpcState.runBottomRight;
-
-        _facing = 'east';
-      }
-      else if (_character.velocity.y == 1)
-      {
-        _character.current = NpcState.runBottomRight;
-        _character.setNewDirection(Vector2(1, 1));
-
-        _facing = "south-east";
-      }
-      else
-      {
-        _character.current = NpcState.runTopRight;
-        _character.setNewDirection(Vector2(1, -1));
-
-        _facing = "north-east";
-      }
-    } else if (e.data.keyLabel == 'w') {
-      _character.current = NpcState.runTopRight;
-      _character.velocity.y = isKeyDown ? -1 : 0;
-    } else if (e.data.keyLabel == 's') {
-      _character.current = NpcState.runBottomLeft;
-      _character.velocity.y = isKeyDown ? 1 : 0;
-    } else {
-      _character.velocity.x = 0;
-      if (_character.velocity.y == 1) {
-        _facing = "south";
-      }
-      else if(_character.velocity.y == -1) {
-        _facing = "north";
-      }
-    }
-    if (_character.velocity.y == 0 && _character.velocity.x == 0) {
-      print(_facing);
-      _character.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing!, StateAction.Idle);
-    }
+    // print(_character.velocity);
+    // if (e.data.keyLabel == 'a') {
+    //   _character.velocity.x = isKeyDown ? -1 : 0;
+    //   if (_character.velocity.y == 0) {
+    //     _character.current = NpcState.runTopLeft;
+    //     _facing = "west";
+    //   }
+    //   else if (_character.velocity.y == 1) {
+    //     _character.current = NpcState.runBottomLeft;
+    //     if(isKeyDown) _character.setNewDirection(Vector2(1,-1));
+    //     else _character.velocity.x = _character.velocity.y = 0;
+    //
+    //     _facing = "south-west";
+    //   }
+    //   else
+    //   {
+    //     _character.current = NpcState.runTopLeft;
+    //     _character.setNewDirection(Vector2(-1,-1));
+    //
+    //     _facing = "northwest";
+    //   }
+    // } else if (e.data.keyLabel == 'd') {
+    //   _character.velocity.x = isKeyDown ? 1 : 0;
+    //   if (_character.velocity.y == 0)
+    //   {
+    //     _character.current = NpcState.runBottomRight;
+    //
+    //     _facing = 'east';
+    //   }
+    //   else if (_character.velocity.y == 1)
+    //   {
+    //     _character.current = NpcState.runBottomRight;
+    //     _character.setNewDirection(Vector2(1, 1));
+    //
+    //     _facing = "south-east";
+    //   }
+    //   else
+    //   {
+    //     _character.current = NpcState.runTopRight;
+    //     _character.setNewDirection(Vector2(1, -1));
+    //
+    //     _facing = "north-east";
+    //   }
+    // } else if (e.data.keyLabel == 'w') {
+    //   _character.current = NpcState.runTopRight;
+    //   _character.velocity.y = isKeyDown ? -1 : 0;
+    // } else if (e.data.keyLabel == 's') {
+    //   _character.current = NpcState.runBottomLeft;
+    //   _character.velocity.y = isKeyDown ? 1 : 0;
+    // } else {
+    //   _character.velocity.x = 0;
+    //   if (_character.velocity.y == 1) {
+    //     _facing = "south";
+    //   }
+    //   else if(_character.velocity.y == -1) {
+    //     _facing = "north";
+    //   }
+    // }
+    // if (_character.velocity.y == 0 && _character.velocity.x == 0) {
+    //   print(_facing);
+    //   _character.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing!, StateAction.Idle);
+    // }
   }
 
   @override

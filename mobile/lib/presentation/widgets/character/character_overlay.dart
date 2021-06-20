@@ -79,29 +79,29 @@ class CharacterOverlayState extends State<CharacterOverlay>
                     ),
         
 
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.only(bottom: 5.0),
-                    child: FAProgressBar(
-                
-                      maxValue: state.userModel.characters[0].hp,
-                      currentValue: state.userModel.characters[0].hp,
-                      displayText: ' / ${state.userModel.characters[0].hp} HP',
-                      progressColor: Color(HexColor.convertHexColor('#A42324')),
-                    ),
-                  ),
-                  
-                  FAProgressBar(
-               
-                  
-                      maxValue: state.userModel.characters[0].mana,
-                      currentValue: state.userModel.characters[0].mana,
-                      displayText: ' / ${state.userModel.characters[0].mana} MANA',
-                      progressColor: Color(HexColor.convertHexColor('#106FB5')),
-                    ),
-                ],),
+                // Column(
+                //   mainAxisAlignment: MainAxisAlignment.center,
+                //   children: <Widget>[
+                //   Container(
+                //     margin: EdgeInsets.only(bottom: 5.0),
+                //     child: FAProgressBar(
+                //
+                //       maxValue: state.userModel.characters[0].hp,
+                //       currentValue: state.userModel.characters[0].hp,
+                //       displayText: ' / ${state.userModel.characters[0].hp} HP',
+                //       progressColor: Color(HexColor.convertHexColor('#A42324')),
+                //     ),
+                //   ),
+                //
+                //   FAProgressBar(
+                //
+                //
+                //       maxValue: state.userModel.characters[0].mana,
+                //       currentValue: state.userModel.characters[0].mana,
+                //       displayText: ' / ${state.userModel.characters[0].mana} MANA',
+                //       progressColor: Color(HexColor.convertHexColor('#106FB5')),
+                //     ),
+                // ],),
 
               ],
             );
