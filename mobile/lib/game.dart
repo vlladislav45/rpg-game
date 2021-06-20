@@ -166,19 +166,17 @@ class MyGame extends BaseGame
     ..current = NpcState.idleRight;
 
     // if (Platform.isAndroid || Platform.isIOS) {
-    //   final joystick = await getJoystick();
-    //   joystick.addObserver(_character);
+      final joystick = await getJoystick();
+      joystick.addObserver(_character);
     // }
-    final joystick = await getJoystick();
-    joystick.addObserver(_character);
 
     add(_character);
     add(joystick);
-    // if (!overlays.isActive('CharacterOverlay')) overlays.add('CharacterOverlay');
+    if (!overlays.isActive('CharacterOverlay')) overlays.add('CharacterOverlay');
 
     // camera.cameraSpeed = 1;
     // camera.followComponent(_character);
-    // _isCharacterSpawned = true;
+    _isCharacterSpawned = true;
   }
 
   Future<JoystickComponent> getJoystick() async {
