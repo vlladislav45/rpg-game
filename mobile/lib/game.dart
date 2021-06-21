@@ -102,42 +102,44 @@ class MyGame extends BaseGame
     final npcSpriteAnimation = NpcSpriteAnimation();
     await npcSpriteAnimation.loadSpriteAnimations();
 
-    _npc = Npc(
-      _character,
-      {
-        NpcState.idleRight: npcSpriteAnimation.idleRight,
-        NpcState.hitRight: npcSpriteAnimation.hitRight,
-        NpcState.runRight: npcSpriteAnimation.runRight,
-        NpcState.idleDown:npcSpriteAnimation.idleDown,
-        NpcState.hitDown: npcSpriteAnimation.hitDown,
-        NpcState.runDown: npcSpriteAnimation.runDown,
-        NpcState.idleLeft: npcSpriteAnimation.idleLeft,
-        NpcState.hitLeft: npcSpriteAnimation.hitLeft,
-        NpcState.runLeft: npcSpriteAnimation.runLeft,
-        NpcState.idleTop: npcSpriteAnimation.idleTop,
-        NpcState.hitTop: npcSpriteAnimation.hitTop,
-        NpcState.runTop: npcSpriteAnimation.runTop,
-        NpcState.idleBottomRight: npcSpriteAnimation.idleBottomRight,
-        NpcState.hitBottomRight: npcSpriteAnimation.hitBottomRight,
-        NpcState.runBottomRight: npcSpriteAnimation.runBottomRight,
-        NpcState.idleBottomLeft:npcSpriteAnimation.idleBottomLeft,
-        NpcState.hitBottomLeft: npcSpriteAnimation.hitBottomLeft,
-        NpcState.runBottomLeft: npcSpriteAnimation.runBottomLeft,
-        NpcState.idleTopLeft: npcSpriteAnimation.idleTopLeft,
-        NpcState.hitTopLeft: npcSpriteAnimation.hitTopLeft,
-        NpcState.runTopLeft: npcSpriteAnimation.runTopLeft,
-        NpcState.idleTopRight: npcSpriteAnimation.idleTopRight,
-        NpcState.hitTopRight: npcSpriteAnimation.hitTopRight,
-        NpcState.runTopRight: npcSpriteAnimation.runTopRight,
-      },
-      size: Vector2(79, 63),
-      position: map.getBlockPosition(map.getBlock(Vector2(x, y)
-          + topLeft
-          + Vector2(0, 350))),
-    )
-      ..current = NpcState.idleDown;
-
-    add(_npc);
+    for(int i = 0; i < 5; i++) {
+      add(Npc(
+        _character,
+        {
+          NpcState.idleRight: npcSpriteAnimation.idleRight,
+          NpcState.hitRight: npcSpriteAnimation.hitRight,
+          NpcState.runRight: npcSpriteAnimation.runRight,
+          NpcState.idleDown:npcSpriteAnimation.idleDown,
+          NpcState.hitDown: npcSpriteAnimation.hitDown,
+          NpcState.runDown: npcSpriteAnimation.runDown,
+          NpcState.idleLeft: npcSpriteAnimation.idleLeft,
+          NpcState.hitLeft: npcSpriteAnimation.hitLeft,
+          NpcState.runLeft: npcSpriteAnimation.runLeft,
+          NpcState.idleTop: npcSpriteAnimation.idleTop,
+          NpcState.hitTop: npcSpriteAnimation.hitTop,
+          NpcState.runTop: npcSpriteAnimation.runTop,
+          NpcState.idleBottomRight: npcSpriteAnimation.idleBottomRight,
+          NpcState.hitBottomRight: npcSpriteAnimation.hitBottomRight,
+          NpcState.runBottomRight: npcSpriteAnimation.runBottomRight,
+          NpcState.idleBottomLeft:npcSpriteAnimation.idleBottomLeft,
+          NpcState.hitBottomLeft: npcSpriteAnimation.hitBottomLeft,
+          NpcState.runBottomLeft: npcSpriteAnimation.runBottomLeft,
+          NpcState.idleTopLeft: npcSpriteAnimation.idleTopLeft,
+          NpcState.hitTopLeft: npcSpriteAnimation.hitTopLeft,
+          NpcState.runTopLeft: npcSpriteAnimation.runTopLeft,
+          NpcState.idleTopRight: npcSpriteAnimation.idleTopRight,
+          NpcState.hitTopRight: npcSpriteAnimation.hitTopRight,
+          NpcState.runTopRight: npcSpriteAnimation.runTopRight,
+        },
+        size: Vector2(79, 63),
+        position: map.getBlockPosition(map.getBlock(
+            Vector2(Npc.generateRandomCoordinates(), Npc.generateRandomCoordinates())
+            + topLeft
+            )
+        ),
+      )
+        ..current = NpcState.idleDown);
+    }
   }
 
   void spawnCharacter() async {
@@ -251,67 +253,67 @@ class MyGame extends BaseGame
     final isKeyDown = e is RawKeyDownEvent;
 
     // print(_character.velocity);
-    // if (e.data.keyLabel == 'a') {
-    //   _character.velocity.x = isKeyDown ? -1 : 0;
-    //   if (_character.velocity.y == 0) {
-    //     _character.current = NpcState.runTopLeft;
-    //     _facing = "west";
-    //   }
-    //   else if (_character.velocity.y == 1) {
-    //     _character.current = NpcState.runBottomLeft;
-    //     if(isKeyDown) _character.setNewDirection(Vector2(1,-1));
-    //     else _character.velocity.x = _character.velocity.y = 0;
-    //
-    //     _facing = "south-west";
-    //   }
-    //   else
-    //   {
-    //     _character.current = NpcState.runTopLeft;
-    //     _character.setNewDirection(Vector2(-1,-1));
-    //
-    //     _facing = "northwest";
-    //   }
-    // } else if (e.data.keyLabel == 'd') {
-    //   _character.velocity.x = isKeyDown ? 1 : 0;
-    //   if (_character.velocity.y == 0)
-    //   {
-    //     _character.current = NpcState.runBottomRight;
-    //
-    //     _facing = 'east';
-    //   }
-    //   else if (_character.velocity.y == 1)
-    //   {
-    //     _character.current = NpcState.runBottomRight;
-    //     _character.setNewDirection(Vector2(1, 1));
-    //
-    //     _facing = "south-east";
-    //   }
-    //   else
-    //   {
-    //     _character.current = NpcState.runTopRight;
-    //     _character.setNewDirection(Vector2(1, -1));
-    //
-    //     _facing = "north-east";
-    //   }
-    // } else if (e.data.keyLabel == 'w') {
-    //   _character.current = NpcState.runTopRight;
-    //   _character.velocity.y = isKeyDown ? -1 : 0;
-    // } else if (e.data.keyLabel == 's') {
-    //   _character.current = NpcState.runBottomLeft;
-    //   _character.velocity.y = isKeyDown ? 1 : 0;
-    // } else {
-    //   _character.velocity.x = 0;
-    //   if (_character.velocity.y == 1) {
-    //     _facing = "south";
-    //   }
-    //   else if(_character.velocity.y == -1) {
-    //     _facing = "north";
-    //   }
-    // }
-    // if (_character.velocity.y == 0 && _character.velocity.x == 0) {
-    //   print(_facing);
-    //   _character.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing!, StateAction.Idle);
-    // }
+    if (e.data.keyLabel == 'a') {
+      _character.velocity.x = isKeyDown ? -1 : 0;
+      if (_character.velocity.y == 0) {
+        _character.current = NpcState.runTopLeft;
+        _facing = "west";
+      }
+      else if (_character.velocity.y == 1) {
+        _character.current = NpcState.runBottomLeft;
+        if(isKeyDown) _character.setVelocity(Vector2(1,-1));
+        else _character.velocity.x = _character.velocity.y = 0;
+
+        _facing = "south-west";
+      }
+      else
+      {
+        _character.current = NpcState.runTopLeft;
+        _character.setVelocity(Vector2(-1,-1));
+
+        _facing = "northwest";
+      }
+    } else if (e.data.keyLabel == 'd') {
+      _character.velocity.x = isKeyDown ? 1 : 0;
+      if (_character.velocity.y == 0)
+      {
+        _character.current = NpcState.runBottomRight;
+
+        _facing = 'east';
+      }
+      else if (_character.velocity.y == 1)
+      {
+        _character.current = NpcState.runBottomRight;
+        _character.setVelocity(Vector2(1, 1));
+
+        _facing = "south-east";
+      }
+      else
+      {
+        _character.current = NpcState.runTopRight;
+        _character.setVelocity(Vector2(1, -1));
+
+        _facing = "north-east";
+      }
+    } else if (e.data.keyLabel == 'w') {
+      _character.current = NpcState.runTopRight;
+      _character.velocity.y = isKeyDown ? -1 : 0;
+    } else if (e.data.keyLabel == 's') {
+      _character.current = NpcState.runBottomLeft;
+      _character.velocity.y = isKeyDown ? 1 : 0;
+    } else {
+      _character.velocity.x = 0;
+      if (_character.velocity.y == 1) {
+        _facing = "south";
+      }
+      else if(_character.velocity.y == -1) {
+        _facing = "north";
+      }
+    }
+    if (_character.velocity.y == 0 && _character.velocity.x == 0) {
+      print(_facing);
+      _character.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing!, StateAction.Idle);
+    }
   }
 
   @override

@@ -10,7 +10,6 @@ import 'package:rpg_game/utils/directional_helper.dart';
 
 class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidable, HasGameRef<MyGame> {
   static const speed = 50;
-  final Vector2 velocity = Vector2(0, 0);
 
   // Random spawn
   static const double S = 1500;
@@ -74,20 +73,47 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
     double differentX = _character.position.x - position.x;
     double differentY = _character.position.y - position.y;
 
-    print('offsetY: $differentY');
-    print('offsetX: $differentX');
+    // print('offsetY: $differentY');
+    // print('offsetX: $differentX');
 
     if(differentX > 0)
-      pathFinder.add(Vector2(3,0));
-    else
-      pathFinder.add(Vector2(-3,0));
+      pathFinder.add(Vector2(1, 0));
+     else
+      pathFinder.add(Vector2(-1, 0));
+
 
     if(differentY > 0)
-      pathFinder.add(Vector2(0,3));
-    else
-      pathFinder.add(Vector2(0,-3));
+      pathFinder.add(Vector2(0, 1));
+     else
+      pathFinder.add(Vector2(-1, 0));
 
+    facing();
     return pathFinder;
+  }
+
+  void facing() {
+    double differentX = _character.position.x - position.x;
+    double differentY = _character.position.y - position.y;
+
+    print('ATAN22222222222222 ${atan2(differentY, differentX)}');
+    print('RESULT ${atan2(differentY, differentX) / pi * 180}');
+    final double npcAngle = atan2(differentY, differentX) / pi * 180;
+
+    if(npcAngle >= 45 && npcAngle < 90)
+      current = NpcState.runTopRight;
+    else if(npcAngle >= 0 && npcAngle < 45)
+      current = NpcState.runTop;
+    else if(npcAngle >= 90 && npcAngle < 135)
+      current = NpcState.runRight;
+    else if(npcAngle >= 135 && npcAngle < 180)
+      current = NpcState.runBottomRight;
+    else if(npcAngle >= -45 && npcAngle < -90)
+      current = NpcState.runTopLeft;
+    else if(npcAngle >= -90 && npcAngle < -135)
+      current = NpcState.runLeft;
+    else if(npcAngle >= -135 && npcAngle < -180)
+      current = NpcState.runBottomLeft;
+    else current = NpcState.runDown;
   }
 
   // Generate random coordinates
