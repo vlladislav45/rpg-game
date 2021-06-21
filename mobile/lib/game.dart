@@ -103,6 +103,7 @@ class MyGame extends BaseGame
     await npcSpriteAnimation.loadSpriteAnimations();
 
     _npc = Npc(
+      _character,
       {
         NpcState.idleRight: npcSpriteAnimation.idleRight,
         NpcState.hitRight: npcSpriteAnimation.hitRight,
@@ -132,7 +133,7 @@ class MyGame extends BaseGame
       size: Vector2(79, 63),
       position: map.getBlockPosition(map.getBlock(Vector2(x, y)
           + topLeft
-          + Vector2(0, 150))),
+          + Vector2(0, 350))),
     )
       ..current = NpcState.idleDown;
 
