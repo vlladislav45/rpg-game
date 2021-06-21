@@ -11,9 +11,6 @@ import 'package:flame/joystick.dart';
 import 'package:rpg_game/utils/convert_coordinates.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
 
-final _regularTextConfig = TextPaintConfig(color: BasicPalette.white.color);
-final _regular = TextPaint(config: _regularTextConfig);
-
 class Character extends SpriteAnimationGroupComponent<NpcState>
     with Hitbox, Collidable, HasGameRef<MyGame>
     implements JoystickListener {
@@ -56,29 +53,24 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   Future<void> onLoad() async {
     super.onLoad();
 
-    // gameRef.add(
-    //     _renderNickName(),
-    // );
-    //
-    // await gameRef.add(
-    //     TextComponent(
-    //       'my',
-    //       textRenderer: _regular,
-    //     )
-    //       ..anchor = Anchor.topCenter
-    //       ..x = 200
-    //       ..y = 200,
-    // );
+    //Player name
+    gameRef.add(
+        _renderNickName(),
+    );
   }
 
   TextComponent _renderNickName() {
     return TextComponent(
       'my',
-      textRenderer: _regular,
+      position: Vector2(position.x + size.x / 2, position.y),
+      textRenderer: TextPaint(
+          config: TextPaintConfig(
+            color: BasicPalette.black.color,
+            fontSize: 14.0,
+          ),
+      ),
     )
-    ..anchor = Anchor.topCenter
-    ..x = position.x + ((width - (position.length * (width / 13))) / 2)
-    ..y = position.y - 20;
+    ..anchor = Anchor.topCenter;
   }
 
   @override

@@ -185,11 +185,12 @@ class MyGame extends BaseGame
     // }
 
     add(_character);
+    camera.cameraSpeed = 1;
+    camera.followComponent(_character);
+
     add(joystick);
     if (!overlays.isActive('CharacterOverlay')) overlays.add('CharacterOverlay');
 
-    // camera.cameraSpeed = 1;
-    // camera.followComponent(_character);
     _isCharacterSpawned = true;
   }
 
@@ -320,8 +321,16 @@ class MyGame extends BaseGame
       // if(map.containsBlock(map.getBlock(map.cartToIso(_character.position)))) {
       //   _character.update(dt);
       // }
-      Block block = map.getBlock(_character.position);
-      if(map.containsBlock(block)) print(map.position);
+
+
+
+
+      // Block block = map.getBlock(_character.position);
+      // if(map.containsBlock(block)) print(map.position);
+
+
+
+
       // if (map.containsBlock(block)) {
       //   if (block.y <= 0)
       //     _character.velocity.y = 1;
