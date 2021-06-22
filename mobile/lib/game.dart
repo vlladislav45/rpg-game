@@ -31,11 +31,7 @@ const x = 500.0;
 const y = 150.0;
 final topLeft = Vector2(x, y);
 
-class MyGame extends BaseGame
-    with
-        KeyboardEvents,
-        HasCollidables,
-        HasTapableComponents,
+class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableComponents,
         HasDraggableComponents {
   //Properties
   Vector2? screenMousePosition;
@@ -178,14 +174,12 @@ class MyGame extends BaseGame
       position: map.getBlockPosition(characterSpawnPosition),
     )..current = NpcState.idleRight;
 
-    // if (Platform.isAndroid || Platform.isIOS) {
     final joystick = await getJoystick();
     joystick.addObserver(_character);
-    // }
 
     add(_character);
-    camera.cameraSpeed = 1;
-    camera.followComponent(_character);
+    // camera.cameraSpeed = 1;
+    // camera.followComponent(_character);
 
     add(joystick);
     if (!overlays.isActive('CharacterOverlay'))
@@ -198,18 +192,15 @@ class MyGame extends BaseGame
     final joystick = JoystickComponent(
       gameRef: this,
       directional: JoystickDirectional(
-        background: JoystickElement.sprite(
-            await loadJoystick('joystick_background.png')),
+        background: JoystickElement.sprite(await loadJoystick('joystick_background.png')),
         knob: JoystickElement.sprite(await loadJoystick('joystick_knob.png')),
       ),
       actions: [
         JoystickAction(
-          actionId: 1,
-          margin: const EdgeInsets.all(50),
-          action:
-              JoystickElement.sprite(await loadJoystick('joystick_attack.png')),
-          actionPressed: JoystickElement.sprite(
-              await loadJoystick('joystick_attack_selected.png')),
+          actionId: 0,
+          margin: const EdgeInsets.only(right: 75.0, bottom: 50.0),
+          action: JoystickElement.sprite(await loadJoystick('joystick_attack.png')),
+          actionPressed: JoystickElement.sprite(await loadJoystick('joystick_attack_selected.png')),
         ),
       ],
     );

@@ -29,10 +29,13 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   final _collisionColor = Colors.amber;
   final _defaultColor = Colors.cyan;
   bool _isCollision = false;
+  bool _isDead = false;
 
-  // Where is facing of the character
-  // north, south, east, west, north-east, north-west, south-east, south-west
+  /// Where is facing of the character
+  /// north, south, east, west, north-east, north-west, south-east, south-west
   late String _facing;
+
+  late final TextComponent _nickname;
 
   Character(Map<NpcState, SpriteAnimation> animations, {
     Vector2? position,
@@ -53,16 +56,16 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   Future<void> onLoad() async {
     super.onLoad();
 
-    //Player name
+    //Player nickname
     gameRef.add(
-        _renderNickName(),
+      _nickname = _renderNickName(),
     );
   }
 
   TextComponent _renderNickName() {
     return TextComponent(
       'my',
-      position: Vector2(position.x + size.x / 2, position.y),
+      position: Vector2(this.position.x + this.size.x / 2, this.position.y),
       textRenderer: TextPaint(
           config: TextPaintConfig(
             color: BasicPalette.black.color,
@@ -76,6 +79,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   @override
   void render(Canvas canvas) {
     super.render(canvas);
+
     debugMode = true;
   }
 
@@ -83,6 +87,8 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   void update(double dt) {
     super.update(dt);
     timer.update(dt);
+
+    _nickname.position = Vector2(this.position.x + this.size.x / 2, this.position.y);
 
     debugColor = _isCollision ? _collisionColor : _defaultColor;
 
@@ -112,10 +118,12 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   }
 
   @override
-  void onCollision(Set<Vector2> points, Collidable other) {
+  void onCollision(Set<Vector2> points, Collidable other) async {
     if (other is Npc) {
       // gameRef.camera.setRelativeOffset(Anchor.center);
       // timer.start();
+      this.die();
+
       _isCollision = true;
       print('My character is hitted');
     }
@@ -131,12 +139,13 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
 
   @override
   void joystickAction(JoystickActionEvent event) {
-    if(event.event == ActionEvent.down) {
-      if (event.id == 1) {
-        this.current = DirectionalHelper.getDirectionalSpriteAnimation(
-            _facing, StateAction.Attack);
-      }
-    }else {
+
+    if (event.id == 0 && event.event == ActionEvent.down) {
+      print('Character is hitting');
+
+      this.current = DirectionalHelper.getDirectionalSpriteAnimation(
+          _facing, StateAction.Attack);
+    } else {
       this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Idle);
     }
   }
@@ -186,6 +195,28 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     } else {
       this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Idle);
       this.setVelocity(Vector2(0,0));
+    }
+  }
+
+  void die() async {
+    // int lengthOfSprites = 1296; // Death sprites started from 1256-1296
+    // List<Sprite> sprites = [];
+    // for (int i = 1256; i <= lengthOfSprites; i += 4)
+    //   sprites.add(await Sprite.load(
+    //   'sprites/characters/knights/seq_antlerKnight/A_right${i}.png'));
+    // final die = SpriteAnimation.spriteList(sprites, stepTime: 0.20);
+    _isDead = true;
+
+    if(_isDead) {
+      gameRef.add(
+          SpriteComponent(
+            sprite: await Sprite.load('crypt.png'),
+            position: this.position,
+            size: Vector2(151, 76),
+          )
+      );
+      gameRef.remove(this);
+      gameRef.remove(_nickname);
     }
   }
 }
