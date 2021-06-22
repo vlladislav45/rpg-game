@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/geometry.dart';
+import 'package:flutter/material.dart';
 import 'package:rpg_game/components/character.dart';
 import 'package:rpg_game/game.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
@@ -64,6 +65,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
 
     final Vector2 displacement = this.pathFinding() * (speed * dt);
     position.add(displacement);
+
     _isCollision = false;
   }
 
@@ -85,7 +87,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
     if(differentY > 0)
       pathFinder.add(Vector2(0, 1));
      else
-      pathFinder.add(Vector2(-1, 0));
+      pathFinder.add(Vector2(0, -1));
 
     facing();
     return pathFinder;
@@ -95,25 +97,38 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
     double differentX = _character.position.x - position.x;
     double differentY = _character.position.y - position.y;
 
-    print('ATAN22222222222222 ${atan2(differentY, differentX)}');
-    print('RESULT ${atan2(differentY, differentX) / pi * 180}');
-    final double npcAngle = atan2(differentY, differentX) / pi * 180;
+    // print('ATAN22222222222222 ${atan2(differentY, differentX)}');
+    // print('RESULT ${atan2(differentY, differentX) / pi * 180}');
+    final double npcAngle = (atan2(differentY, differentX) / pi) * 180;
 
-    if(npcAngle >= 45 && npcAngle < 90)
-      current = NpcState.runTopRight;
-    else if(npcAngle >= 0 && npcAngle < 45)
+    /// TOP right side of the circle
+    if(npcAngle >= 60 && npcAngle <= 90) // Top direction
       current = NpcState.runTop;
-    else if(npcAngle >= 90 && npcAngle < 135)
+    else if(npcAngle >= 30 && npcAngle < 60) // Top right direction
+      current = NpcState.runTopRight;
+    else if(npcAngle >= 0 && npcAngle < 30) // Right direction
       current = NpcState.runRight;
-    else if(npcAngle >= 135 && npcAngle < 180)
-      current = NpcState.runBottomRight;
-    else if(npcAngle >= -45 && npcAngle < -90)
+    /// Top left side of the circle
+    else if(npcAngle >= 90 && npcAngle <= 120) // Top direction
+      current = NpcState.runTop;
+    else if(npcAngle >= 120 && npcAngle < 150) // Top left direction
       current = NpcState.runTopLeft;
-    else if(npcAngle >= -90 && npcAngle < -135)
+    else if(npcAngle >= 180 && npcAngle < 150) // Left direction
       current = NpcState.runLeft;
-    else if(npcAngle >= -135 && npcAngle < -180)
+    /// BOTTOM right side of the circle
+    if(npcAngle >= -60 && npcAngle <= -90) // Down direction
+      current = NpcState.runDown;
+    else if(npcAngle >= -30 && npcAngle < -60) // Bottom right direction
+      current = NpcState.runBottomRight;
+    else if(npcAngle >= -0 && npcAngle < -30) // Right direction
+      current = NpcState.runRight;
+    /// Bottom left side of the circle
+    else if(npcAngle >= -90 && npcAngle <= -120) // Down direction
+      current = NpcState.runDown;
+    else if(npcAngle >= -120 && npcAngle < -150) // Bottom left direction
       current = NpcState.runBottomLeft;
-    else current = NpcState.runDown;
+    else if(npcAngle >= -180 && npcAngle < -150) // Left direction
+      current = NpcState.runLeft;
   }
 
   // Generate random coordinates

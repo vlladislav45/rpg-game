@@ -32,7 +32,8 @@ const y = 150.0;
 final topLeft = Vector2(x, y);
 
 class MyGame extends BaseGame
-    with KeyboardEvents,
+    with
+        KeyboardEvents,
         HasCollidables,
         HasTapableComponents,
         HasDraggableComponents {
@@ -60,11 +61,11 @@ class MyGame extends BaseGame
   Vector2 viewportResolution;
 
   MyGame({
-      String? jsonMap,
-      int? mapLevel,
-      int? arena,
-      required this.viewportResolution,
-    }) {
+    String? jsonMap,
+    int? mapLevel,
+    int? arena,
+    required this.viewportResolution,
+  }) {
     this.mapLevel = mapLevel;
     this.jsonMap = jsonMap;
     this.arena = arena;
@@ -84,14 +85,11 @@ class MyGame extends BaseGame
     final matrix = Map.toList(this.jsonMap.toString());
 
     // Add main town
-    add(
-      map = Map(
-        tileset,
-        matrix,
-        tileHeight: 25.0,
-      )
-      ..position = topLeft
-    );
+    add(map = Map(
+      tileset,
+      matrix,
+      tileHeight: 25.0,
+    )..position = topLeft);
 
     spawnCharacter();
     spawnNpcs();
@@ -102,14 +100,14 @@ class MyGame extends BaseGame
     final npcSpriteAnimation = NpcSpriteAnimation();
     await npcSpriteAnimation.loadSpriteAnimations();
 
-    for(int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) {
       add(Npc(
         _character,
         {
           NpcState.idleRight: npcSpriteAnimation.idleRight,
           NpcState.hitRight: npcSpriteAnimation.hitRight,
           NpcState.runRight: npcSpriteAnimation.runRight,
-          NpcState.idleDown:npcSpriteAnimation.idleDown,
+          NpcState.idleDown: npcSpriteAnimation.idleDown,
           NpcState.hitDown: npcSpriteAnimation.hitDown,
           NpcState.runDown: npcSpriteAnimation.runDown,
           NpcState.idleLeft: npcSpriteAnimation.idleLeft,
@@ -121,7 +119,7 @@ class MyGame extends BaseGame
           NpcState.idleBottomRight: npcSpriteAnimation.idleBottomRight,
           NpcState.hitBottomRight: npcSpriteAnimation.hitBottomRight,
           NpcState.runBottomRight: npcSpriteAnimation.runBottomRight,
-          NpcState.idleBottomLeft:npcSpriteAnimation.idleBottomLeft,
+          NpcState.idleBottomLeft: npcSpriteAnimation.idleBottomLeft,
           NpcState.hitBottomLeft: npcSpriteAnimation.hitBottomLeft,
           NpcState.runBottomLeft: npcSpriteAnimation.runBottomLeft,
           NpcState.idleTopLeft: npcSpriteAnimation.idleTopLeft,
@@ -132,59 +130,57 @@ class MyGame extends BaseGame
           NpcState.runTopRight: npcSpriteAnimation.runTopRight,
         },
         size: Vector2(79, 63),
-        position: map.getBlockPosition(map.getBlock(
-            Vector2(Npc.generateRandomCoordinates(), Npc.generateRandomCoordinates())
-            + topLeft
-            )
-        ),
-      )
-        ..current = NpcState.idleDown);
+        position: map.getBlockPosition(map.getBlock(Vector2(
+                Npc.generateRandomCoordinates(),
+                Npc.generateRandomCoordinates()) +
+            topLeft)),
+      )..current = NpcState.idleDown);
     }
   }
 
   void spawnCharacter() async {
     /// Load Character Sprite Direction Animations
     final characterSpriteAnimation = CharacterSpriteAnimation();
+
     /// Spawn the character
 
-    final characterSpawnPosition = map.getBlock(Vector2(x, y)
-        + topLeft
-        + Vector2(0, 150));
+    final characterSpawnPosition =
+        map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150));
     await characterSpriteAnimation.loadSpriteAnimations();
-    _character = Character({
-      NpcState.idleRight: characterSpriteAnimation.idleRight,
-      NpcState.hitRight: characterSpriteAnimation.hitRight,
-      NpcState.runRight: characterSpriteAnimation.runRight,
-      NpcState.idleDown:characterSpriteAnimation.idleDown,
-      NpcState.hitDown: characterSpriteAnimation.hitDown,
-      NpcState.runDown: characterSpriteAnimation.runDown,
-      NpcState.idleLeft: characterSpriteAnimation.idleLeft,
-      NpcState.hitLeft: characterSpriteAnimation.hitLeft,
-      NpcState.runLeft: characterSpriteAnimation.runLeft,
-      NpcState.idleTop: characterSpriteAnimation.idleTop,
-      NpcState.hitTop: characterSpriteAnimation.hitTop,
-      NpcState.runTop: characterSpriteAnimation.runTop,
-      NpcState.idleBottomRight: characterSpriteAnimation.idleBottomRight,
-      NpcState.hitBottomRight: characterSpriteAnimation.hitBottomRight,
-      NpcState.runBottomRight: characterSpriteAnimation.runBottomRight,
-      NpcState.idleBottomLeft:characterSpriteAnimation.idleBottomLeft,
-      NpcState.hitBottomLeft: characterSpriteAnimation.hitBottomLeft,
-      NpcState.runBottomLeft: characterSpriteAnimation.runBottomLeft,
-      NpcState.idleTopLeft: characterSpriteAnimation.idleTopLeft,
-      NpcState.hitTopLeft: characterSpriteAnimation.hitTopLeft,
-      NpcState.runTopLeft: characterSpriteAnimation.runTopLeft,
-      NpcState.idleTopRight: characterSpriteAnimation.idleTopRight,
-      NpcState.hitTopRight: characterSpriteAnimation.hitTopRight,
-      NpcState.runTopRight: characterSpriteAnimation.runTopRight,
-    },
+    _character = Character(
+      {
+        NpcState.idleRight: characterSpriteAnimation.idleRight,
+        NpcState.hitRight: characterSpriteAnimation.hitRight,
+        NpcState.runRight: characterSpriteAnimation.runRight,
+        NpcState.idleDown: characterSpriteAnimation.idleDown,
+        NpcState.hitDown: characterSpriteAnimation.hitDown,
+        NpcState.runDown: characterSpriteAnimation.runDown,
+        NpcState.idleLeft: characterSpriteAnimation.idleLeft,
+        NpcState.hitLeft: characterSpriteAnimation.hitLeft,
+        NpcState.runLeft: characterSpriteAnimation.runLeft,
+        NpcState.idleTop: characterSpriteAnimation.idleTop,
+        NpcState.hitTop: characterSpriteAnimation.hitTop,
+        NpcState.runTop: characterSpriteAnimation.runTop,
+        NpcState.idleBottomRight: characterSpriteAnimation.idleBottomRight,
+        NpcState.hitBottomRight: characterSpriteAnimation.hitBottomRight,
+        NpcState.runBottomRight: characterSpriteAnimation.runBottomRight,
+        NpcState.idleBottomLeft: characterSpriteAnimation.idleBottomLeft,
+        NpcState.hitBottomLeft: characterSpriteAnimation.hitBottomLeft,
+        NpcState.runBottomLeft: characterSpriteAnimation.runBottomLeft,
+        NpcState.idleTopLeft: characterSpriteAnimation.idleTopLeft,
+        NpcState.hitTopLeft: characterSpriteAnimation.hitTopLeft,
+        NpcState.runTopLeft: characterSpriteAnimation.runTopLeft,
+        NpcState.idleTopRight: characterSpriteAnimation.idleTopRight,
+        NpcState.hitTopRight: characterSpriteAnimation.hitTopRight,
+        NpcState.runTopRight: characterSpriteAnimation.runTopRight,
+      },
       size: Vector2(200, 200),
       position: map.getBlockPosition(characterSpawnPosition),
-    )
-    ..current = NpcState.idleRight;
+    )..current = NpcState.idleRight;
 
     // if (Platform.isAndroid || Platform.isIOS) {
-      final joystick = await getJoystick();
-      joystick.addObserver(_character);
+    final joystick = await getJoystick();
+    joystick.addObserver(_character);
     // }
 
     add(_character);
@@ -192,7 +188,8 @@ class MyGame extends BaseGame
     camera.followComponent(_character);
 
     add(joystick);
-    if (!overlays.isActive('CharacterOverlay')) overlays.add('CharacterOverlay');
+    if (!overlays.isActive('CharacterOverlay'))
+      overlays.add('CharacterOverlay');
 
     _isCharacterSpawned = true;
   }
@@ -201,15 +198,18 @@ class MyGame extends BaseGame
     final joystick = JoystickComponent(
       gameRef: this,
       directional: JoystickDirectional(
-        background: JoystickElement.sprite(await loadJoystick('joystick_background.png')),
+        background: JoystickElement.sprite(
+            await loadJoystick('joystick_background.png')),
         knob: JoystickElement.sprite(await loadJoystick('joystick_knob.png')),
       ),
       actions: [
         JoystickAction(
           actionId: 1,
           margin: const EdgeInsets.all(50),
-          action: JoystickElement.sprite(await loadJoystick('joystick_attack.png')),
-          actionPressed: JoystickElement.sprite(await loadJoystick('joystick_attack_selected.png')),
+          action:
+              JoystickElement.sprite(await loadJoystick('joystick_attack.png')),
+          actionPressed: JoystickElement.sprite(
+              await loadJoystick('joystick_attack_selected.png')),
         ),
       ],
     );
@@ -229,7 +229,7 @@ class MyGame extends BaseGame
     add(_town!);
     _town!.spawnTown();
   }
-  
+
   @override
   Future<void> onLoad() async {
     print('Map Level: $mapLevel');
@@ -253,66 +253,50 @@ class MyGame extends BaseGame
     final isKeyDown = e is RawKeyDownEvent;
 
     // print(_character.velocity);
+    if (e.data.keyLabel == 'w') {
+      _character.current = NpcState.runTopRight;
+      _character.velocity.y = isKeyDown ? -1 : 0;
+      _facing = 'north-east';
+    } else if (e.data.keyLabel == 's') {
+      _character.velocity.y = isKeyDown ? 1 : 0;
+      _character.current = NpcState.runBottomLeft;
+      _facing = 'south-west';
+    }
     if (e.data.keyLabel == 'a') {
       _character.velocity.x = isKeyDown ? -1 : 0;
       if (_character.velocity.y == 0) {
         _character.current = NpcState.runTopLeft;
-        _facing = "west";
-      }
-      else if (_character.velocity.y == 1) {
-        _character.current = NpcState.runBottomLeft;
-        if(isKeyDown) _character.setVelocity(Vector2(1,-1));
-        else _character.velocity.x = _character.velocity.y = 0;
-
-        _facing = "south-west";
-      }
-      else
-      {
-        _character.current = NpcState.runTopLeft;
-        _character.setVelocity(Vector2(-1,-1));
-
-        _facing = "northwest";
+        _facing = 'north-west';
+      } else if (_character.velocity.y == 1) {
+        // if (-1,1)
+        if (isKeyDown) _character.setVelocity(Vector2(-1, 1));
+        _character.current = NpcState.runLeft;
+        _facing = 'west';
+      } else {
+        if (isKeyDown) _character.setVelocity(Vector2(-1, -1));
+        _character.current = NpcState.runTop;
+        _facing = 'north';
       }
     } else if (e.data.keyLabel == 'd') {
       _character.velocity.x = isKeyDown ? 1 : 0;
-      if (_character.velocity.y == 0)
-      {
+      if (_character.velocity.y == 0) {
         _character.current = NpcState.runBottomRight;
-
+        _facing = 'south-east';
+      } else if (_character.velocity.y == 1) {
+        if (isKeyDown) _character.setVelocity(Vector2(1, 1));
+        _character.current = NpcState.runDown;
+        _facing = 'south';
+      } else {
+        if (isKeyDown) _character.setVelocity(Vector2(1, -1));
+        _character.current = NpcState.runRight;
         _facing = 'east';
       }
-      else if (_character.velocity.y == 1)
-      {
-        _character.current = NpcState.runBottomRight;
-        _character.setVelocity(Vector2(1, 1));
-
-        _facing = "south-east";
-      }
-      else
-      {
-        _character.current = NpcState.runTopRight;
-        _character.setVelocity(Vector2(1, -1));
-
-        _facing = "north-east";
-      }
-    } else if (e.data.keyLabel == 'w') {
-      _character.current = NpcState.runTopRight;
-      _character.velocity.y = isKeyDown ? -1 : 0;
-    } else if (e.data.keyLabel == 's') {
-      _character.current = NpcState.runBottomLeft;
-      _character.velocity.y = isKeyDown ? 1 : 0;
-    } else {
-      _character.velocity.x = 0;
-      if (_character.velocity.y == 1) {
-        _facing = "south";
-      }
-      else if(_character.velocity.y == -1) {
-        _facing = "north";
-      }
     }
+
     if (_character.velocity.y == 0 && _character.velocity.x == 0) {
       print(_facing);
-      _character.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing!, StateAction.Idle);
+      _character.current = DirectionalHelper.getDirectionalSpriteAnimation(
+          _facing!, StateAction.Idle);
     }
   }
 
@@ -320,19 +304,13 @@ class MyGame extends BaseGame
   void update(double dt) {
     super.update(dt);
 
-    if(_isCharacterSpawned) {
+    if (_isCharacterSpawned) {
       // if(map.containsBlock(map.getBlock(map.cartToIso(_character.position)))) {
       //   _character.update(dt);
       // }
 
-
-
-
       // Block block = map.getBlock(_character.position);
       // if(map.containsBlock(block)) print(map.position);
-
-
-
 
       // if (map.containsBlock(block)) {
       //   if (block.y <= 0)
