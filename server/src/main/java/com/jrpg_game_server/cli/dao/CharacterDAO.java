@@ -11,7 +11,7 @@ public class CharacterDAO extends AbstractDatabaseCliDAO implements BaseDAO {
     private static final String CHARACTERS_TABLE_NAME = "characters";
 
     public CharacterDAO() {
-        super(Config.gameServer());
+        super(Config.databaseConfig());
     }
 
     @Override

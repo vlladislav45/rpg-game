@@ -7,7 +7,7 @@ import 'package:rpg_game/network/socket_manager.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
 class OnlineBloc extends Bloc<OnlineEvent, OnlineState> {
-  static const String url = '192.168.0.50';
+  static const String url = 'localhost';
   static const String port = '9096';
 
   OnlineBloc()

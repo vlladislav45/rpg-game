@@ -17,7 +17,7 @@ public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO {
     private final CharacterDAO characterDAO;
 
     public UserDAO(CharacterDAO characterDAO) {
-        super(Config.gameServer());
+        super(Config.databaseConfig());
         this.characterDAO = characterDAO;
     }
 

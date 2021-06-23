@@ -9,6 +9,7 @@ import com.jrpg_game_server.cli.models.views.UserViewModel;
 import com.jrpg_game_server.cli.services.ServiceWrapper;
 import com.jrpg_game_server.cli.services.UserServices;
 import com.jrpg_game_server.cli.services.impl.UserServicesImpl;
+import com.jrpg_game_server.network.SocketServerManager;
 import picocli.CommandLine;
 
 import java.util.HashMap;
@@ -17,19 +18,19 @@ import java.util.HashMap;
 
 public class ServerStartCommand extends AbstractCommand {
     private ServiceWrapper serviceWrapper;
+    private SocketServerManager socketServerManager;
 
     @Override
     public void run() {
         System.out.println("Server is starting..");
 
         // Initialize entire set of services and dao's
-        initialize();
+        initializeServices();
 
-        Configuration config = new Configuration();
-        config.setHostname("192.168.0.50");
-        config.setPort(9096);
+        // Init socket server
+        socketServerManager = SocketServerManager.setup();
+        final SocketIOServer server = socketServerManager.getSocketServer();
 
-        final SocketIOServer server = new SocketIOServer(config);
         server.addEventListener("authentication", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {
             boolean isAuthenticated = loginCheck(data.getUsername(), data.getPassword());
             if (isAuthenticated) {
@@ -62,7 +63,7 @@ public class ServerStartCommand extends AbstractCommand {
 
     }
 
-    private void initialize() {
+    private void initializeServices() {
         //Init Database access objects
         CharacterDAO characterDAO = new CharacterDAO();
         UserDAO userDAO = new UserDAO(characterDAO);

@@ -1,8 +1,8 @@
 package com.jrpg_game_server.cli.dao;
 
-import com.jrpg_game_server.cli.config.ServerConfig;
-import com.jrpg_game_server.cli.filters.SQLFilter;
+import com.jrpg_game_server.cli.config.DatabaseConfig;
 import com.jrpg_game_server.cli.database.JdbcFactory;
+import com.jrpg_game_server.cli.filters.SQLFilter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -18,14 +18,14 @@ public class AbstractCliDAO {
 
     private final String database;
 
-    public AbstractCliDAO(ServerConfig server) {
-        this.database = server.getDatabaseName();
+    public AbstractCliDAO(DatabaseConfig databaseConfig) {
+        this.database = databaseConfig.getDatabaseName();
 
         this.connectionFactory = JdbcFactory.builder()
-                .withDatabaseName(server.getDatabaseName())
-                .withUrl(server.getDatabaseURL())
-                .withUser(server.getDatabaseUser())
-                .withPassword(server.getDatabasePassword())
+                .withDatabaseName(databaseConfig.getDatabaseName())
+                .withUrl(databaseConfig.getDatabaseURL())
+                .withUser(databaseConfig.getDatabaseUser())
+                .withPassword(databaseConfig.getDatabasePassword())
                 .build();
     }
 
