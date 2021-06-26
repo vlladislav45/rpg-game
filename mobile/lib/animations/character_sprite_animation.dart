@@ -72,7 +72,7 @@ class CharacterSpriteAnimation extends SpriteAnimationAction {
       else
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
-    this._hitRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._hitRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
     // running
     characterSprites = [];
@@ -98,7 +98,7 @@ class CharacterSpriteAnimation extends SpriteAnimationAction {
       else
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/B_F_right00${i}.png'));
-    this._hitBottomRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._hitBottomRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
     // Run
     characterSprites = [];
@@ -124,7 +124,7 @@ class CharacterSpriteAnimation extends SpriteAnimationAction {
       else
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/C_Front00${i}.png'));
-    this._hitDown = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._hitDown = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
     // Run
     characterSprites = [];
@@ -150,7 +150,7 @@ class CharacterSpriteAnimation extends SpriteAnimationAction {
       else
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/D_FrontLeft00${i}.png'));
-    this._hitBottomLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._hitBottomLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
     // Run
     characterSprites = [];
@@ -176,7 +176,7 @@ class CharacterSpriteAnimation extends SpriteAnimationAction {
       else
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/E_Left00${i}.png'));
-    this._hitLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._hitLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
     // Run
     characterSprites = [];
@@ -202,7 +202,7 @@ class CharacterSpriteAnimation extends SpriteAnimationAction {
       else
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/F_BackLeft00${i}.png'));
-    this._hitTopLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._hitTopLeft = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
     // Run
     characterSprites = [];
@@ -228,7 +228,7 @@ class CharacterSpriteAnimation extends SpriteAnimationAction {
       else
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/G_Back00${i}.png'));
-    this._hitTop = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._hitTop = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
     // Run
     characterSprites = [];
@@ -254,7 +254,7 @@ class CharacterSpriteAnimation extends SpriteAnimationAction {
       else
         characterSprites.add(await Sprite.load(
             'sprites/characters/knights/seq_antlerKnight/H_BackRight00${i}.png'));
-    this._hitTopRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.20);
+    this._hitTopRight = SpriteAnimation.spriteList(characterSprites, stepTime: 0.10);
 
     // Run
     characterSprites = [];

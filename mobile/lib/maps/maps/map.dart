@@ -4,12 +4,16 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/src/spritesheet.dart';
-import 'package:rpg_game/components/rock.dart';
+import 'package:rpg_game/components/water.dart';
 import 'package:rpg_game/game.dart';
+import 'package:rpg_game/utils/convert_coordinates.dart';
 
 class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
-  static const double S = 1500;
   static final R = Random();
+
+  // Width and height of all maps
+  static const double MAP_OFFSETX_LENGTH = 25;
+  static const double MAP_OFFSETY_LENGTH = 25;
 
   // Constructor
   Map(
@@ -21,8 +25,29 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
 
 
   @override
-  void render(Canvas c) {
+  Future<void> onLoad() async {
+    Vector2 topLeft = Vector2(500,150);
+
+    for (var i = 0; i < matrix.length; i++) {
+      for (var j = 0; j < matrix[i].length; j++) {
+        final element = matrix[i][j];
+        if (element == -1) {
+          final p = getBlockPositionInts(j, i);
+          final waterSprite = await gameRef.loadSprite('sprites/tile_maps/water.png');
+          gameRef.add(Water(
+            sprite: waterSprite,
+            position: p + topLeft,
+            size: waterSprite.srcSize,
+          ));
+        }
+      }
+    }
+  }
+
+  @override
+  void render(Canvas c) async {
     super.render(c);
+
     debugMode = true;
   }
 
@@ -42,10 +67,10 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
   }
 
   /// If map is loaded in onLoad method, 
-  /// the stones will be appear below the iso tiles
-  void setWalls() async {
-    final rockWallSprite = await gameRef.loadSprite('sprites/walls/stones.png');
-    //Add walls around isometric map
+  /// the water tiles will be appear on top the iso tiles
+  void addRestrictions() async {
+    final waterSprite = await gameRef.loadSprite('sprites/tile_maps/water.png');
+    //Add watter around isometric map
     for (int i = 0; i < this.matrix.length; i++) {
       int lastRow = this.matrix.length - 1;
       if (i == 0 || i == lastRow) {
@@ -57,10 +82,10 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
             final p = this.getBlockPositionInts(j, i) +
                 topLeft; // get coordinate of the tile
             // and add obstacle(wall)
-            gameRef.add(Rock(
-              sprite: rockWallSprite,
+            gameRef.add(Water(
+              sprite: waterSprite,
               position: p,
-              size: rockWallSprite.srcSize,
+              size: waterSprite.srcSize,
             ));
           }
           int lastColumn = this.matrix[i].length - 1;
@@ -74,10 +99,10 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
                 final p = this.getBlockPositionInts(j, r) +
                     topLeft; // get coordinates of tile
                 //add obstacle (wall)
-                  gameRef.add(Rock(
-                    sprite: rockWallSprite,
+                  gameRef.add(Water(
+                    sprite: waterSprite,
                     position: p,
-                    size: rockWallSprite.srcSize,
+                    size: waterSprite.srcSize,
                   ));
               }
             }
@@ -87,8 +112,20 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
     }
   }
 
+  Vector2 mapSize() {
+    // Map width and height contribute equally in both directions
+    final double side = MAP_OFFSETX_LENGTH + MAP_OFFSETY_LENGTH;
+    return Vector2(side * effectiveTileSize.x / 2,
+                   side * effectiveTileSize.y / 2);
+  }
+
   // Generate random coordinates
-  static double genCoord() {
-    return -S + R.nextDouble() * (2 * S);
+  Vector2 genCoord() {
+    // double S = (mapSize().x * 2) + (mapSize().y * 2);
+    // return -S + R.nextDouble() * (2 * S);
+
+    double x = R.nextDouble() * (mapSize().x / 2);
+    double y = R.nextDouble() * (mapSize().y / 2);
+    return ConvertCoordinates.cartToIso(Vector2(x, y));
   }
 }

@@ -6,6 +6,7 @@ import 'package:flame/geometry.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:rpg_game/components/npc.dart';
+import 'package:rpg_game/components/water.dart';
 import 'package:rpg_game/game.dart';
 import 'package:flame/joystick.dart';
 import 'package:rpg_game/utils/convert_coordinates.dart';
@@ -29,7 +30,9 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   final _collisionColor = Colors.amber;
   final _defaultColor = Colors.cyan;
   bool _isCollision = false;
+  bool _isWall = false;
   bool _isDead = false;
+  bool isPlayerPressAttack = false;
 
   /// Where is facing of the character
   /// north, south, east, west, north-east, north-west, south-east, south-west
@@ -37,7 +40,8 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
 
   late final TextComponent _nickname;
 
-  Character(Map<NpcState, SpriteAnimation> animations, {
+  Character(
+      Map<NpcState, SpriteAnimation> animations, {
     Vector2? position,
     Vector2? size,
   }) : super(
@@ -45,12 +49,17 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
           size: size,
           animations: animations,
         ) {
+
     timer = Timer(3.0)
       ..stop()
       ..callback = () {
         gameRef.camera.setRelativeOffset(Anchor.center);
       };
   }
+
+
+  @override
+  int get priority => 1;
 
   @override
   Future<void> onLoad() async {
@@ -80,6 +89,8 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   void render(Canvas canvas) {
     super.render(canvas);
 
+    _nickname.position = Vector2(this.position.x + this.size.x / 2, this.position.y);
+
     debugMode = true;
   }
 
@@ -88,17 +99,32 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     super.update(dt);
     timer.update(dt);
 
-    _nickname.position = Vector2(this.position.x + this.size.x / 2, this.position.y);
-
     debugColor = _isCollision ? _collisionColor : _defaultColor;
 
     // Increment the current position of player by speed * delta time along moveDirection.
     // Delta time is the time elapsed since last update. For devices with higher frame rates,
     // delta time will be smaller and for devices with lower frame rates, it will be larger. Multiplying speed with
     // delta time ensure that player speed remains same irrespective of the device FPS.
-    final displacement = _velocity * (speed * dt);
+    if(_isWall && velocity.y == -1) {
+      final displacement = (_velocity.y * -1) + 10;
+      position.add(ConvertCoordinates.cartToIso(Vector2(0, displacement)));
+    }else if(_isWall && velocity.y == 1) {
+      final displacement = (_velocity.y * -1) - 10;
+      position.add(ConvertCoordinates.cartToIso(Vector2(0, displacement)));
+    } else if(_isWall && velocity.x == 1) {
+      final displacement = (_velocity.x * -1) - 10;
+      position.add(ConvertCoordinates.cartToIso(Vector2(displacement, 0)));
+    }else if(_isWall && velocity.x == -1) {
+      final displacement = (_velocity.x * -1) + 10;
+      position.add(ConvertCoordinates.cartToIso(Vector2(displacement, 0)));
+    }
+    else {
+      final displacement = _velocity * (speed * dt);
 
-    position.add(ConvertCoordinates.cartToIso(displacement));
+      position.add(ConvertCoordinates.cartToIso(displacement));
+    }
+
+    _isWall = false;
     _isCollision = false;
   }
 
@@ -108,12 +134,11 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     this._velocity = newVelocity;
   }
 
-
   @override
   void onMount() {
     super.onMount();
 
-    final shape = HitboxCircle(definition: 0.5);
+    final shape = HitboxCircle(definition: 0.6);
     addShape(shape);
   }
 
@@ -122,10 +147,12 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     if (other is Npc) {
       // gameRef.camera.setRelativeOffset(Anchor.center);
       // timer.start();
-      this.die();
+      // this.die();
 
       _isCollision = true;
-      print('My character is hitted');
+      // print('My character is hitted');
+    } else if(other is Water) {
+      _isWall = true;
     }
   }
 
@@ -141,7 +168,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   void joystickAction(JoystickActionEvent event) {
 
     if (event.id == 0 && event.event == ActionEvent.down) {
-      print('Character is hitting');
+      // print('Character is hitting');
 
       this.current = DirectionalHelper.getDirectionalSpriteAnimation(
           _facing, StateAction.Attack);
@@ -208,11 +235,12 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     _isDead = true;
 
     if(_isDead) {
+      Sprite sprite = await Sprite.load('crypt.png');
       gameRef.add(
           SpriteComponent(
-            sprite: await Sprite.load('crypt.png'),
+            sprite: sprite,
             position: this.position,
-            size: Vector2(151, 76),
+            size: Vector2(50, 50),
           )
       );
       gameRef.remove(this);

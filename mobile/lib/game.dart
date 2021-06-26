@@ -23,8 +23,6 @@ import 'package:rpg_game/components/selector.dart';
 import 'package:rpg_game/maps/town.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
 
-import 'logic/cubits/arena/arena_cubit.dart';
-import 'utils/convert_coordinates.dart';
 import 'utils/hex_color.dart';
 
 const x = 500.0;
@@ -52,6 +50,9 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
 
   // Useful properties
   bool _isCharacterSpawned = false;
+  // There are eight images * 0.10
+  static const double time = 8 * 0.10;
+  late final Timer _timer;
 
   // Screen Resolution
   Vector2 viewportResolution;
@@ -65,6 +66,14 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     this.mapLevel = mapLevel;
     this.jsonMap = jsonMap;
     this.arena = arena;
+
+    _timer = Timer(time)
+      ..stop()
+      ..callback = () {
+        _character.isPlayerPressAttack = true;
+        _character.current = DirectionalHelper.getDirectionalSpriteAnimation(
+            _facing!, StateAction.Idle);
+      };
   }
 
   @override
@@ -87,6 +96,10 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
       tileHeight: 25.0,
     )..position = topLeft);
 
+    // print(map.mapSize());
+    //Add map restrictions
+    // map.addRestrictions();
+
     spawnCharacter();
     spawnNpcs();
   }
@@ -96,8 +109,18 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     final npcSpriteAnimation = NpcSpriteAnimation();
     await npcSpriteAnimation.loadSpriteAnimations();
 
+    print('SIZE OF THE MAP ${map.mapSize()}');
     for (int i = 0; i < 5; i++) {
+      final npcSpawnPosition = map.getBlock(Vector2(x, y) + topLeft +  map.genCoord());
+      final spawnPosition = map.getBlockPosition(npcSpawnPosition);
+
+      bool isAggressive = false;
+      // Odd number
+      if(i % 2 == 1) isAggressive = true;
+
+      print(spawnPosition);
       add(Npc(
+        isAggressive,
         _character,
         {
           NpcState.idleRight: npcSpriteAnimation.idleRight,
@@ -126,10 +149,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
           NpcState.runTopRight: npcSpriteAnimation.runTopRight,
         },
         size: Vector2(79, 63),
-        position: map.getBlockPosition(map.getBlock(Vector2(
-                Npc.generateRandomCoordinates(),
-                Npc.generateRandomCoordinates()) +
-            topLeft)),
+        position: spawnPosition,
       )..current = NpcState.idleDown);
     }
   }
@@ -141,7 +161,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     /// Spawn the character
 
     final characterSpawnPosition =
-        map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 150));
+        map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 125));
     await characterSpriteAnimation.loadSpriteAnimations();
     _character = Character(
       {
@@ -178,8 +198,8 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     joystick.addObserver(_character);
 
     add(_character);
-    // camera.cameraSpeed = 1;
-    // camera.followComponent(_character);
+    camera.cameraSpeed = 1;
+    camera.followComponent(_character);
 
     add(joystick);
     if (!overlays.isActive('CharacterOverlay'))
@@ -195,6 +215,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
         background: JoystickElement.sprite(await loadJoystick('joystick_background.png')),
         knob: JoystickElement.sprite(await loadJoystick('joystick_knob.png')),
       ),
+      priority: 1,
       actions: [
         JoystickAction(
           actionId: 0,
@@ -227,9 +248,6 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     mapLevel == 0 ? spawnTown() : await loadMapLevel();
     print('Arena: $arena');
 
-    //Add walls around the town
-    //map.setWalls();
-
     // final selectorImage = await images.load('tile_maps/selector.png');
     // add(_selector = Selector(s, selectorImage));
   }
@@ -240,8 +258,15 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
   }
 
   @override
-  void onKeyEvent(RawKeyEvent e) {
+  void onKeyEvent(RawKeyEvent e) async {
     final isKeyDown = e is RawKeyDownEvent;
+
+    // print(_facing);
+    if(e.data.keyLabel == '1') {
+      _character.current = DirectionalHelper.getDirectionalSpriteAnimation(
+          _facing!, StateAction.Attack);
+      _timer.start();
+    }
 
     // print(_character.velocity);
     if (e.data.keyLabel == 'w') {
@@ -284,7 +309,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
       }
     }
 
-    if (_character.velocity.y == 0 && _character.velocity.x == 0) {
+    if (_character.velocity.y == 0 && _character.velocity.x == 0 && e.data.keyLabel != '1') {
       print(_facing);
       _character.current = DirectionalHelper.getDirectionalSpriteAnimation(
           _facing!, StateAction.Idle);
@@ -294,24 +319,6 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
   @override
   void update(double dt) {
     super.update(dt);
-
-    if (_isCharacterSpawned) {
-      // if(map.containsBlock(map.getBlock(map.cartToIso(_character.position)))) {
-      //   _character.update(dt);
-      // }
-
-      // Block block = map.getBlock(_character.position);
-      // if(map.containsBlock(block)) print(map.position);
-
-      // if (map.containsBlock(block)) {
-      //   if (block.y <= 0)
-      //     _character.velocity.y = 1;
-      //   else if (block.y >= map.matrix.length)
-      //     _character.velocity.y = -1;
-      //   else if (block.x <= 0)
-      //     _character.velocity.x = 1;
-      //   else if (block.x >= map.matrix[block.y].length) _character.velocity.x = -1;
-      // }
-    }
+    _timer.update(dt);
   }
 }
