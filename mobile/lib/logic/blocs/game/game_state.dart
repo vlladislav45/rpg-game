@@ -7,10 +7,10 @@ abstract class GameState {
   List<Object> get props => [];
 }
 
-class GamePlayerState extends GameState {
+class GamePropertiesState extends GameState {
   final UserModel userModel;
 
-  GamePlayerState({
+  GamePropertiesState({
     required this.userModel,
   });
 

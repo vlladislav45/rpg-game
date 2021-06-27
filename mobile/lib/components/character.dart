@@ -31,8 +31,9 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   final _defaultColor = Colors.cyan;
   bool _isCollision = false;
   bool _isWall = false;
-  bool _isDead = false;
+  bool isDead = false;
   bool isPlayerPressAttack = false;
+  int _health = 100;
 
   /// Where is facing of the character
   /// north, south, east, west, north-east, north-west, south-east, south-west
@@ -50,7 +51,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
           animations: animations,
         ) {
 
-    timer = Timer(3.0)
+    timer = Timer(1.0)
       ..stop()
       ..callback = () {
         gameRef.camera.setRelativeOffset(Anchor.center);
@@ -99,6 +100,12 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     super.update(dt);
     timer.update(dt);
 
+    if(_health <= 0) {
+      gameRef.camera.setRelativeOffset(Anchor.center);
+      timer.start();
+      this.die();
+    }
+
     debugColor = _isCollision ? _collisionColor : _defaultColor;
 
     // Increment the current position of player by speed * delta time along moveDirection.
@@ -119,6 +126,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
       position.add(ConvertCoordinates.cartToIso(Vector2(displacement, 0)));
     }
     else {
+      _isWall = false;
       final displacement = _velocity * (speed * dt);
 
       position.add(ConvertCoordinates.cartToIso(displacement));
@@ -145,14 +153,17 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   @override
   void onCollision(Set<Vector2> points, Collidable other) async {
     if (other is Npc) {
-      // gameRef.camera.setRelativeOffset(Anchor.center);
-      // timer.start();
-      // this.die();
+      if(other.isPlayerPressAttack) {
+        _isCollision = true;
+        isPlayerPressAttack = false;
 
-      _isCollision = true;
-      // print('My character is hitted');
+        _health -= 7;
+      }
     } else if(other is Water) {
       _isWall = true;
+    } else {
+      _isCollision = false;
+      _isWall = false;
     }
   }
 
@@ -232,9 +243,9 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     //   sprites.add(await Sprite.load(
     //   'sprites/characters/knights/seq_antlerKnight/A_right${i}.png'));
     // final die = SpriteAnimation.spriteList(sprites, stepTime: 0.20);
-    _isDead = true;
+    isDead = true;
 
-    if(_isDead) {
+    if(isDead) {
       Sprite sprite = await Sprite.load('crypt.png');
       gameRef.add(
           SpriteComponent(
@@ -244,7 +255,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
           )
       );
       gameRef.remove(this);
-      gameRef.remove(_nickname);
+      // gameRef.remove(_nickname);
     }
   }
 }

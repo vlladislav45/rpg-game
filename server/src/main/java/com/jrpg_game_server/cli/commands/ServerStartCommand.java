@@ -38,18 +38,20 @@ public class ServerStartCommand extends AbstractCommand {
                 client.sendEvent("authenticated", userViewModel);
             } else {
                 // Wrong credentials
-                client.sendEvent("authenticationError", new HashMap<String, String>(){{
+                client.sendEvent("authenticationError", new HashMap<String, String>() {{
                     put("error", "WRONG CREDENTIALS");
                 }});
             }
         });
 
-        if(serviceWrapper.getUserServices().getLoggedUser() != null) {
-            System.out.println(serviceWrapper.getUserServices().getLoggedUser().getUsername());
-            server.addEventListener("loggedPlayer", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {
 
-            });
-        }
+        server.addEventListener("handshake", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {
+            if (serviceWrapper.getUserServices().getLoggedUser() != null) {
+                UserViewModel userViewModel = UserViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser());
+                client.sendEvent("loggedPlayer", userViewModel);
+            }
+        });
+
 
         server.start();
 
@@ -77,7 +79,7 @@ public class ServerStartCommand extends AbstractCommand {
     }
 
     private boolean loginCheck(String username, String password) {
-        if(username == null || username.trim().isEmpty()
+        if (username == null || username.trim().isEmpty()
                 || password == null || password.isEmpty()) {
             //TODO: Send warning message that the user doesn't has entered username or password
         } else {

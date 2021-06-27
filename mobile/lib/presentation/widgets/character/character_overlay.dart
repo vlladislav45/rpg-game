@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
 import 'package:rpg_game/logic/blocs/game/game_bloc.dart';
+import 'package:rpg_game/logic/blocs/game/game_event.dart';
 import 'package:rpg_game/logic/blocs/game/game_state.dart';
+import 'package:rpg_game/network/socket_manager.dart';
 import 'package:rpg_game/utils/hex_color.dart';
 
 Widget characterOverlayBuilder(BuildContext context, MyGame myGame) {
@@ -20,12 +22,17 @@ class CharacterOverlay extends StatefulWidget {
 
 class CharacterOverlayState extends State<CharacterOverlay>
     with TickerProviderStateMixin {
+
   AnimationController? controller;
   late double topLeftCharacterStatusWIDTH;
+  late GameBloc _gameBloc;
 
   @override
   void initState() {
     super.initState();
+
+    // init blocs
+    _gameBloc = context.read<GameBloc>();
 
     controller = AnimationController(
       vsync: this,
@@ -55,8 +62,10 @@ class CharacterOverlayState extends State<CharacterOverlay>
       ),
       width: this.topLeftCharacterStatusWIDTH,
       height: MediaQuery.of(context).size.width / 12,
-      child: BlocBuilder<GameBloc, GameState>(builder: (context, state) {
-        if (state is GamePlayerState) {
+      child: BlocBuilder<GameBloc, GameState>
+        (builder: (context, state) {
+        if (state is GamePropertiesState) {
+        // _gameBloc.add(LoggedEvent());
           return Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,

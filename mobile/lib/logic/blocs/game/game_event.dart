@@ -7,15 +7,20 @@ abstract class GameEvent {
   List<Object> get props => [];
 }
 
-class GamePlayerEvent extends GameEvent {
+class LoggedEvent extends GameEvent {
+  @override
+  List<Object> get props => [];
+}
+
+class GamePropertiesEvent extends GameEvent {
   final UserModel userModel;
 
-  GamePlayerEvent({
+  GamePropertiesEvent({
     required this.userModel,
   });
 
-  factory GamePlayerEvent.fromJson(Map<String, dynamic> json) {
-    return GamePlayerEvent(
+  factory GamePropertiesEvent.fromJson(Map<String, dynamic> json) {
+    return GamePropertiesEvent(
       userModel: UserModel.fromJson(json),
     );
   }

@@ -1,18 +1,16 @@
-import 'dart:io';
+import 'dart:math';
 import 'dart:ui';
 import 'dart:async';
 
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
-import 'package:flame/gestures.dart';
 import 'package:flame/keyboard.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/animations/character_sprite_animation.dart';
 import 'package:rpg_game/animations/npc_sprite_animation.dart';
 import 'package:rpg_game/components/npc.dart';
@@ -23,6 +21,7 @@ import 'package:rpg_game/components/selector.dart';
 import 'package:rpg_game/maps/town.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
 
+import 'models/character_model.dart';
 import 'utils/hex_color.dart';
 
 const x = 500.0;
@@ -44,6 +43,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
   late Map map;
   Town? _town;
   late Character _character;
+  late final CharacterModel _characterModel;
   late Npc _npc;
   Selector? _selector;
   Portal? _portal;
@@ -58,6 +58,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
   Vector2 viewportResolution;
 
   MyGame({
+    CharacterModel? characterModel,
     String? jsonMap,
     int? mapLevel,
     int? arena,
@@ -66,11 +67,11 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     this.mapLevel = mapLevel;
     this.jsonMap = jsonMap;
     this.arena = arena;
+    this._characterModel = characterModel!;
 
     _timer = Timer(time)
       ..stop()
       ..callback = () {
-        _character.isPlayerPressAttack = true;
         _character.current = DirectionalHelper.getDirectionalSpriteAnimation(
             _facing!, StateAction.Idle);
       };
@@ -116,9 +117,10 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
 
       bool isAggressive = false;
       // Odd number
-      if(i % 2 == 1) isAggressive = true;
+      var rand = Random().nextInt(100);
+      if(rand % 2 == 1) isAggressive = true;
 
-      print(spawnPosition);
+      print('Npc is spawned on: $spawnPosition');
       add(Npc(
         isAggressive,
         _character,
@@ -262,9 +264,11 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     final isKeyDown = e is RawKeyDownEvent;
 
     // print(_facing);
+    // print(_character.isPlayerPressAttack);
     if(e.data.keyLabel == '1') {
       _character.current = DirectionalHelper.getDirectionalSpriteAnimation(
           _facing!, StateAction.Attack);
+      _character.isPlayerPressAttack = true;
       _timer.start();
     }
 
@@ -310,7 +314,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     }
 
     if (_character.velocity.y == 0 && _character.velocity.x == 0 && e.data.keyLabel != '1') {
-      print(_facing);
+      // print(_facing);
       _character.current = DirectionalHelper.getDirectionalSpriteAnimation(
           _facing!, StateAction.Idle);
     }
