@@ -193,15 +193,16 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
         NpcState.runTopRight: characterSpriteAnimation.runTopRight,
       },
       size: Vector2(200, 200),
-      position: map.getBlockPosition(characterSpawnPosition),
+      //position: map.getBlockPosition(characterSpawnPosition),
     )..current = NpcState.idleRight;
+    _character.position.setFrom(map.getBlockPosition(characterSpawnPosition));
 
     final joystick = await getJoystick();
     joystick.addObserver(_character);
 
     add(_character);
     camera.cameraSpeed = 1;
-    camera.followComponent(_character);
+    camera.followComponent(_character, relativeOffset: Anchor.center);
 
     add(joystick);
     if (!overlays.isActive('CharacterOverlay'))

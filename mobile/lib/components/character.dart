@@ -58,7 +58,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
       };
   }
 
-
   @override
   int get priority => 1;
 
@@ -99,6 +98,13 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   void update(double dt) {
     super.update(dt);
     timer.update(dt);
+
+    /// Without this camera isn't working
+    /// You are following a position component, but you are not setting the position of that component
+    /// Until now
+    /// So the changes are basically to use the position field of your position component and set it to the
+    /// center of the rect and in render you don't call super since that will prepare the canvas
+
 
     if(_health <= 0) {
       gameRef.camera.setRelativeOffset(Anchor.center);
@@ -168,16 +174,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   }
 
   @override
-  void onGameResize(Vector2 gameSize) {
-    // final offset = (gameSize - size) / 2;
-    // this.size = offset;
-
-    super.onGameResize(gameSize);
-  }
-
-  @override
   void joystickAction(JoystickActionEvent event) {
-
     if (event.id == 0 && event.event == ActionEvent.down) {
       // print('Character is hitting');
 
