@@ -1,20 +1,20 @@
-package com.jrpg_game_server.cli.services.impl;
+package com.jrpg_game_server.cli.services;
 
 import com.jrpg_game_server.cli.dao.CharacterDAO;
 import com.jrpg_game_server.cli.dao.UserDAO;
 import com.jrpg_game_server.cli.entities.User;
 import com.jrpg_game_server.cli.entities.Character;
-import com.jrpg_game_server.cli.services.UserServices;
+import com.jrpg_game_server.cli.services.base.UserService;
 
 import java.util.List;
 import java.util.Map;
 
-public class UserServicesImpl implements UserServices {
+public class UserServiceImpl implements UserService {
     private final UserDAO userDao;
     private final CharacterDAO characterDAO;
     private User loggedUser;
 
-    public UserServicesImpl(UserDAO userDao, CharacterDAO characterDAO) {
+    public UserServiceImpl(UserDAO userDao, CharacterDAO characterDAO) {
         this.userDao = userDao;
         this.characterDAO = characterDAO;
     }

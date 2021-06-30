@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
-import 'package:rpg_game/logic/cubits/arena/arena_cubit.dart';
+import 'package:rpg_game/logic/cubits/map/map_cubit.dart';
 
 Widget portalOverlayBuilder(BuildContext context, MyGame myGame) {
   return const PortalOverlay();
@@ -30,7 +30,7 @@ class _PortalOverlayState extends State<PortalOverlay> {
               onPressed: () {
                 print('The player was teleported to the arena');
 
-                context.read<ArenaCubit>().update(1);
+                context.read<MapCubit>().update(0, 1, isArena: true);
               },
               child: Container(
                 child: AutoSizeText(

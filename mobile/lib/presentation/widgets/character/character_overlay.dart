@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
 import 'package:rpg_game/logic/blocs/game/game_bloc.dart';
-import 'package:rpg_game/logic/blocs/game/game_event.dart';
 import 'package:rpg_game/logic/blocs/game/game_state.dart';
-import 'package:rpg_game/network/socket_manager.dart';
+import 'package:rpg_game/logic/cubits/character_overlay/character_overlay_cubit.dart';
 import 'package:rpg_game/utils/hex_color.dart';
 
 Widget characterOverlayBuilder(BuildContext context, MyGame myGame) {
@@ -22,17 +21,14 @@ class CharacterOverlay extends StatefulWidget {
 
 class CharacterOverlayState extends State<CharacterOverlay>
     with TickerProviderStateMixin {
-
   AnimationController? controller;
-  late double topLeftCharacterStatusWIDTH;
-  late GameBloc _gameBloc;
+  late final CharacterOverlayCubit _characterOverlayCubit;
 
   @override
   void initState() {
     super.initState();
 
-    // init blocs
-    _gameBloc = context.read<GameBloc>();
+    _characterOverlayCubit = context.read<CharacterOverlayCubit>();
 
     controller = AnimationController(
       vsync: this,
@@ -45,9 +41,7 @@ class CharacterOverlayState extends State<CharacterOverlay>
 
   @override
   Widget build(BuildContext context) {
-    this.topLeftCharacterStatusWIDTH = MediaQuery.of(context).size.width / 5;
-
-    return Container(
+     return Container(
       padding: EdgeInsets.all(10.0),
       alignment: Alignment.topLeft,
       decoration: BoxDecoration(
@@ -60,13 +54,12 @@ class CharacterOverlayState extends State<CharacterOverlay>
           ],
         ),
       ),
-      width: this.topLeftCharacterStatusWIDTH,
+      width: MediaQuery.of(context).size.width / 5,
       height: MediaQuery.of(context).size.width / 12,
       child: BlocBuilder<GameBloc, GameState>
         (builder: (context, state) {
         if (state is GamePropertiesState) {
-        // _gameBloc.add(LoggedEvent());
-          return Row(
+            return Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -107,7 +100,8 @@ class CharacterOverlayState extends State<CharacterOverlay>
                         curve: Curves.fastOutSlowIn,
                         alignment: Alignment.center,
                         child: AutoSizeText(
-                          '${state.userModel.characters[0].hp} / ${state.userModel.characters[0].hp}',
+                          '${_characterOverlayCubit.state.characterModel.hp == null ? state.userModel.characters[0].hp : _characterOverlayCubit.state.characterModel.hp}'
+                              ' / ${state.userModel.characters[0].hp}',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
@@ -144,7 +138,7 @@ class CharacterOverlayState extends State<CharacterOverlay>
                   ),
                 ),
               ],
-          );
+            );
         }
         return CircularProgressIndicator();
       }),

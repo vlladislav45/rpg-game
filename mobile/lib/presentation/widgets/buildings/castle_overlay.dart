@@ -2,7 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
-import 'package:rpg_game/logic/cubits/map_levels/map_level_cubit.dart';
+import 'package:rpg_game/logic/cubits/map/map_cubit.dart';
 
 Widget castleOverlayBuilder(BuildContext context, MyGame myGame) {
   return CastleOverlay(myGame: myGame,);
@@ -32,7 +32,7 @@ class _CastleOverlayState extends State<CastleOverlay> {
               onPressed: () {
                 print('The player was teleported to the dungeon level: 1');
 
-                context.read<MapLevelCubit>().changeMapLevel(1);
+                context.read<MapCubit>().update(1, 0, isArena: false);
               },
               child: Container(
                 child: AutoSizeText(

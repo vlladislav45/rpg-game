@@ -7,9 +7,8 @@ import 'package:rpg_game/game.dart';
 import 'package:rpg_game/logic/blocs/game/game_bloc.dart';
 import 'package:rpg_game/logic/blocs/game/game_event.dart';
 import 'package:rpg_game/logic/blocs/game/game_state.dart';
-import 'package:rpg_game/logic/cubits/arena/arena_cubit.dart';
-import 'package:rpg_game/logic/cubits/map_levels/map_level_cubit.dart';
-import 'package:rpg_game/logic/cubits/map_levels/map_level_state.dart';
+import 'package:rpg_game/logic/cubits/map/map_cubit.dart';
+import 'package:rpg_game/logic/cubits/map/map_state.dart';
 import 'package:rpg_game/presentation/widgets/buildings/blacksmith_overlay.dart';
 import 'package:rpg_game/presentation/widgets/buildings/castle_overlay.dart';
 import 'package:rpg_game/presentation/widgets/buildings/portal_overlay.dart';
@@ -26,7 +25,7 @@ class MyGameScreen extends StatefulWidget {
 }
 
 class _MyGameScreenState extends State<MyGameScreen> {
-  late GameBloc _gameBloc;
+  late final GameBloc _gameBloc;
 
   @override
   void initState() {
@@ -56,27 +55,19 @@ class _MyGameScreenState extends State<MyGameScreen> {
                 );
               final jsonMap = snapshot.data;
 
-              return BlocBuilder<MapLevelCubit, MapLevelState>(
+              return BlocBuilder<MapCubit, MapState>(
                 builder: (context, state) {
                   return BlocBuilder<GameBloc, GameState>(
                   builder: (context, gameState) {
                   if (gameState is GamePropertiesState) {
                     return GameWidget<MyGame>(
                       game: MyGame(jsonMap: jsonMap.toString(),
-                          mapLevel: state.mapLevel,
-                          arena: context
-                              .read<ArenaCubit>()
-                              .state
-                              .arenaIndex,
+                          context: context,
+                          mapLevel: state.map,
+                          arena: state.arena,
                           characterModel: gameState.userModel.characters[0],
-                          viewportResolution: Vector2(MediaQuery
-                              .of(context)
-                              .size
-                              .width,
-                              MediaQuery
-                                  .of(context)
-                                  .size
-                                  .height)),
+                          viewportResolution: Vector2(MediaQuery.of(context).size.width,
+                              MediaQuery.of(context).size.height)),
                       overlayBuilderMap: {
                         'PortalMenu': portalOverlayBuilder,
                         'CastleMenu': castleOverlayBuilder,

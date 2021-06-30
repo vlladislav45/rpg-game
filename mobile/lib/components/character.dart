@@ -5,10 +5,14 @@ import 'package:flame/extensions.dart';
 import 'package:flame/geometry.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/components/npc.dart';
 import 'package:rpg_game/components/water.dart';
 import 'package:rpg_game/game.dart';
 import 'package:flame/joystick.dart';
+import 'package:rpg_game/logic/cubits/character_overlay/character_overlay_cubit.dart';
+import 'package:rpg_game/models/character_model.dart';
+import 'package:rpg_game/network/socket_manager.dart';
 import 'package:rpg_game/utils/convert_coordinates.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
 
@@ -23,7 +27,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   bool move = false;
 
   // Camera
-  late Rect rect;
   late Timer timer;
 
   // Collisions
@@ -33,7 +36,10 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   bool _isWall = false;
   bool isDead = false;
   bool isPlayerPressAttack = false;
-  int _health = 100;
+
+  //Character model
+  late final CharacterModel _characterModel;
+  late final BuildContext context;
 
   /// Where is facing of the character
   /// north, south, east, west, north-east, north-west, south-east, south-west
@@ -42,6 +48,8 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   late final TextComponent _nickname;
 
   Character(
+      BuildContext context,
+      CharacterModel characterModel,
       Map<NpcState, SpriteAnimation> animations, {
     Vector2? position,
     Vector2? size,
@@ -50,7 +58,8 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
           size: size,
           animations: animations,
         ) {
-
+    this.context = context;
+    this._characterModel = characterModel;
     timer = Timer(1.0)
       ..stop()
       ..callback = () {
@@ -73,7 +82,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
 
   TextComponent _renderNickName() {
     return TextComponent(
-      'my',
+      '${_characterModel.nickname}',
       position: Vector2(this.position.x + this.size.x / 2, this.position.y),
       textRenderer: TextPaint(
           config: TextPaintConfig(
@@ -105,9 +114,8 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     /// So the changes are basically to use the position field of your position component and set it to the
     /// center of the rect and in render you don't call super since that will prepare the canvas
 
-
-    if(_health <= 0) {
-      gameRef.camera.setRelativeOffset(Anchor.center);
+    if(_characterModel.hp <= 0) {
+      gameRef.camera.setRelativeOffset(Anchor.topCenter);
       timer.start();
       this.die();
     }
@@ -118,28 +126,14 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     // Delta time is the time elapsed since last update. For devices with higher frame rates,
     // delta time will be smaller and for devices with lower frame rates, it will be larger. Multiplying speed with
     // delta time ensure that player speed remains same irrespective of the device FPS.
-    if(_isWall && velocity.y == -1) {
-      final displacement = (_velocity.y * -1) + 10;
-      position.add(ConvertCoordinates.cartToIso(Vector2(0, displacement)));
-    }else if(_isWall && velocity.y == 1) {
-      final displacement = (_velocity.y * -1) - 10;
-      position.add(ConvertCoordinates.cartToIso(Vector2(0, displacement)));
-    } else if(_isWall && velocity.x == 1) {
-      final displacement = (_velocity.x * -1) - 10;
-      position.add(ConvertCoordinates.cartToIso(Vector2(displacement, 0)));
-    }else if(_isWall && velocity.x == -1) {
-      final displacement = (_velocity.x * -1) + 10;
-      position.add(ConvertCoordinates.cartToIso(Vector2(displacement, 0)));
-    }
-    else {
-      _isWall = false;
+    if(!_isWall) {
       final displacement = _velocity * (speed * dt);
 
       position.add(ConvertCoordinates.cartToIso(displacement));
     }
 
-    _isWall = false;
     _isCollision = false;
+    _isWall = false;
   }
 
   Vector2 get velocity => _velocity;
@@ -163,13 +157,33 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
         _isCollision = true;
         isPlayerPressAttack = false;
 
-        _health -= 7;
+        _characterModel.hp -= 7;
+        BlocProvider.of<CharacterOverlayCubit>(context).update(_characterModel.nickname, _characterModel.hp,
+            _characterModel.mana, _characterModel.level, id: _characterModel.id);
+        // var update = new CharacterModel(
+        //     _characterModel.id,
+        //     _characterModel.nickname,
+        //     _characterModel.hp,
+        //     _characterModel.level,
+        //     _characterModel.mana,
+        // );
+        // SocketManager.socket.emit("update", update.toJson());
       }
     } else if(other is Water) {
-      _isWall = true;
-    } else {
-      _isCollision = false;
       _isWall = false;
+      if(velocity.y == -1) {
+        // final displacement = (_velocity.y * -1) + 10;
+        position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+      }else if(velocity.y == 1) {
+        // final displacement = (_velocity.y * -1) - 10;
+        position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+      } else if(velocity.x == 1) {
+        // final displacement = (_velocity.x * -1) - 10;
+        position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+      }else if(velocity.x == -1) {
+        // final displacement = (_velocity.x * -1) + 10;
+        position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+      }
     }
   }
 
@@ -242,17 +256,14 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     // final die = SpriteAnimation.spriteList(sprites, stepTime: 0.20);
     isDead = true;
 
-    if(isDead) {
-      Sprite sprite = await Sprite.load('crypt.png');
-      gameRef.add(
-          SpriteComponent(
-            sprite: sprite,
-            position: this.position,
-            size: Vector2(50, 50),
-          )
-      );
-      gameRef.remove(this);
-      // gameRef.remove(_nickname);
-    }
+    Sprite sprite = await Sprite.load('crypt.png');
+    gameRef.add(
+        SpriteComponent(
+          sprite: sprite,
+          position: this.position,
+          size: Vector2(50, 50),
+        )
+    );
+    gameRef.remove(this);
   }
 }

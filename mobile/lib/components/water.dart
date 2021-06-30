@@ -13,6 +13,9 @@ class Water extends SpriteComponent with HasGameRef<MyGame>, Hitbox, Collidable 
     Vector2? size,
   }) : super(position: position, size: size);
 
+
+  bool get isWallHit => _isWallHit;
+
   @override
   void onMount() {
     super.onMount();
@@ -25,7 +28,6 @@ class Water extends SpriteComponent with HasGameRef<MyGame>, Hitbox, Collidable 
   void onCollision(Set<Vector2> intersectionPoints, Collidable other) {
     if (other is Character) {
       _isWallHit = true;
-      return;
     }
   }
 

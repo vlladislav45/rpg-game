@@ -73,7 +73,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
 
         other.isPlayerPressAttack = false;
         if(health > 0) {
-          health = health - 15;
+          health -= 20;
         }
       }
     }
@@ -267,9 +267,9 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
             size: Vector2(50,50),
           )
       );
-      gameRef.remove(_name);
-      gameRef.remove(_title);
-      gameRef.remove(_healthBar);
       gameRef.remove(this);
+      gameRef.remove(_name);
+      if(_title.text.isNotEmpty) gameRef.remove(_title);
+      gameRef.remove(_healthBar);
   }
 }

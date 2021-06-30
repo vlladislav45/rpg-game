@@ -9,5 +9,5 @@ public interface BaseDAO<T> {
 
     void removeById(int id);
 
-    void update(T object, Object... wildParams);
+    void update(T object);
 }

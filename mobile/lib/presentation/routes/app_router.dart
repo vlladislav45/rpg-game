@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/logic/blocs/game/game_bloc.dart';
 import 'package:rpg_game/logic/blocs/online/online_bloc.dart';
-import 'package:rpg_game/logic/cubits/arena/arena_cubit.dart';
-import 'package:rpg_game/logic/cubits/map_levels/map_level_cubit.dart';
+import 'package:rpg_game/logic/cubits/character_overlay/character_overlay_cubit.dart';
+import 'package:rpg_game/logic/cubits/map/map_cubit.dart';
 import 'package:rpg_game/presentation/screens/game_screen.dart';
 import 'package:rpg_game/presentation/screens/login_screen.dart';
 
 class AppRouter {
   // Cubit
-  MapLevelCubit _mapLevelCubit = MapLevelCubit();
-  ArenaCubit _arenaCubit = ArenaCubit();
+  MapCubit _mapCubit = MapCubit();
+  CharacterOverlayCubit _characterOverlayCubit = CharacterOverlayCubit();
 
   // Bloc
   OnlineBloc _onlineBloc = OnlineBloc();
@@ -23,7 +23,7 @@ class AppRouter {
             settings: RouteSettings(name: '/'),
             builder: (_) => MultiBlocProvider(providers: [
                   BlocProvider.value(
-                    value: _mapLevelCubit,
+                    value: _mapCubit,
                   ),
                   BlocProvider.value(
                     value: _onlineBloc,
@@ -35,8 +35,9 @@ class AppRouter {
         return MaterialPageRoute(
           settings: RouteSettings(name: '/game'),
           builder: (_) => MultiBlocProvider(providers: [
-              BlocProvider.value(
-              value: _mapLevelCubit,),
+            BlocProvider.value(
+              value: _mapCubit,
+            ),
             BlocProvider.value(
               value: _onlineBloc,
             ),
@@ -44,7 +45,7 @@ class AppRouter {
               value: _gameBloc,
             ),
             BlocProvider.value(
-              value: _arenaCubit,
+              value: _characterOverlayCubit,
             ),
           ], child: MyGameScreen(),
           ),
@@ -55,7 +56,8 @@ class AppRouter {
   }
 
   void dispose() {
-    _mapLevelCubit.close();
+    _characterOverlayCubit.close();
+    _mapCubit.close();
     _onlineBloc.close();
     _gameBloc.close();
   }

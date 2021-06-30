@@ -1,18 +1,23 @@
 package com.jrpg_game_server.cli.commands;
 
-import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.jrpg_game_server.cli.dao.CharacterDAO;
 import com.jrpg_game_server.cli.dao.UserDAO;
+import com.jrpg_game_server.cli.entities.Character;
 import com.jrpg_game_server.cli.models.binding.AuthenticationRequestBindingModel;
+import com.jrpg_game_server.cli.models.binding.CharacterBindingModel;
+import com.jrpg_game_server.cli.models.views.CharacterViewModel;
 import com.jrpg_game_server.cli.models.views.UserViewModel;
+import com.jrpg_game_server.cli.services.CharacterServiceImpl;
 import com.jrpg_game_server.cli.services.ServiceWrapper;
-import com.jrpg_game_server.cli.services.UserServices;
-import com.jrpg_game_server.cli.services.impl.UserServicesImpl;
+import com.jrpg_game_server.cli.services.base.CharacterService;
+import com.jrpg_game_server.cli.services.base.UserService;
+import com.jrpg_game_server.cli.services.UserServiceImpl;
 import com.jrpg_game_server.network.SocketServerManager;
 import picocli.CommandLine;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 @CommandLine.Command(name = "start server", aliases = "ss")
 
@@ -44,7 +49,6 @@ public class ServerStartCommand extends AbstractCommand {
             }
         });
 
-
         server.addEventListener("handshake", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {
             if (serviceWrapper.getUserServices().getLoggedUser() != null) {
                 UserViewModel userViewModel = UserViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser());
@@ -52,6 +56,23 @@ public class ServerStartCommand extends AbstractCommand {
             }
         });
 
+        server.addEventListener("update", CharacterBindingModel.class, (client, data, ackRequest) -> {
+            if (serviceWrapper.getUserServices().getLoggedUser() != null) {
+                // update the information about character
+                Character character = new Character(
+                        UUID.fromString(data.getId()),
+                        data.getNickname(),
+                        data.getLevel(),
+                        data.getHp(),
+                        data.getMana()
+                );
+                serviceWrapper.getCharacterService().update(character);
+
+                CharacterViewModel characterViewModel =
+                        CharacterViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser().getCharacters().iterator().next());
+                client.sendEvent("loggedPlayer", characterViewModel);
+            }
+        });
 
         server.start();
 
@@ -71,11 +92,12 @@ public class ServerStartCommand extends AbstractCommand {
         UserDAO userDAO = new UserDAO(characterDAO);
 
         //Init service layer
-        UserServices userServices = new UserServicesImpl(userDAO,
+        UserService userService = new UserServiceImpl(userDAO,
                 characterDAO);
+        CharacterService characterService = new CharacterServiceImpl(characterDAO);
 
         serviceWrapper = new ServiceWrapper();
-        serviceWrapper.setServices(userServices);
+        serviceWrapper.setServices(userService, characterService);
     }
 
     private boolean loginCheck(String username, String password) {

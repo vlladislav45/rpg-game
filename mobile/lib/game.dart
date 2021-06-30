@@ -47,6 +47,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
   late Npc _npc;
   Selector? _selector;
   Portal? _portal;
+  late final BuildContext _context;
 
   // Useful properties
   bool _isCharacterSpawned = false;
@@ -59,6 +60,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
 
   MyGame({
     CharacterModel? characterModel,
+    BuildContext? context,
     String? jsonMap,
     int? mapLevel,
     int? arena,
@@ -68,6 +70,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     this.jsonMap = jsonMap;
     this.arena = arena;
     this._characterModel = characterModel!;
+    this._context = context!;
 
     _timer = Timer(time)
       ..stop()
@@ -105,6 +108,24 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     spawnNpcs();
   }
 
+  Future<void> loadArena() async {
+    viewport = FixedResolutionViewport(viewportResolution);
+    print('ViewPort: ${viewport.canvasSize}');
+
+    final tilesetImage = await images.load('sprites/tile_maps/tileset.png');
+    final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2(151, 76));
+    final matrix = Map.toList(this.jsonMap.toString());
+
+    // Add main town
+    add(map = Map(
+      tileset,
+      matrix,
+      tileHeight: 25.0,
+    )..position = topLeft);
+
+    spawnCharacter();
+  }
+
   void spawnNpcs() async {
     /// Load npc Sprite Direction Animations
     final npcSpriteAnimation = NpcSpriteAnimation();
@@ -112,13 +133,13 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
 
     print('SIZE OF THE MAP ${map.mapSize()}');
     for (int i = 0; i < 5; i++) {
-      final npcSpawnPosition = map.getBlock(Vector2(x, y) + topLeft +  map.genCoord());
+      final npcSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + map.genCoord());
       final spawnPosition = map.getBlockPosition(npcSpawnPosition);
 
       bool isAggressive = false;
       // Odd number
       var rand = Random().nextInt(100);
-      if(rand % 2 == 1) isAggressive = true;
+      if(i % 2 == 1) isAggressive = true;
 
       print('Npc is spawned on: $spawnPosition');
       add(Npc(
@@ -162,10 +183,11 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
 
     /// Spawn the character
 
-    final characterSpawnPosition =
-        map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 125));
+    final characterSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 125));
     await characterSpriteAnimation.loadSpriteAnimations();
     _character = Character(
+      _context,
+      _characterModel,
       {
         NpcState.idleRight: characterSpriteAnimation.idleRight,
         NpcState.hitRight: characterSpriteAnimation.hitRight,
@@ -193,7 +215,6 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
         NpcState.runTopRight: characterSpriteAnimation.runTopRight,
       },
       size: Vector2(200, 200),
-      //position: map.getBlockPosition(characterSpawnPosition),
     )..current = NpcState.idleRight;
     _character.position.setFrom(map.getBlockPosition(characterSpawnPosition));
 
@@ -249,7 +270,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
   Future<void> onLoad() async {
     print('Map Level: $mapLevel');
     mapLevel == 0 ? spawnTown() : await loadMapLevel();
-    print('Arena: $arena');
+    // arena == 0 ? spawnTown() : await loadArena();
 
     // final selectorImage = await images.load('tile_maps/selector.png');
     // add(_selector = Selector(s, selectorImage));

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO {
+public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO<User> {
     private static final String USER_TABLE_NAME = "users";
     private static final String USER_ROLE_TABLE_NAME = "user_roles";
 
@@ -22,9 +22,7 @@ public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO {
     }
 
     @Override
-    public void add(Object object) {
-        User user = (User) object;
-
+    public void add(User user) {
         String query =
                 "INSERT INTO "
                         + USER_TABLE_NAME +
@@ -36,7 +34,7 @@ public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO {
     }
 
     @Override
-    public Object getById(UUID id) {
+    public User getById(UUID id) {
         String query = "SELECT * FROM " + USER_TABLE_NAME + " WHERE id = '" + id + "'";
         Map<String,Object> result = executeQueryWithSingleResult(query);
 
@@ -62,14 +60,12 @@ public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO {
     }
 
     @Override
-    public void update(Object object, Object... wildParams) {
-        User user = (User) object;
-
+    public void update(User user) {
         String query = "UPDATE " + USER_TABLE_NAME +
                 " SET password=? " +
                 " WHERE username=?";
 
-        executeQuery(query, wildParams, user.getUsername());
+        executeQuery(query, user.getPassword(), user.getUsername());
     }
 
     public User getByParams(String username, String password) {

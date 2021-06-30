@@ -13,10 +13,17 @@ public class Character {
     public Character() {
     }
 
+    public Character(UUID id, String nickname, int hp, int mana, int level) {
+        this.id = id;
+        this.nickname = nickname;
+        this.hp = hp;
+        this.level = level;
+        this.mana = mana;
+    }
+
     public Character(String nickname, int hp, int mana) {
         this.nickname = nickname;
         this.hp = hp;
-        this.level = 1;
         this.mana = mana;
     }
 
