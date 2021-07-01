@@ -124,8 +124,10 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
     // double S = (mapSize().x * 2) + (mapSize().y * 2);
     // return -S + R.nextDouble() * (2 * S);
 
-    double x = R.nextDouble() * (mapSize().x / 4);
-    double y = R.nextDouble() * (mapSize().y / 2);
+    // double x = R.nextDouble() * (mapSize().x / 4);
+    // double y = R.nextDouble() * (mapSize().y / 2);
+    double x = R.nextDouble() * 1300 + 500;
+    double y = R.nextDouble() * 300 + 150;
     return Vector2(x, y);
   }
 }

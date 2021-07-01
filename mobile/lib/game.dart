@@ -45,6 +45,8 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
   late Character _character;
   late final CharacterModel _characterModel;
   late Npc _npc;
+  late List<Npc> _npcs = [];
+  bool _isAllNpcsAreDeath = false;
   Selector? _selector;
   Portal? _portal;
   late final BuildContext _context;
@@ -133,16 +135,18 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
 
     print('SIZE OF THE MAP ${map.mapSize()}');
     for (int i = 0; i < 5; i++) {
-      final npcSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + map.genCoord());
+      final npcSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + Vector2(Random().nextInt(1000).roundToDouble(),
+          Random().nextInt(300).roundToDouble()));
       final spawnPosition = map.getBlockPosition(npcSpawnPosition);
 
       bool isAggressive = false;
       // Odd number
       var rand = Random().nextInt(100);
-      if(i % 2 == 1) isAggressive = true;
+      if(rand % 2 == 1) isAggressive = true;
 
       print('Npc is spawned on: $spawnPosition');
-      add(Npc(
+      Npc npc;
+      add(npc = Npc(
         isAggressive,
         _character,
         {
@@ -174,6 +178,8 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
         size: Vector2(79, 63),
         position: spawnPosition,
       )..current = NpcState.idleDown);
+
+    _npcs.add(npc);
     }
   }
 
@@ -346,5 +352,18 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
   void update(double dt) {
     super.update(dt);
     _timer.update(dt);
+
+    _npcs.forEach((Npc npc) {
+      if(npc.isNpcDeath)
+        _isAllNpcsAreDeath = true;
+      else _isAllNpcsAreDeath = false;
+    });
+    if(_isAllNpcsAreDeath) {
+      remove(map);
+      spawnTown();
+    }
+    if(_isCharacterSpawned) {
+      if(_character.isDead) spawnTown();
+    }
   }
 }

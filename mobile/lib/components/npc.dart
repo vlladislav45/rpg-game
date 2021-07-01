@@ -29,6 +29,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   // Random point of character
   static int _chPoint = Random().nextInt(3);
   bool isPlayerPressAttack = false;
+  bool isNpcDeath = false;
 
   // Timer
   static const double time = 8 * 0.10;
@@ -260,6 +261,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   }
 
   void die() async {
+    isNpcDeath = true;
       gameRef.add(
           SpriteComponent(
             sprite: await Sprite.load('crypt.png'),

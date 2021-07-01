@@ -49,13 +49,6 @@ public class ServerStartCommand extends AbstractCommand {
             }
         });
 
-        server.addEventListener("handshake", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {
-            if (serviceWrapper.getUserServices().getLoggedUser() != null) {
-                UserViewModel userViewModel = UserViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser());
-                client.sendEvent("loggedPlayer", userViewModel);
-            }
-        });
-
         server.addEventListener("update", CharacterBindingModel.class, (client, data, ackRequest) -> {
             if (serviceWrapper.getUserServices().getLoggedUser() != null) {
                 // update the information about character
