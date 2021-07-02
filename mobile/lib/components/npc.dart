@@ -26,8 +26,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   int _range = 150;
   int health = 100;
   String _facing = "";
-  // Random point of character
-  static int _chPoint = Random().nextInt(3);
+
   bool isPlayerPressAttack = false;
   bool isNpcDeath = false;
 
@@ -68,7 +67,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   @override
   void onCollision(Set<Vector2> points, Collidable other) {
     if (other is Character) {
-      print(other.isPlayerPressAttack);
+      print('Character hit the npc ${other.isPlayerPressAttack}');
       if(other.isPlayerPressAttack) {
         _isCollision = true;
 
@@ -177,8 +176,8 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   Vector2 pathFinding() {
     Vector2 pathFinder = Vector2.zero();
 
-    double differentX = (_character.position.x + _character.width / _chPoint) - position.x;
-    double differentY = (_character.position.y + _character.height / _chPoint) - position.y;
+    double differentX = (_character.position.x + _character.width / 2) - position.x;
+    double differentY = (_character.position.y + _character.height / 2) - position.y;
 
     // print('offsetY: $differentY');
     // print('offsetX: $differentX');
@@ -210,8 +209,8 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   }
 
   void facing() {
-    double differentX = (_character.position.x + _character.width / _chPoint) - position.x;
-    double differentY = (_character.position.y + _character.height / _chPoint) - position.y;
+    double differentX = (_character.position.x + _character.width / 2) - position.x;
+    double differentY = (_character.position.y + _character.height / 2) - position.y;
 
     final double npcAngle = (atan2(differentY, differentX) / pi) * 180;
 
@@ -271,7 +270,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
       );
       gameRef.remove(this);
       gameRef.remove(_name);
-      if(_title.text.isNotEmpty) gameRef.remove(_title);
+      if(_isAggressive) gameRef.remove(_title);
       gameRef.remove(_healthBar);
   }
 }

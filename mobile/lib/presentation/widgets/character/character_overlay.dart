@@ -59,6 +59,7 @@ class CharacterOverlayState extends State<CharacterOverlay>
       child: BlocBuilder<GameBloc, GameState>
         (builder: (context, state) {
         if (state is GamePropertiesState) {
+          print(_characterOverlayCubit.state.characterModel.hp);
             return Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,

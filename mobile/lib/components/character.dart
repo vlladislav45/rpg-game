@@ -248,12 +248,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   }
 
   void die() async {
-    // int lengthOfSprites = 1296; // Death sprites started from 1256-1296
-    // List<Sprite> sprites = [];
-    // for (int i = 1256; i <= lengthOfSprites; i += 4)
-    //   sprites.add(await Sprite.load(
-    //   'sprites/characters/knights/seq_antlerKnight/A_right${i}.png'));
-    // final die = SpriteAnimation.spriteList(sprites, stepTime: 0.20);
     isDead = true;
 
     Sprite sprite = await Sprite.load('crypt.png');
