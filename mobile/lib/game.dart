@@ -17,7 +17,6 @@ import 'package:rpg_game/components/npc.dart';
 import 'package:rpg_game/components/portal.dart';
 import 'package:rpg_game/maps/maps/map.dart';
 import 'package:rpg_game/components/character.dart';
-import 'package:rpg_game/components/selector.dart';
 import 'package:rpg_game/maps/town.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
 
@@ -43,11 +42,11 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
   late Map map;
   Town? _town;
   late Character _character;
+  late JoystickComponent _joystick;
   late final CharacterModel _characterModel;
   late Npc _npc;
   late List<Npc> _npcs = [];
   bool _isAllNpcsAreDeath = false;
-  Selector? _selector;
   Portal? _portal;
   late final BuildContext _context;
 
@@ -224,22 +223,22 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     )..current = NpcState.idleRight;
     _character.position.setFrom(map.getBlockPosition(characterSpawnPosition));
 
-    final joystick = await getJoystick();
-    joystick.addObserver(_character);
+    _joystick = await getJoystick();
+    _joystick.addObserver(_character);
 
     add(_character);
     camera.cameraSpeed = 1;
     camera.followComponent(_character, relativeOffset: Anchor.center);
 
-    add(joystick);
-    if (!overlays.isActive('CharacterOverlay'))
-      overlays.add('CharacterOverlay');
+    add(_joystick);
+    if (!overlays.isActive(_character.overlay))
+      overlays.add(_character.overlay);
 
     _isCharacterSpawned = true;
   }
 
   Future<JoystickComponent> getJoystick() async {
-    final joystick = JoystickComponent(
+   return JoystickComponent(
       gameRef: this,
       directional: JoystickDirectional(
         background: JoystickElement.sprite(await loadJoystick('joystick_background.png')),
@@ -255,7 +254,6 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
         ),
       ],
     );
-    return joystick;
   }
 
   Future<Sprite> loadJoystick(String imageName) async {
@@ -277,9 +275,6 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     print('Map Level: $mapLevel');
     mapLevel == 0 ? spawnTown() : await loadMapLevel();
     // arena == 0 ? spawnTown() : await loadArena();
-
-    // final selectorImage = await images.load('tile_maps/selector.png');
-    // add(_selector = Selector(s, selectorImage));
   }
 
   @override
@@ -353,19 +348,23 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     super.update(dt);
     _timer.update(dt);
 
-  //   List<Npc> matches = _npcs.where((n) => n.isNpcDeath == true).toList();
-  //   if(matches.length == _npcs.length && _npcs.length > 0) {
-  //     _isAllNpcsAreDeath = true;
-  //   }
-  //   if(_isAllNpcsAreDeath) {
-  //     remove(map);
-  //     spawnTown();
-  //   }
-  //   if(_isCharacterSpawned) {
-  //     if(_character.isDead) {
-  //       remove(map);
-  //       spawnTown();
-  //     }
-  //   }
+    List<Npc> matches = _npcs.where((n) => n.isNpcDeath == true).toList();
+    if(matches.length == _npcs.length && _npcs.length > 0) {
+      _isAllNpcsAreDeath = true;
+    }
+    if(_isAllNpcsAreDeath) {
+      remove(map);
+      spawnTown();
+    }
+    if(_isCharacterSpawned) {
+      if(_character.isDead) {
+        // Remove map and his restrictions
+        map.removeChildComponents();
+        remove(map);
+        remove(_joystick);
+        overlays.remove(_character.overlay);
+        spawnTown();
+      }
+    }
   }
 }

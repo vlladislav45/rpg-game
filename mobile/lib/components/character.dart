@@ -34,7 +34,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   final _defaultColor = Colors.cyan;
   bool _isCollision = false;
   bool _isWall = false;
-  bool isDead = false;
+  bool _isDead = false;
   bool isPlayerPressAttack = false;
 
   //Character model
@@ -46,6 +46,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   late String _facing;
 
   late final TextComponent _nickname;
+  late String _overlay = 'CharacterOverlay';
 
   Character(
       BuildContext context,
@@ -66,6 +67,15 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
         gameRef.camera.setRelativeOffset(Anchor.center);
       };
   }
+
+  //Getter and setters
+  bool get isDead => _isDead;
+
+  set setIsDead(bool value) {
+    _isDead = value;
+  }
+
+  String get overlay => _overlay;
 
   @override
   int get priority => 1;
@@ -115,7 +125,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     /// center of the rect and in render you don't call super since that will prepare the canvas
 
     if(_characterModel.hp <= 0) {
-      gameRef.camera.setRelativeOffset(Anchor.topCenter);
       timer.start();
       this.die();
     }
@@ -173,7 +182,10 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
       _isWall = false;
       if(velocity.y == -1) {
         // final displacement = (_velocity.y * -1) + 10;
-        position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+        // position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+        print(position);
+        position.y = other.position.y + 1;
+        print('New coordiantes: ${position}');
       }else if(velocity.y == 1) {
         // final displacement = (_velocity.y * -1) - 10;
         position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
@@ -248,7 +260,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   }
 
   void die() async {
-    isDead = true;
+    this._isDead = true;
 
     Sprite sprite = await Sprite.load('crypt.png');
     gameRef.add(

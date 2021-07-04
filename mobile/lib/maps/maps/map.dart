@@ -15,6 +15,9 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
   static const double MAP_OFFSETX_LENGTH = 25;
   static const double MAP_OFFSETY_LENGTH = 25;
 
+  // Walls
+  List<Component> _restrictObstacles = [];
+
   // Constructor
   Map(
       SpriteSheet tileset,
@@ -22,7 +25,6 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
       {Vector2? destTileSize,
         double? tileHeight})
       : super(tileset, matrix, destTileSize: destTileSize, tileHeight: tileHeight);
-
 
   @override
   Future<void> onLoad() async {
@@ -34,11 +36,14 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
         if (element == -1) {
           final p = getBlockPositionInts(j, i);
           final waterSprite = await gameRef.loadSprite('sprites/tile_maps/water.png');
-          gameRef.add(Water(
+
+          Water obstacle;
+          gameRef.add(obstacle = Water(
             sprite: waterSprite,
             position: p + topLeft,
             size: waterSprite.srcSize,
           ));
+          _restrictObstacles.add(obstacle);
         }
       }
     }
@@ -111,6 +116,12 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
       }
     }
   }
+
+  void removeChildComponents() {
+    gameRef.removeAll(_restrictObstacles);
+  }
+
+
 
   Vector2 mapSize() {
     // Map width and height contribute equally in both directions
