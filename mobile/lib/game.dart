@@ -353,19 +353,19 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     super.update(dt);
     _timer.update(dt);
 
-    List<Npc> matches = _npcs.where((n) => n.isNpcDeath == true).toList();
-    if(matches.length == _npcs.length && _npcs.length > 0) {
-      _isAllNpcsAreDeath = true;
-    }
-    if(_isAllNpcsAreDeath) {
-      remove(map);
-      spawnTown();
-    }
-    if(_isCharacterSpawned) {
-      if(_character.isDead) {
-        remove(map);
-        spawnTown();
-      }
-    }
+  //   List<Npc> matches = _npcs.where((n) => n.isNpcDeath == true).toList();
+  //   if(matches.length == _npcs.length && _npcs.length > 0) {
+  //     _isAllNpcsAreDeath = true;
+  //   }
+  //   if(_isAllNpcsAreDeath) {
+  //     remove(map);
+  //     spawnTown();
+  //   }
+  //   if(_isCharacterSpawned) {
+  //     if(_character.isDead) {
+  //       remove(map);
+  //       spawnTown();
+  //     }
+  //   }
   }
 }

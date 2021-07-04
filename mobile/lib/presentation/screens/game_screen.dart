@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
-import 'package:rpg_game/logic/blocs/game/game_bloc.dart';
-import 'package:rpg_game/logic/blocs/game/game_event.dart';
-import 'package:rpg_game/logic/blocs/game/game_state.dart';
+import 'package:rpg_game/logic/blocs/online/online_bloc.dart';
+import 'package:rpg_game/logic/blocs/online/online_state.dart';
 import 'package:rpg_game/logic/cubits/map/map_cubit.dart';
 import 'package:rpg_game/logic/cubits/map/map_state.dart';
 import 'package:rpg_game/presentation/widgets/buildings/blacksmith_overlay.dart';
@@ -25,20 +24,8 @@ class MyGameScreen extends StatefulWidget {
 }
 
 class _MyGameScreenState extends State<MyGameScreen> {
-  late final GameBloc _gameBloc;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // init blocs
-    _gameBloc = context.read<GameBloc>();
-  }
-
   @override
   Widget build(BuildContext context) {
-    _gameBloc.add(LoggedEvent());
-
     return Scaffold(
         body: Container(
           padding: EdgeInsets.all(0.0),
@@ -57,15 +44,15 @@ class _MyGameScreenState extends State<MyGameScreen> {
 
               return BlocBuilder<MapCubit, MapState>(
                 builder: (context, state) {
-                  return BlocBuilder<GameBloc, GameState>(
-                  builder: (context, gameState) {
-                  if (gameState is GamePropertiesState) {
+                  return BlocBuilder<OnlineBloc, OnlineState>(
+                  builder: (_, gameState) {
+                  if (gameState is OnlineAuthenticatedState) {
                     return GameWidget<MyGame>(
                       game: MyGame(jsonMap: jsonMap.toString(),
                           context: context,
                           mapLevel: state.map,
                           arena: state.arena,
-                          characterModel: gameState.userModel.characters[0],
+                          characterModel: gameState.userViewModel.characters[0],
                           viewportResolution: Vector2(MediaQuery.of(context).size.width,
                               MediaQuery.of(context).size.height)),
                       overlayBuilderMap: {
