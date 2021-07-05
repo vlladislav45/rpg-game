@@ -6,7 +6,6 @@ import 'package:flame/components.dart';
 import 'package:flame/src/spritesheet.dart';
 import 'package:rpg_game/components/water.dart';
 import 'package:rpg_game/game.dart';
-import 'package:rpg_game/utils/convert_coordinates.dart';
 
 class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
   static final R = Random();
@@ -120,8 +119,6 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
   void removeChildComponents() {
     gameRef.removeAll(_restrictObstacles);
   }
-
-
 
   Vector2 mapSize() {
     // Map width and height contribute equally in both directions

@@ -122,7 +122,8 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
       tileset,
       matrix,
       tileHeight: 25.0,
-    )..position = topLeft);
+    )..position = topLeft
+    ..isHud = true);
 
     spawnCharacter();
   }
