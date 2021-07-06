@@ -60,18 +60,17 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   void onMount() {
     super.onMount();
 
-    final shape = HitboxCircle(definition: 0.8);
+    final shape = HitboxCircle(definition: 1.0);
     addShape(shape);
   }
 
   @override
   void onCollision(Set<Vector2> points, Collidable other) {
     if (other is Character) {
-      print('Character hit the npc ${other.isPlayerPressAttack}');
       if(other.isPlayerPressAttack) {
         _isCollision = true;
+        other.setIsPlayerPressAttack(false);
 
-        other.isPlayerPressAttack = false;
         if(health > 0) {
           health -= 20;
         }
@@ -272,5 +271,12 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
       gameRef.remove(_name);
       if(_isAggressive) gameRef.remove(_title);
       gameRef.remove(_healthBar);
+  }
+
+  void remove() {
+    gameRef.remove(this);
+    gameRef.remove(_name);
+    if(_isAggressive) gameRef.remove(_title);
+    gameRef.remove(_healthBar);
   }
 }

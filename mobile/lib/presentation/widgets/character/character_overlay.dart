@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
-import 'package:rpg_game/logic/blocs/game/game_bloc.dart';
-import 'package:rpg_game/logic/blocs/game/game_state.dart';
+import 'package:rpg_game/logic/blocs/online/online_bloc.dart';
+import 'package:rpg_game/logic/blocs/online/online_state.dart';
 import 'package:rpg_game/logic/cubits/character_overlay/character_overlay_cubit.dart';
 import 'package:rpg_game/utils/hex_color.dart';
 
@@ -39,9 +39,17 @@ class CharacterOverlayState extends State<CharacterOverlay>
     controller!.repeat(reverse: true);
   }
 
+
+  @override
+  void dispose() {
+    controller!.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-     return Container(
+
+    return Container(
       padding: EdgeInsets.all(10.0),
       alignment: Alignment.topLeft,
       decoration: BoxDecoration(
@@ -56,90 +64,91 @@ class CharacterOverlayState extends State<CharacterOverlay>
       ),
       width: MediaQuery.of(context).size.width / 5,
       height: MediaQuery.of(context).size.width / 12,
-      child: BlocBuilder<GameBloc, GameState>
+      child: BlocBuilder<OnlineBloc, OnlineState>
         (builder: (context, state) {
-        if (state is GamePropertiesState) {
-          print(_characterOverlayCubit.state.characterModel.hp);
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Expanded(
-                  child: Container(
-                    child: CircleAvatar(
-                      maxRadius: 25.0,
-                      backgroundColor: Colors.brown.shade800,
+        if (state is OnlineAuthenticatedState) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  child: CircleAvatar(
+                    maxRadius: 25.0,
+                    backgroundColor: Colors.brown.shade800,
+                    child: AutoSizeText(
+                      'Lv. ${state.userViewModel.characters[0].level}',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    AnimatedContainer(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Color(HexColor.convertHexColor('#EC2018')),
+                        borderRadius: BorderRadius.horizontal(
+                            left: Radius.circular(8.0),
+                            right: Radius.circular(8.0)),
+                        gradient: LinearGradient(
+                          begin: Alignment.topRight,
+                          end: Alignment.bottomLeft,
+                          colors: [
+                            Color(HexColor.convertHexColor('#FF2C1F')),
+                            Color(HexColor.convertHexColor('#6D0E16')),
+                          ],
+                        ),
+                      ),
+                      duration: Duration(seconds: 1),
+                      curve: Curves.fastOutSlowIn,
+                      alignment: Alignment.center,
                       child: AutoSizeText(
-                        'Lv. ${state.userModel.characters[0].level}',
+                        '${_characterOverlayCubit.state.characterModel.hp == null ? state.userViewModel.characters[0].hp : _characterOverlayCubit.state.characterModel.hp}'
+                        ' / ${state.userViewModel.characters[0].hp}',
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
                         ),
                       ),
                     ),
-                  ),
-                ),
-
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      AnimatedContainer(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Color(HexColor.convertHexColor('#EC2018')),
-                          borderRadius: BorderRadius.horizontal(left: Radius.circular(8.0), right: Radius.circular(8.0)),
-                          gradient: LinearGradient(
-                            begin: Alignment.topRight,
-                            end: Alignment.bottomLeft,
-                            colors: [
-                              Color(HexColor.convertHexColor('#FF2C1F')),
-                              Color(HexColor.convertHexColor('#6D0E16')),
-                            ],
-                          ),
-                        ),
-                        duration: Duration(seconds: 1),
-                        curve: Curves.fastOutSlowIn,
-                        alignment: Alignment.center,
-                        child: AutoSizeText(
-                          '${_characterOverlayCubit.state.characterModel.hp == null ? state.userModel.characters[0].hp : _characterOverlayCubit.state.characterModel.hp}'
-                              ' / ${state.userModel.characters[0].hp}',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
+                    AnimatedContainer(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Color(HexColor.convertHexColor('#EC2018')),
+                        borderRadius: BorderRadius.horizontal(
+                            left: Radius.circular(8.0),
+                            right: Radius.circular(8.0)),
+                        gradient: LinearGradient(
+                          begin: Alignment.topRight,
+                          end: Alignment.bottomLeft,
+                          colors: [
+                            Color(HexColor.convertHexColor('#00C1FA')),
+                            Color(HexColor.convertHexColor('#004977')),
+                          ],
                         ),
                       ),
-
-                      AnimatedContainer(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Color(HexColor.convertHexColor('#EC2018')),
-                          borderRadius: BorderRadius.horizontal(left: Radius.circular(8.0), right: Radius.circular(8.0)),
-                          gradient: LinearGradient(
-                            begin: Alignment.topRight,
-                            end: Alignment.bottomLeft,
-                            colors: [
-                              Color(HexColor.convertHexColor('#00C1FA')),
-                              Color(HexColor.convertHexColor('#004977')),
-                            ],
-                          ),
-                        ),
-                        duration: Duration(seconds: 1),
-                        curve: Curves.fastOutSlowIn,
-                        alignment: Alignment.center,
-                        child: AutoSizeText(
-                          '${state.userModel.characters[0].mana} / ${state.userModel.characters[0].mana}',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
+                      duration: Duration(seconds: 1),
+                      curve: Curves.fastOutSlowIn,
+                      alignment: Alignment.center,
+                      child: AutoSizeText(
+                        '${state.userViewModel.characters[0].mana} / ${state.userViewModel.characters[0].mana}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            );
+              ),
+            ],
+          );
         }
         return CircularProgressIndicator();
       }),

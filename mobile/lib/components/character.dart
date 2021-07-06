@@ -35,7 +35,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   bool _isCollision = false;
   bool _isWall = false;
   bool _isDead = false;
-  bool isPlayerPressAttack = false;
+  bool _isPlayerPressAttack = false;
 
   //Character model
   late final CharacterModel _characterModel;
@@ -75,7 +75,11 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     _isDead = value;
   }
 
-  String get overlay => _overlay;
+  bool get isPlayerPressAttack => _isPlayerPressAttack;
+
+  void setIsPlayerPressAttack(bool value) {
+    _isPlayerPressAttack = value;
+  }
 
   @override
   int get priority => 1;
@@ -151,6 +155,9 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     this._velocity = newVelocity;
   }
 
+
+  String get overlay => _overlay;
+
   @override
   void onMount() {
     super.onMount();
@@ -164,7 +171,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     if (other is Npc) {
       if(other.isPlayerPressAttack) {
         _isCollision = true;
-        isPlayerPressAttack = false;
+        other.isPlayerPressAttack = false;
 
         _characterModel.hp -= 7;
         BlocProvider.of<CharacterOverlayCubit>(context).update(_characterModel.nickname, _characterModel.hp,
@@ -182,10 +189,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
       _isWall = false;
       if(velocity.y == -1) {
         // final displacement = (_velocity.y * -1) + 10;
-        // position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
-        print(position);
-        position.y = other.position.y + 1;
-        print('New coordiantes: ${position}');
+        position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
       }else if(velocity.y == 1) {
         // final displacement = (_velocity.y * -1) - 10;
         position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
@@ -270,6 +274,8 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
           size: Vector2(50, 50),
         )
     );
+    gameRef.remove(_nickname);
+    gameRef.overlays.remove(_overlay);
     gameRef.remove(this);
   }
 }

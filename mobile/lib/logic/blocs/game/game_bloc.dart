@@ -6,7 +6,7 @@ import 'package:rpg_game/network/socket_manager.dart';
 
 class GameBloc extends Bloc<GameEvent, GameState> {
 
-  GameBloc() : super(null) {
+  GameBloc() : super(GameInitialState()) {
     SocketManager.socket.on('loggedPlayer', (data) => add(GamePropertiesEvent.fromJson(data)));
   }
 

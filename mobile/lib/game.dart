@@ -76,6 +76,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     _timer = Timer(time)
       ..stop()
       ..callback = () {
+        // _character.setIsPlayerPressAttack(false);
         _character.current = DirectionalHelper.getDirectionalSpriteAnimation(
             _facing!, StateAction.Idle);
       };
@@ -135,8 +136,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
 
     print('SIZE OF THE MAP ${map.mapSize()}');
     for (int i = 0; i < 5; i++) {
-      final npcSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + Vector2(Random().nextInt(1000).roundToDouble(),
-          Random().nextInt(300).roundToDouble()));
+      final npcSpawnPosition = map.getBlock(Vector2(x, y) + map.genCoord());
       final spawnPosition = map.getBlockPosition(npcSpawnPosition);
 
       bool isAggressive = false;
@@ -266,9 +266,13 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
   void spawnTown() async {
     //Spawn town
     final townSprite = await Sprite.load('bg/Background_3_3840x2160.jpg');
-    _town = Town(size: size, position: Vector2(0, 0))..sprite = townSprite;
+    _town = Town(size: size, position: Vector2.zero())
+      ..sprite = townSprite
+      ..isHud = true;
     add(_town!);
     _town!.spawnTown();
+
+    camera.snapTo(Vector2.zero());
   }
 
   @override
@@ -292,7 +296,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     if(e.data.keyLabel == '1') {
       _character.current = DirectionalHelper.getDirectionalSpriteAnimation(
           _facing!, StateAction.Attack);
-      _character.isPlayerPressAttack = true;
+      _character.setIsPlayerPressAttack(true);
       _timer.start();
     }
 
@@ -345,7 +349,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
   }
 
   @override
-  void update(double dt) {
+  void update(double dt) async {
     super.update(dt);
     _timer.update(dt);
 
@@ -360,10 +364,12 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     if(_isCharacterSpawned) {
       if(_character.isDead) {
         // Remove map and his restrictions
-        map.removeChildComponents();
-        remove(map);
-        remove(_joystick);
-        overlays.remove(_character.overlay);
+        // map.removeChildComponents();
+        // remove(map);
+        // remove(_joystick);
+        // for(Npc npc in _npcs) npc.remove();
+
+        // and then spawn the town
         spawnTown();
       }
     }
