@@ -5,14 +5,11 @@ import 'package:flame/extensions.dart';
 import 'package:flame/geometry.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/components/npc.dart';
 import 'package:rpg_game/components/water.dart';
 import 'package:rpg_game/game.dart';
 import 'package:flame/joystick.dart';
-import 'package:rpg_game/logic/cubits/character_overlay/character_overlay_cubit.dart';
 import 'package:rpg_game/models/character_model.dart';
-import 'package:rpg_game/network/socket_manager.dart';
 import 'package:rpg_game/utils/convert_coordinates.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
 
@@ -36,6 +33,9 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   bool _isWall = false;
   bool _isDead = false;
   bool _isPlayerPressAttack = false;
+
+  // Character Properties
+  late int currentHp;
 
   //Character model
   late final CharacterModel _characterModel;
@@ -174,16 +174,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
         other.isPlayerPressAttack = false;
 
         _characterModel.hp -= 7;
-        BlocProvider.of<CharacterOverlayCubit>(context).update(_characterModel.nickname, _characterModel.hp,
-            _characterModel.mana, _characterModel.level, id: _characterModel.id);
-        // var update = new CharacterModel(
-        //     _characterModel.id,
-        //     _characterModel.nickname,
-        //     _characterModel.hp,
-        //     _characterModel.level,
-        //     _characterModel.mana,
-        // );
-        // SocketManager.socket.emit("update", update.toJson());
       }
     } else if(other is Water) {
       _isWall = false;

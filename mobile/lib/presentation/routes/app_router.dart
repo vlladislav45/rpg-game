@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/logic/blocs/game/game_bloc.dart';
 import 'package:rpg_game/logic/blocs/online/online_bloc.dart';
-import 'package:rpg_game/logic/cubits/character_overlay/character_overlay_cubit.dart';
 import 'package:rpg_game/logic/cubits/map/map_cubit.dart';
 import 'package:rpg_game/presentation/screens/game_screen.dart';
 import 'package:rpg_game/presentation/screens/login_screen.dart';
@@ -10,7 +9,6 @@ import 'package:rpg_game/presentation/screens/login_screen.dart';
 class AppRouter {
   // Cubit
   MapCubit _mapCubit = MapCubit();
-  CharacterOverlayCubit _characterOverlayCubit = CharacterOverlayCubit();
 
   // Bloc
   OnlineBloc _onlineBloc = OnlineBloc();
@@ -44,9 +42,6 @@ class AppRouter {
             BlocProvider.value(
               value: _gameBloc,
             ),
-            BlocProvider.value(
-              value: _characterOverlayCubit,
-            ),
           ], child: MyGameScreen(),
           ),
         );
@@ -56,7 +51,6 @@ class AppRouter {
   }
 
   void dispose() {
-    _characterOverlayCubit.close();
     _mapCubit.close();
     _onlineBloc.close();
     _gameBloc.close();

@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
 import 'package:rpg_game/logic/blocs/online/online_bloc.dart';
 import 'package:rpg_game/logic/blocs/online/online_state.dart';
-import 'package:rpg_game/logic/cubits/character_overlay/character_overlay_cubit.dart';
 import 'package:rpg_game/utils/hex_color.dart';
 
 Widget characterOverlayBuilder(BuildContext context, MyGame myGame) {
@@ -22,19 +21,19 @@ class CharacterOverlay extends StatefulWidget {
 class CharacterOverlayState extends State<CharacterOverlay>
     with TickerProviderStateMixin {
   AnimationController? controller;
-  late final CharacterOverlayCubit _characterOverlayCubit;
+  late int currentHp;
+  late int maxHp;
 
   @override
   void initState() {
     super.initState();
 
-    _characterOverlayCubit = context.read<CharacterOverlayCubit>();
-
     controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
     )..addListener(() {
-        setState(() {});
+        setState(() {
+        });
       });
     controller!.repeat(reverse: true);
   }
@@ -48,7 +47,6 @@ class CharacterOverlayState extends State<CharacterOverlay>
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       padding: EdgeInsets.all(10.0),
       alignment: Alignment.topLeft,
@@ -105,12 +103,11 @@ class CharacterOverlayState extends State<CharacterOverlay>
                           ],
                         ),
                       ),
-                      duration: Duration(seconds: 1),
+                      duration: Duration(seconds: 3),
                       curve: Curves.fastOutSlowIn,
                       alignment: Alignment.center,
                       child: AutoSizeText(
-                        '${_characterOverlayCubit.state.characterModel.hp == null ? state.userViewModel.characters[0].hp : _characterOverlayCubit.state.characterModel.hp}'
-                        ' / ${state.userViewModel.characters[0].hp}',
+                        '${state.userViewModel.characters[0].hp < 0 ? 'Dead' : state.userViewModel.characters[0].hp}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
@@ -137,7 +134,7 @@ class CharacterOverlayState extends State<CharacterOverlay>
                       curve: Curves.fastOutSlowIn,
                       alignment: Alignment.center,
                       child: AutoSizeText(
-                        '${state.userViewModel.characters[0].mana} / ${state.userViewModel.characters[0].mana}',
+                        '${state.userViewModel.characters[0].mana < 0 ? 0 : state.userViewModel.characters[0].mana}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,

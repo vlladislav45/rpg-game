@@ -18,6 +18,7 @@ import 'package:rpg_game/components/portal.dart';
 import 'package:rpg_game/maps/maps/map.dart';
 import 'package:rpg_game/components/character.dart';
 import 'package:rpg_game/maps/town.dart';
+import 'package:rpg_game/network/socket_manager.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
 
 import 'models/character_model.dart';
@@ -358,19 +359,27 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
       _isAllNpcsAreDeath = true;
     }
     if(_isAllNpcsAreDeath) {
+      map.removeChildComponents();
       remove(map);
+      remove(_joystick);
+
+      // this._characterModel.level += 1;
+      // SocketManager.socket.emit('update', this._characterModel);
+
       spawnTown();
+      _isAllNpcsAreDeath = false;
     }
     if(_isCharacterSpawned) {
       if(_character.isDead) {
         // Remove map and his restrictions
-        // map.removeChildComponents();
-        // remove(map);
-        // remove(_joystick);
-        // for(Npc npc in _npcs) npc.remove();
+        map.removeChildComponents();
+        remove(map);
+        remove(_joystick);
 
         // and then spawn the town
         spawnTown();
+
+        _character.setIsDead = false;
       }
     }
   }
