@@ -48,6 +48,9 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   late final TextComponent _nickname;
   late String _overlay = 'CharacterOverlay';
 
+  // There are eight images * 0.10
+  static const double time = 8 * 0.10;
+
   Character(
       BuildContext context,
       CharacterModel characterModel,
@@ -61,10 +64,13 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
         ) {
     this.context = context;
     this._characterModel = characterModel;
-    timer = Timer(1.0)
+
+    timer = Timer(time)
       ..stop()
       ..callback = () {
-        gameRef.camera.setRelativeOffset(Anchor.center);
+        // _character.setIsPlayerPressAttack(false);
+        this.current = DirectionalHelper.getDirectionalSpriteAnimation(
+            _facing!, StateAction.Idle);
       };
   }
 
@@ -204,6 +210,8 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
 
       this.current = DirectionalHelper.getDirectionalSpriteAnimation(
           _facing, StateAction.Attack);
+      this.setIsPlayerPressAttack(true);
+      timer.start();
     } else {
       this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Idle);
     }

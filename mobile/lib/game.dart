@@ -77,7 +77,6 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTappableCo
     _timer = Timer(time)
       ..stop()
       ..callback = () {
-        // _character.setIsPlayerPressAttack(false);
         _character.current = DirectionalHelper.getDirectionalSpriteAnimation(
             _facing!, StateAction.Idle);
       };
@@ -257,7 +256,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTappableCo
           actionPressed: JoystickElement.sprite(await loadJoystick('joystick_attack_selected.png')),
         ),
       ],
-    );
+    )..isHud = true;
   }
 
   Future<Sprite> loadJoystick(String imageName) async {
