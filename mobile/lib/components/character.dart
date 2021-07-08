@@ -176,20 +176,24 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
         _characterModel.hp -= 7;
       }
     } else if(other is Water) {
-      _isWall = false;
-      if(velocity.y == -1) {
-        // final displacement = (_velocity.y * -1) + 10;
-        position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
-      }else if(velocity.y == 1) {
-        // final displacement = (_velocity.y * -1) - 10;
-        position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
-      } else if(velocity.x == 1) {
-        // final displacement = (_velocity.x * -1) - 10;
-        position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
-      }else if(velocity.x == -1) {
-        // final displacement = (_velocity.x * -1) + 10;
-        position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+      other.setWallHit(true);
+      if(other.isWallHit) {
+        if(velocity.y == -1) {
+          // final displacement = (_velocity.y * -1) + 10;
+          position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+        }else if(velocity.y == 1) {
+          // final displacement = (_velocity.y * -1) - 10;
+          position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+        } else if(velocity.x == 1) {
+          // final displacement = (_velocity.x * -1) - 10;
+          position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+        }else if(velocity.x == -1) {
+          // final displacement = (_velocity.x * -1) + 10;
+          position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+        }
       }
+      other.setWallHit(false);
+      _isWall = other.isWallHit;
     }
   }
 

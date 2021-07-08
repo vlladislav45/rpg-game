@@ -10,6 +10,8 @@ import 'package:rpg_game/components/character.dart';
 import 'package:rpg_game/game.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
 
+import 'tree.dart';
+
 class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidable, HasGameRef<MyGame> {
   // On Single player game character
   late final Character _character;
@@ -29,6 +31,9 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
 
   bool isPlayerPressAttack = false;
   bool isNpcDeath = false;
+
+  bool _isHasObstacle = false;
+  late Tree _obstacle;
 
   // Timer
   static const double time = 8 * 0.10;
@@ -74,6 +79,13 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
         if(health > 0) {
           health -= 20;
         }
+      }
+    }
+    if(other is Tree) {
+      other.setAround(true);
+      _isHasObstacle = other.isAround;
+      if(other.isAround) {
+        _obstacle = other;
       }
     }
   }
@@ -170,10 +182,12 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
     }
 
     _isCollision = false;
+    _isHasObstacle = false;
   }
 
   Vector2 pathFinding() {
     Vector2 pathFinder = Vector2.zero();
+    Vector2 tryToMove = Vector2.zero();
 
     double differentX = (_character.position.x + _character.width / 2) - position.x;
     double differentY = (_character.position.y + _character.height / 2) - position.y;
@@ -185,19 +199,35 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
         (differentY <= this._range) && _isAggressive && !_character.isDead) {
 
       if(differentX > 0)
-        pathFinder.add(Vector2(1, 0));
+        tryToMove.add(Vector2(1, 0));
       else
-        pathFinder.add(Vector2(-1, 0));
+        tryToMove.add(Vector2(-1, 0));
 
       if(differentY > 0)
-        pathFinder.add(Vector2(0, 1));
+        tryToMove.add(Vector2(0, 1));
       else
-        pathFinder.add(Vector2(0, -1));
+        tryToMove.add(Vector2(0, -1));
 
-      if ((differentX < 100 && differentX > -100) && (differentY < 100 && differentY > -100)) {
-        this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Attack);
-        isPlayerPressAttack = true;
-        _timer.start();
+      if(!_isHasObstacle) {
+        pathFinder.add(tryToMove);
+
+        if ((differentX < 100 && differentX > -100) && (differentY < 100 && differentY > -100)) {
+          this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Attack);
+          isPlayerPressAttack = true;
+          _timer.start();
+        }
+      }else {
+        if(position.x > _obstacle.position.x)
+          pathFinder.add(Vector2(-1, 0));
+        else
+          pathFinder.add(Vector2(1, 0));
+
+        if(position.y > _obstacle.position.x)
+          pathFinder.add(Vector2(0, -1));
+        else
+          pathFinder.add(Vector2(0, 1));
+
+        pathFinder.add(tryToMove);
       }
 
       return pathFinder;

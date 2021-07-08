@@ -102,6 +102,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
       matrix,
       tileHeight: 25.0,
     )..position = topLeft);
+    map.renderTrees();
 
     // print(map.mapSize());
     //Add map restrictions
@@ -143,7 +144,8 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
       bool isAggressive = false;
       // Odd number
       var rand = Random().nextInt(100);
-      if(rand % 2 == 1) isAggressive = true;
+      // if(rand % 2 == 1)
+        isAggressive = true;
 
       print('Npc is spawned on: $spawnPosition');
       Npc npc;

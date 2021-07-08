@@ -13,8 +13,12 @@ class Water extends SpriteComponent with HasGameRef<MyGame>, Hitbox, Collidable 
     Vector2? size,
   }) : super(position: position, size: size);
 
-
   bool get isWallHit => _isWallHit;
+
+
+  void setWallHit(bool value) {
+    _isWallHit = value;
+  }
 
   @override
   void onMount() {

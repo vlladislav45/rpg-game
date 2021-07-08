@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/src/spritesheet.dart';
+import 'package:rpg_game/components/tree.dart';
 import 'package:rpg_game/components/water.dart';
 import 'package:rpg_game/game.dart';
 
@@ -48,6 +49,24 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
     }
   }
 
+  void renderTrees() async {
+    for (var i = 0; i < matrix.length; i++) {
+      for (var j = 0; j < matrix[i].length; j++) {
+        final element = matrix[i][j];
+        if(element == 4) {
+          final p = getBlockPositionInts(j, i);
+          final treeSprite = await gameRef.loadSprite('sprites/obstacles/Tree_2.png');
+
+          gameRef.add(Tree(
+            sprite: treeSprite,
+            position: p + topLeft,
+            size: Vector2(151,120),
+          ));
+        }
+      }
+    }
+  }
+
   @override
   void render(Canvas c) async {
     super.render(c);
@@ -70,6 +89,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
     return fromJson(array);
   }
 
+  /// DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!
   /// If map is loaded in onLoad method, 
   /// the water tiles will be appear on top the iso tiles
   void addRestrictions() async {
@@ -96,8 +116,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
           if (j == 0 || j == lastColumn) {
             // Loop first and last columns vertically
             for (int r = 0; r < this.matrix.length; r++) {
-              final element =
-                  this.matrix[r][j]; // in first column [0][0], [1][0] etc..
+              final element = this.matrix[r][j]; // in first column [0][0], [1][0] etc..
               if (element != -1) {
                 // if tile exists
                 final p = this.getBlockPositionInts(j, r) +
