@@ -185,6 +185,13 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
     _isHasObstacle = false;
   }
 
+  // Vector2 heuristic(Vector2 tile, Vector2 goal) {
+  //   final x = tile.x - goal.x;
+  //   final y = tile.y - goal.y;
+  //
+  //   final result = sqrt(x * x + y * y);
+  // }
+
   Vector2 pathFinding() {
     Vector2 pathFinder = Vector2.zero();
     Vector2 tryToMove = Vector2.zero();
@@ -297,16 +304,16 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
             size: Vector2(50,50),
           )
       );
-      gameRef.remove(this);
-      gameRef.remove(_name);
-      if(_isAggressive) gameRef.remove(_title);
-      gameRef.remove(_healthBar);
+      gameRef.components.remove(this);
+      gameRef.components.remove(_name);
+      if(_isAggressive) gameRef.components.remove(_title);
+      gameRef.components.remove(_healthBar);
   }
 
   void remove() {
-    gameRef.remove(this);
-    gameRef.remove(_name);
-    if(_isAggressive) gameRef.remove(_title);
-    gameRef.remove(_healthBar);
+    gameRef.components.remove(this);
+    gameRef.components.remove(_name);
+    if(_isAggressive) gameRef.components.remove(_title);
+    gameRef.components.remove(_healthBar);
   }
 }

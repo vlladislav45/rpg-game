@@ -2,7 +2,7 @@ import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:rpg_game/game.dart';
 
-class Portal extends SpriteAnimationComponent with HasGameRef<MyGame>, Tapable {
+class Portal extends SpriteAnimationComponent with HasGameRef<MyGame>, Tappable {
   static final String _overlay = 'PortalMenu';
 
   Portal({Vector2? position, Vector2? size})

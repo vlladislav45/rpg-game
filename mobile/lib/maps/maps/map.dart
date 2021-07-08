@@ -136,7 +136,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
   }
 
   void removeChildComponents() {
-    gameRef.removeAll(_restrictObstacles);
+    gameRef.components.removeAll(_restrictObstacles);
   }
 
   Vector2 mapSize() {

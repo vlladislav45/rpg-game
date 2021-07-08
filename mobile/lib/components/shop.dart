@@ -4,7 +4,7 @@ import 'package:flame/extensions.dart';
 
 import '../game.dart';
 
-class Shop extends SpriteComponent with HasGameRef<MyGame>, Tapable {
+class Shop extends SpriteComponent with HasGameRef<MyGame>, Tappable {
   static final String _overlay = 'ShopMenu';
 
   Shop({

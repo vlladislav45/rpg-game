@@ -28,7 +28,7 @@ const x = 500.0;
 const y = 150.0;
 final topLeft = Vector2(x, y);
 
-class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableComponents,
+class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTappableComponents,
         HasDraggableComponents {
   //Properties
   Vector2? screenMousePosition;
@@ -362,8 +362,8 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
     }
     if(_isAllNpcsAreDeath) {
       map.removeChildComponents();
-      remove(map);
-      remove(_joystick);
+      components.remove(map);
+      components.remove(_joystick);
 
       // this._characterModel.level += 1;
       // SocketManager.socket.emit('update', this._characterModel);
@@ -375,8 +375,8 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTapableCom
       if(_character.isDead) {
         // Remove map and his restrictions
         map.removeChildComponents();
-        remove(map);
-        remove(_joystick);
+        components.remove(map);
+        components.remove(_joystick);
 
         // and then spawn the town
         spawnTown();

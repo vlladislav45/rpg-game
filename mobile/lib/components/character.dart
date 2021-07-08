@@ -268,8 +268,8 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
           size: Vector2(50, 50),
         )
     );
-    gameRef.remove(_nickname);
+    gameRef.components.remove(_nickname);
     gameRef.overlays.remove(_overlay);
-    gameRef.remove(this);
+    gameRef.components.remove(this);
   }
 }
