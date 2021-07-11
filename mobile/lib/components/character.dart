@@ -40,6 +40,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   //Character model
   late final CharacterModel _characterModel;
   late final BuildContext context;
+  late final Block _spawnPosition;
 
   /// Where is facing of the character
   /// north, south, east, west, north-east, north-west, south-east, south-west
@@ -52,6 +53,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   static const double time = 8 * 0.10;
 
   Character(
+      Block characterSpawnPosition,
       BuildContext context,
       CharacterModel characterModel,
       Map<NpcState, SpriteAnimation> animations, {
@@ -64,13 +66,14 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
         ) {
     this.context = context;
     this._characterModel = characterModel;
+    this._spawnPosition = characterSpawnPosition;
 
     timer = Timer(time)
       ..stop()
       ..callback = () {
         // _character.setIsPlayerPressAttack(false);
         this.current = DirectionalHelper.getDirectionalSpriteAnimation(
-            _facing!, StateAction.Idle);
+            _facing, StateAction.Idle);
       };
   }
 
@@ -86,6 +89,9 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   void setIsPlayerPressAttack(bool value) {
     _isPlayerPressAttack = value;
   }
+
+
+  Block get spawnPosition => _spawnPosition;
 
   @override
   int get priority => 1;

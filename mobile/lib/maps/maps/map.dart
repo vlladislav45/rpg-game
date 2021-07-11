@@ -11,10 +11,6 @@ import 'package:rpg_game/game.dart';
 class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
   static final R = Random();
 
-  // Width and height of all maps
-  static const double MAP_OFFSETX_LENGTH = 25;
-  static const double MAP_OFFSETY_LENGTH = 25;
-
   // Walls
   List<Component> _restrictObstacles = [];
 
@@ -141,20 +137,22 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
 
   Vector2 mapSize() {
     // Map width and height contribute equally in both directions
-    final double side = MAP_OFFSETX_LENGTH + MAP_OFFSETY_LENGTH;
+    final double side = matrix.length.toDouble() + matrix[0].length;
     return Vector2(side * effectiveTileSize.x / 2,
                    side * effectiveTileSize.y / 2);
   }
 
   // Generate random coordinates
   Vector2 genCoord() {
-    // double S = (mapSize().x * 2) + (mapSize().y * 2);
-    // return -S + R.nextDouble() * (2 * S);
+    double x;
+    double y;
+    Block block;
+    do {
+      block = Block((R.nextInt(matrix.length)), (R.nextInt(matrix[0].length)));
+    }while(!this.containsBlock(block));
 
-    // double x = R.nextDouble() * (mapSize().x / 4);
-    // double y = R.nextDouble() * (mapSize().y / 3);
-    double x = 500 + (R.nextDouble() * 1500);
-    double y = 500 + (R.nextDouble() * 500) ;
+    x = this.getBlockPosition(block).x;
+    y = this.getBlockPosition(block).y;
     return Vector2(x, y);
   }
 }

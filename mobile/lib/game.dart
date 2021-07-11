@@ -137,19 +137,21 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTappableCo
 
     print('SIZE OF THE MAP ${map.mapSize()}');
     for (int i = 0; i < 5; i++) {
-      final npcSpawnPosition = map.getBlock(Vector2(x, y) + map.genCoord());
+      final npcSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + map.genCoord());
       final spawnPosition = map.getBlockPosition(npcSpawnPosition);
 
       bool isAggressive = false;
       // Odd number
       var rand = Random().nextInt(100);
-      // if(rand % 2 == 1)
+      if(rand % 2 == 1)
         isAggressive = true;
 
       print('Npc is spawned on: $spawnPosition');
       Npc npc;
       add(npc = Npc(
-        isAggressive,
+        npcSpawnPosition,
+        map,
+        true,
         _character,
         {
           NpcState.idleRight: npcSpriteAnimation.idleRight,
@@ -194,6 +196,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTappableCo
     final characterSpawnPosition = map.getBlock(Vector2(x, y) + topLeft + Vector2(0, 125));
     await characterSpriteAnimation.loadSpriteAnimations();
     _character = Character(
+      characterSpawnPosition,
       _context,
       _characterModel,
       {

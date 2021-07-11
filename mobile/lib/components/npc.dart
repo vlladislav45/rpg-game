@@ -8,6 +8,8 @@ import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:rpg_game/components/character.dart';
 import 'package:rpg_game/game.dart';
+import 'package:rpg_game/maps/maps/map.dart';
+import 'package:rpg_game/pathfinding/a_star.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
 
 import 'tree.dart';
@@ -28,18 +30,25 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   int _range = 150;
   int health = 100;
   String _facing = "";
+  late final Block _spawnPosition;
 
   bool isPlayerPressAttack = false;
   bool isNpcDeath = false;
 
   bool _isHasObstacle = false;
   late Tree _obstacle;
+  late Map _map;
 
   // Timer
   static const double time = 8 * 0.10;
   late final Timer _timer;
 
-  Npc(bool isAggressive,
+  late Vector2 _displacement;
+  Vector2 _velocity = Vector2.zero();
+
+  Npc(Block spawnPosition,
+      Map map,
+      bool isAggressive,
       character,
       animations, {
     Vector2? position,
@@ -51,6 +60,8 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   ) {
     this._character = character;
     this._isAggressive = isAggressive;
+    this._map = map;
+    this._spawnPosition = spawnPosition;
 
     _timer = Timer(time)
       ..stop()
@@ -174,8 +185,25 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
     super.update(dt);
     _timer.update(dt);
 
-    final Vector2 displacement = this.pathFinding() * (speed * dt);
-    position.add(displacement);
+    _pathFinding().forEach((nextBlock) {
+      _velocity.setValues(0, 0);
+
+      Block nxtBlock = Block(nextBlock.dx.toInt(), nextBlock.dy.toInt());
+      var nextPosition = _map.getBlockPosition(nxtBlock);
+      // position.setFrom(nextPosition);
+      if(this.position.x > nextPosition.x)
+        _velocity.add(Vector2(-1, 0));
+      else if(this.position.x < nextPosition.x)
+        _velocity.add(Vector2(1, 0));
+
+      if(this.position.y > nextPosition.y)
+        _velocity.add(Vector2(0, -1));
+      else if(this.position.y < nextPosition.y)
+        _velocity.add(Vector2(0, 1));
+
+      _displacement = _velocity * (speed * dt);
+      position.add(_displacement);
+    });
 
     if(health <= 0) {
       die();
@@ -185,19 +213,21 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
     _isHasObstacle = false;
   }
 
-  // Vector2 heuristic(Vector2 tile, Vector2 goal) {
-  //   final x = tile.x - goal.x;
-  //   final y = tile.y - goal.y;
-  //
-  //   final result = sqrt(x * x + y * y);
-  // }
-
-  Vector2 pathFinding() {
-    Vector2 pathFinder = Vector2.zero();
-    Vector2 tryToMove = Vector2.zero();
-
+  List<Offset> _pathFinding() {
     double differentX = (_character.position.x + _character.width / 2) - position.x;
     double differentY = (_character.position.y + _character.height / 2) - position.y;
+
+    Offset start = Offset(_character.spawnPosition.x.toDouble(), _character.spawnPosition.y.toDouble());
+    Offset end = Offset(this._spawnPosition.x.toDouble(), this._spawnPosition.y.toDouble());
+    final result = AStar(
+      rows: _map.matrix.length,
+      columns: _map.matrix[0].length,
+      start: start,
+      end: end,
+      barriers: [],
+    ).findThePath();
+    // print(result);
+    // print(_map.getBlockPosition(Block(result[0].dx.toInt(), result[0].dy.toInt())));
 
     // print('offsetY: $differentY');
     // print('offsetX: $differentX');
@@ -205,43 +235,25 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
     if((differentX <= this._range) &&
         (differentY <= this._range) && _isAggressive && !_character.isDead) {
 
-      if(differentX > 0)
-        tryToMove.add(Vector2(1, 0));
-      else
-        tryToMove.add(Vector2(-1, 0));
+      // if(differentX > 0)
+      //   tryToMove.add(Vector2(1, 0));
+      // else
+      //   tryToMove.add(Vector2(-1, 0));
+      //
+      // if(differentY > 0)
+      //   tryToMove.add(Vector2(0, 1));
+      // else
+      //   tryToMove.add(Vector2(0, -1));
 
-      if(differentY > 0)
-        tryToMove.add(Vector2(0, 1));
-      else
-        tryToMove.add(Vector2(0, -1));
-
-      if(!_isHasObstacle) {
-        pathFinder.add(tryToMove);
-
-        if ((differentX < 100 && differentX > -100) && (differentY < 100 && differentY > -100)) {
-          this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Attack);
-          isPlayerPressAttack = true;
-          _timer.start();
-        }
-      }else {
-        if(position.x > _obstacle.position.x)
-          pathFinder.add(Vector2(-1, 0));
-        else
-          pathFinder.add(Vector2(1, 0));
-
-        if(position.y > _obstacle.position.x)
-          pathFinder.add(Vector2(0, -1));
-        else
-          pathFinder.add(Vector2(0, 1));
-
-        pathFinder.add(tryToMove);
+      if ((differentX < 100 && differentX > -100) && (differentY < 100 && differentY > -100)) {
+        this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Attack);
+        isPlayerPressAttack = true;
+        _timer.start();
       }
-
-      return pathFinder;
+    }else {
+      this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Idle);
     }
-
-    this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Idle);
-    return Vector2.zero();
+    return result;
   }
 
   void facing() {
