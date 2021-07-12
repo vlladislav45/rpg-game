@@ -184,7 +184,7 @@ class MyGame extends BaseGame with KeyboardEvents, HasCollidables, HasTappableCo
 
     /// Spawn the character
 
-    final characterSpawnPosition = map.getBlock(Vector2(200, 250));
+    final characterSpawnPosition = map.getBlock(Vector2(300, 450));
     print(characterSpawnPosition);
     await characterSpriteAnimation.loadSpriteAnimations();
     _character = Character(

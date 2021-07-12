@@ -56,7 +56,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
           final p = getBlockPositionInts(j, i);
           final treeSprite = await gameRef.loadSprite('sprites/obstacles/Tree_2.png');
 
-          _treeOffsets.add(new Offset(i.toDouble(), j.toDouble()));
+          _treeOffsets.add(new Offset(j.toDouble(), i.toDouble()));
           gameRef.add(Tree(
             sprite: treeSprite,
             position: p,

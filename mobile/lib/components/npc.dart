@@ -244,7 +244,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
       }
     }else if(differentX <= 20 && differentY <= 20) {
       this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Idle);
-      return [];
+
     }
     return result;
   }
