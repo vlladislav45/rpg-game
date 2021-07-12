@@ -17,7 +17,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     with Hitbox, Collidable, HasGameRef<MyGame>
     implements JoystickListener {
   // Directionals and speed
-  static const speed = 100;
+  static const speed = 130;
   late Vector2 _velocity = Vector2.zero();
 
   // Joystick

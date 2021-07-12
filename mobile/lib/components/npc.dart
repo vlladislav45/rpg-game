@@ -1,4 +1,3 @@
-
 import 'dart:math';
 
 import 'package:flame/components.dart';
@@ -14,7 +13,8 @@ import 'package:rpg_game/utils/directional_helper.dart';
 
 import 'tree.dart';
 
-class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidable, HasGameRef<MyGame> {
+class Npc extends SpriteAnimationGroupComponent<NpcState>
+    with Hitbox, Collidable, HasGameRef<MyGame> {
   // On Single player game character
   late final Character _character;
 
@@ -46,17 +46,17 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   Vector2 _velocity = Vector2.zero();
 
   Npc(
-      Map map,
-      bool isAggressive,
-      character,
-      animations, {
+    Map map,
+    bool isAggressive,
+    character,
+    animations, {
     Vector2? position,
     Vector2? size,
   }) : super(
-    position: position,
-    size: size,
-    animations: animations,
-  ) {
+          position: position,
+          size: size,
+          animations: animations,
+        ) {
     this._character = character;
     this._isAggressive = isAggressive;
     this._map = map;
@@ -69,7 +69,6 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
       };
   }
 
-
   @override
   void onMount() {
     super.onMount();
@@ -81,17 +80,16 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   @override
   void onCollision(Set<Vector2> points, Collidable other) {
     if (other is Character) {
-      if(other.isPlayerPressAttack) {
+      if (other.isPlayerPressAttack) {
         _isCollision = true;
         other.setIsPlayerPressAttack(false);
 
-        if(health > 0) {
+        if (health > 0) {
           health -= 20;
         }
       }
     }
   }
-
 
   @override
   Future<void> onLoad() async {
@@ -103,69 +101,70 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
     );
 
     //Npc title
-    if(_isAggressive) {
+    if (_isAggressive) {
       gameRef.add(
         _title = _renderAggressiveMode(),
       );
     }
 
     // Npc health bar
-    gameRef.add(
-      _healthBar = _renderHealthBar()
-    );
+    gameRef.add(_healthBar = _renderHealthBar());
   }
 
   TextComponent _renderName() {
     return TextComponent(
       'Knight',
-      position: Vector2(this.position.x + this.size.x / 2, this.position.y - 10),
+      position:
+          Vector2(this.position.x + this.size.x / 2, this.position.y - 10),
       textRenderer: TextPaint(
         config: TextPaintConfig(
           color: BasicPalette.black.color,
           fontSize: 14.0,
         ),
       ),
-    )
-      ..anchor = Anchor.topCenter;
+    )..anchor = Anchor.topCenter;
   }
 
   TextComponent _renderAggressiveMode() {
     return TextComponent(
       '* ',
-      position: Vector2(this.position.x + this.size.x / 5, this.position.y - 30),
+      position:
+          Vector2(this.position.x + this.size.x / 5, this.position.y - 30),
       textRenderer: TextPaint(
         config: TextPaintConfig(
           color: BasicPalette.green.color,
           fontSize: 14.0,
         ),
       ),
-    )
-      ..anchor = Anchor.topCenter;
+    )..anchor = Anchor.topCenter;
   }
 
   TextComponent _renderHealthBar() {
     return TextComponent(
       '$health HP',
-      position: Vector2(this.position.x + this.size.x / 2, this.position.y - 25),
+      position:
+          Vector2(this.position.x + this.size.x / 2, this.position.y - 25),
       textRenderer: TextPaint(
         config: TextPaintConfig(
           color: BasicPalette.red.color,
           fontSize: 14.0,
         ),
       ),
-    )
-      ..anchor = Anchor.topCenter;
+    )..anchor = Anchor.topCenter;
   }
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
 
-    _name.position = Vector2(this.position.x + this.size.x / 2, this.position.y - 10);
-    if(_isAggressive) {
-      _title.position = Vector2(this.position.x + this.size.x / 5, this.position.y - 30);
+    _name.position =
+        Vector2(this.position.x + this.size.x / 2, this.position.y - 10);
+    if (_isAggressive) {
+      _title.position =
+          Vector2(this.position.x + this.size.x / 5, this.position.y - 30);
     }
-    _healthBar.position = Vector2(this.position.x + this.size.x / 2, this.position.y - 25);
+    _healthBar.position =
+        Vector2(this.position.x + this.size.x / 2, this.position.y - 25);
     _healthBar.text = '$health HP';
 
     debugMode = true;
@@ -181,21 +180,19 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
 
       Block nxtBlock = Block(nextBlock.dx.toInt(), nextBlock.dy.toInt());
       var nextPosition = _map.getBlockPosition(nxtBlock);
-      if(nextPosition.x > this.position.x)
+      if (nextPosition.x > this.position.x)
         _velocity.add(Vector2(1, 0));
-      else if(nextPosition.x < this.position.x)
-        _velocity.add(Vector2(-1, 0));
+      else if (nextPosition.x < this.position.x) _velocity.add(Vector2(-1, 0));
 
-      if(nextPosition.y > this.position.y)
+      if (nextPosition.y > this.position.y)
         _velocity.add(Vector2(0, 1));
-      else if(nextPosition.y < this.position.y)
-        _velocity.add(Vector2(0, -1));
+      else if (nextPosition.y < this.position.y) _velocity.add(Vector2(0, -1));
 
       _displacement = _velocity * (speed * dt);
       position.add(_displacement);
     });
 
-    if(health <= 0) {
+    if (health <= 0) {
       die();
     }
 
@@ -204,97 +201,110 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   }
 
   List<Offset> _pathFinding() {
-    double differentX = (_character.position.x + _character.width / 2)  - position.x;
-    double differentY = (_character.position.y + _character.height / 2) - position.y;
+    double differentX = _character.position.x + (_character.width / Random().nextInt(3)) - position.x;
+    double differentY = _character.position.y + (_character.height / Random().nextInt(2)) - position.y;
 
-    Block characterGridPosition = _map.getBlock(_character.position);
-    Block npcGridPosition = _map.getBlock(this.position);
-    Offset start = Offset(characterGridPosition.x.toDouble() + 1, characterGridPosition.y.toDouble());
+    final charPos = Vector2(_character.position.x + (_character.width / 2), _character.position.y + (_character.height / 2));
+    final npcPos = Vector2(this.position.x + (this.width / 2), this.position.y + (this.height / 2));
+
+    Block characterGridPosition = _map.getBlock(charPos);
+    Block npcGridPosition = _map.getBlock(npcPos);
+
+    Offset start = Offset(characterGridPosition.x.toDouble(), characterGridPosition.y.toDouble());
     Offset end = Offset(npcGridPosition.y.toDouble(), npcGridPosition.x.toDouble());
+
     final result = AStar(
       rows: _map.matrix.length,
       columns: _map.matrix[0].length,
       start: start,
       end: end,
-      barriers: _map.treeOffsets,
+      barriers: [],
     ).findThePath();
-    // print(result);
-    // print(_map.getBlockPosition(Block(result[0].dx.toInt(), result[0].dy.toInt())));
 
-    // print('offsetY: $differentY');
-    // print('offsetX: $differentX');
     facing();
-    if((differentX <= this._range) &&
-        (differentY <= this._range) && _isAggressive && !_character.isDead) {
+    if (differentX <= this._range &&
+        differentY <= this._range &&
+        _isAggressive &&
+        !_character.isDead) {
 
-      // if(differentX > 0)
-      //   tryToMove.add(Vector2(1, 0));
-      // else
-      //   tryToMove.add(Vector2(-1, 0));
-      //
-      // if(differentY > 0)
-      //   tryToMove.add(Vector2(0, 1));
-      // else
-      //   tryToMove.add(Vector2(0, -1));
-
-      if ((differentX < 100 && differentX > -100) && (differentY < 100 && differentY > -100)) {
-        this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Attack);
+      if ((differentX < 100 || differentX > -100) &&
+          (differentY < 100 || differentY > -100)) {
+        this.current = DirectionalHelper.getDirectionalSpriteAnimation(
+            _facing, StateAction.Attack);
         isPlayerPressAttack = true;
         _timer.start();
       }
-    }else if(differentX <= 20 && differentY <= 20) {
-      this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Idle);
-
+    } else {
+      this.current = DirectionalHelper.getDirectionalSpriteAnimation(
+          _facing, StateAction.Idle);
+      return [];
     }
     return result;
   }
 
   void facing() {
-    double differentX = (_character.position.x + _character.width / 2) - position.x;
-    double differentY = (_character.position.y + _character.height / 2) - position.y;
+    double differentX =
+        _character.position.x + (_character.width / 2) - position.x;
+    double differentY =
+        _character.position.y + (_character.height / 2) - position.y;
 
     final double npcAngle = (atan2(differentY, differentX) / pi) * 180;
 
     // print(npcAngle);
     /// TOP right side of the circle
-    if(npcAngle >= 60 && npcAngle <= 90) { // Top direction
+    if (npcAngle >= 60 && npcAngle <= 90) {
+      // Top direction
       current = NpcState.runDown;
       _facing = "north";
-    }else if(npcAngle >= 30 && npcAngle < 60) { // Top right direction
+    } else if (npcAngle >= 30 && npcAngle < 60) {
+      // Top right direction
       current = NpcState.runBottomRight;
       _facing = "south-east";
-    }else if(npcAngle >= 0 && npcAngle < 30) { // Right direction
+    } else if (npcAngle >= 0 && npcAngle < 30) {
+      // Right direction
       current = NpcState.runRight;
       _facing = "east";
+
       /// Top left side of the circle
-    }else if(npcAngle >= 90 && npcAngle <= 120) { // Top direction
+    } else if (npcAngle >= 90 && npcAngle <= 120) {
+      // Top direction
       current = NpcState.runDown;
       _facing = "south";
-    } else if(npcAngle >= 120 && npcAngle < 150) { // Top left direction
+    } else if (npcAngle >= 120 && npcAngle < 150) {
+      // Top left direction
       current = NpcState.runBottomLeft;
       _facing = "south-left";
-    } else if(npcAngle >= 180 && npcAngle < 150) { // Left direction
+    } else if (npcAngle >= 180 && npcAngle < 150) {
+      // Left direction
       current = NpcState.runLeft;
       _facing = "west";
     }
+
     /// BOTTOM right side of the circle
-    if(npcAngle >= -60 && npcAngle <= -90) { // Down direction
+    if (npcAngle >= -60 && npcAngle <= -90) {
+      // Down direction
       current = NpcState.runTop;
       _facing = "north";
-    } else if(npcAngle >= -30 && npcAngle < -60) { // Bottom right direction
+    } else if (npcAngle >= -30 && npcAngle < -60) {
+      // Bottom right direction
       current = NpcState.runTopRight;
       _facing = "north-east";
-    } else if(npcAngle >= -0 && npcAngle < -30) { // Right direction
+    } else if (npcAngle >= -0 && npcAngle < -30) {
+      // Right direction
       current = NpcState.runRight;
       _facing = "east";
+
       /// Bottom left side of the circle
-    } else if(npcAngle >= -90 && npcAngle <= -120) { // Down direction
+    } else if (npcAngle >= -90 && npcAngle <= -120) {
+      // Down direction
       current = NpcState.runTop;
       _facing = "north";
-    } else if(npcAngle >= -120 && npcAngle < -150) { // Bottom left direction
+    } else if (npcAngle >= -120 && npcAngle < -150) {
+      // Bottom left direction
       current = NpcState.runTopLeft;
       _facing = "north-west";
-    } else if(npcAngle >= -180 && npcAngle < -150) { // Left direction
+    } else if (npcAngle >= -180 && npcAngle < -150) {
+      // Left direction
       current = NpcState.runLeft;
       _facing = "west";
     }
@@ -302,23 +312,21 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
 
   void die() async {
     isNpcDeath = true;
-      gameRef.add(
-          SpriteComponent(
-            sprite: await Sprite.load('crypt.png'),
-            position: this.position,
-            size: Vector2(50,50),
-          )
-      );
-      gameRef.components.remove(this);
-      gameRef.components.remove(_name);
-      if(_isAggressive) gameRef.components.remove(_title);
-      gameRef.components.remove(_healthBar);
+    gameRef.add(SpriteComponent(
+      sprite: await Sprite.load('crypt.png'),
+      position: this.position,
+      size: Vector2(50, 50),
+    ));
+    gameRef.components.remove(this);
+    gameRef.components.remove(_name);
+    if (_isAggressive) gameRef.components.remove(_title);
+    gameRef.components.remove(_healthBar);
   }
 
   void remove() {
     gameRef.components.remove(this);
     gameRef.components.remove(_name);
-    if(_isAggressive) gameRef.components.remove(_title);
+    if (_isAggressive) gameRef.components.remove(_title);
     gameRef.components.remove(_healthBar);
   }
 }
