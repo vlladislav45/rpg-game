@@ -40,7 +40,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   //Character model
   late final CharacterModel _characterModel;
   late final BuildContext context;
-  late final Block _spawnPosition;
 
   /// Where is facing of the character
   /// north, south, east, west, north-east, north-west, south-east, south-west
@@ -53,7 +52,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   static const double time = 8 * 0.10;
 
   Character(
-      Block characterSpawnPosition,
       BuildContext context,
       CharacterModel characterModel,
       Map<NpcState, SpriteAnimation> animations, {
@@ -66,7 +64,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
         ) {
     this.context = context;
     this._characterModel = characterModel;
-    this._spawnPosition = characterSpawnPosition;
 
     timer = Timer(time)
       ..stop()
@@ -89,9 +86,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   void setIsPlayerPressAttack(bool value) {
     _isPlayerPressAttack = value;
   }
-
-
-  Block get spawnPosition => _spawnPosition;
 
   @override
   int get priority => 1;
@@ -192,16 +186,16 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
       if(other.isWallHit) {
         if(velocity.y == -1) {
           // final displacement = (_velocity.y * -1) + 10;
-          position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+          position.setFrom(ConvertCoordinates.cartToIso(Vector2(0, 125)));
         }else if(velocity.y == 1) {
           // final displacement = (_velocity.y * -1) - 10;
-          position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+          position.setFrom(ConvertCoordinates.cartToIso(Vector2(0, 125)));
         } else if(velocity.x == 1) {
           // final displacement = (_velocity.x * -1) - 10;
-          position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+          position.setFrom(ConvertCoordinates.cartToIso(Vector2(0, 125)));
         }else if(velocity.x == -1) {
           // final displacement = (_velocity.x * -1) + 10;
-          position.setFrom(ConvertCoordinates.cartToIso(Vector2(x, y) + topLeft + Vector2(0, 125)));
+          position.setFrom(ConvertCoordinates.cartToIso(Vector2(0, 125)));
         }
       }
       other.setWallHit(false);

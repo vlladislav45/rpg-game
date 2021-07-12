@@ -30,7 +30,6 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   int _range = 150;
   int health = 100;
   String _facing = "";
-  late final Block _spawnPosition;
 
   bool isPlayerPressAttack = false;
   bool isNpcDeath = false;
@@ -46,7 +45,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   late Vector2 _displacement;
   Vector2 _velocity = Vector2.zero();
 
-  Npc(Block spawnPosition,
+  Npc(
       Map map,
       bool isAggressive,
       character,
@@ -61,7 +60,6 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
     this._character = character;
     this._isAggressive = isAggressive;
     this._map = map;
-    this._spawnPosition = spawnPosition;
 
     _timer = Timer(time)
       ..stop()
@@ -190,16 +188,15 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
 
       Block nxtBlock = Block(nextBlock.dx.toInt(), nextBlock.dy.toInt());
       var nextPosition = _map.getBlockPosition(nxtBlock);
-      // position.setFrom(nextPosition);
-      if(this.position.x > nextPosition.x)
-        _velocity.add(Vector2(-1, 0));
-      else if(this.position.x < nextPosition.x)
+      if(nextPosition.x > this.position.x)
         _velocity.add(Vector2(1, 0));
+      else if(nextPosition.x < this.position.x)
+        _velocity.add(Vector2(-1, 0));
 
-      if(this.position.y > nextPosition.y)
-        _velocity.add(Vector2(0, -1));
-      else if(this.position.y < nextPosition.y)
+      if(nextPosition.y > this.position.y)
         _velocity.add(Vector2(0, 1));
+      else if(nextPosition.y < this.position.y)
+        _velocity.add(Vector2(0, -1));
 
       _displacement = _velocity * (speed * dt);
       position.add(_displacement);
@@ -214,17 +211,21 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
   }
 
   List<Offset> _pathFinding() {
-    double differentX = (_character.position.x + _character.width / 2) - position.x;
+    double differentX = (_character.position.x + _character.width / 2)  - position.x;
     double differentY = (_character.position.y + _character.height / 2) - position.y;
 
-    Offset start = Offset(_character.spawnPosition.x.toDouble(), _character.spawnPosition.y.toDouble());
-    Offset end = Offset(this._spawnPosition.x.toDouble(), this._spawnPosition.y.toDouble());
+    Block characterGridPosition = _map.getBlock(_character.position);
+    Block npcGridPosition = _map.getBlock(this.position);
+    Offset start = Offset(characterGridPosition.x.toDouble() + 1, characterGridPosition.y.toDouble());
+    Offset end = Offset(npcGridPosition.x.toDouble(), npcGridPosition.y.toDouble());
     final result = AStar(
       rows: _map.matrix.length,
       columns: _map.matrix[0].length,
       start: start,
       end: end,
-      barriers: [],
+      barriers: [
+
+      ],
     ).findThePath();
     // print(result);
     // print(_map.getBlockPosition(Block(result[0].dx.toInt(), result[0].dy.toInt())));
@@ -250,8 +251,9 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
         isPlayerPressAttack = true;
         _timer.start();
       }
-    }else {
+    }else if(differentX <= 20 && differentY <= 20) {
       this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Idle);
+      return [];
     }
     return result;
   }

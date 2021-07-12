@@ -24,8 +24,6 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
 
   @override
   Future<void> onLoad() async {
-    Vector2 topLeft = Vector2(500,150);
-
     for (var i = 0; i < matrix.length; i++) {
       for (var j = 0; j < matrix[i].length; j++) {
         final element = matrix[i][j];
@@ -36,7 +34,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
           Water obstacle;
           gameRef.add(obstacle = Water(
             sprite: waterSprite,
-            position: p + topLeft,
+            position: p,
             size: waterSprite.srcSize,
           ));
           _restrictObstacles.add(obstacle);
@@ -55,7 +53,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
 
           gameRef.add(Tree(
             sprite: treeSprite,
-            position: p + topLeft,
+            position: p,
             size: Vector2(151,120),
           ));
         }
@@ -99,8 +97,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
           final element = this.matrix[i][j];
           if (element != -1) {
             // if tile exists
-            final p = this.getBlockPositionInts(j, i) +
-                topLeft; // get coordinate of the tile
+            final p = this.getBlockPositionInts(j, i); // get coordinate of the tile
             // and add obstacle(wall)
             gameRef.add(Water(
               sprite: waterSprite,
@@ -115,8 +112,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
               final element = this.matrix[r][j]; // in first column [0][0], [1][0] etc..
               if (element != -1) {
                 // if tile exists
-                final p = this.getBlockPositionInts(j, r) +
-                    topLeft; // get coordinates of tile
+                final p = this.getBlockPositionInts(j, r); // get coordinates of tile
                 //add obstacle (wall)
                   gameRef.add(Water(
                     sprite: waterSprite,
