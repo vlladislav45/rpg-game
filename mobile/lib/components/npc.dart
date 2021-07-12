@@ -88,6 +88,9 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
           health -= 20;
         }
       }
+    }else if(other is Npc){
+      this.position -= Vector2(20,20);
+      other.position += Vector2(20,20);
     }
   }
 
@@ -201,8 +204,8 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
   }
 
   List<Offset> _pathFinding() {
-    double differentX = _character.position.x + (_character.width / Random().nextInt(3)) - position.x;
-    double differentY = _character.position.y + (_character.height / Random().nextInt(2)) - position.y;
+    double differentX = _character.position.x + (_character.width / 2) - position.x;
+    double differentY = _character.position.y + (_character.height / 2) - position.y;
 
     final charPos = Vector2(_character.position.x + (_character.width / 2), _character.position.y + (_character.height / 2));
     final npcPos = Vector2(this.position.x + (this.width / 2), this.position.y + (this.height / 2));
@@ -227,8 +230,8 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
         _isAggressive &&
         !_character.isDead) {
 
-      if ((differentX < 100 || differentX > -100) &&
-          (differentY < 100 || differentY > -100)) {
+      if ((differentX < 150 || differentX > -150) &&
+          (differentY < 150 || differentY > -150)) {
         this.current = DirectionalHelper.getDirectionalSpriteAnimation(
             _facing, StateAction.Attack);
         isPlayerPressAttack = true;
