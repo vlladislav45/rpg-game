@@ -13,6 +13,8 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
 
   // Walls
   List<Component> _restrictObstacles = [];
+  // Trees
+  List<Offset> _treeOffsets = [];
 
   // Constructor
   Map(
@@ -21,6 +23,9 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
       {Vector2? destTileSize,
         double? tileHeight})
       : super(tileset, matrix, destTileSize: destTileSize, tileHeight: tileHeight);
+
+
+  List<Offset> get treeOffsets => _treeOffsets;
 
   @override
   Future<void> onLoad() async {
@@ -51,6 +56,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
           final p = getBlockPositionInts(j, i);
           final treeSprite = await gameRef.loadSprite('sprites/obstacles/Tree_2.png');
 
+          _treeOffsets.add(new Offset(i.toDouble(), j.toDouble()));
           gameRef.add(Tree(
             sprite: treeSprite,
             position: p,
@@ -145,7 +151,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
     Block block;
     do {
       block = Block((R.nextInt(matrix.length)), (R.nextInt(matrix[0].length)));
-    }while(!this.containsBlock(block));
+    }while(!this.containsBlock(block) && this.matrix[block.x][block.y] == 4 && block.x < 0 && block.y < 0);
 
     x = this.getBlockPosition(block).x;
     y = this.getBlockPosition(block).y;

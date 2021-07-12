@@ -90,13 +90,6 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
         }
       }
     }
-    if(other is Tree) {
-      other.setAround(true);
-      _isHasObstacle = other.isAround;
-      if(other.isAround) {
-        _obstacle = other;
-      }
-    }
   }
 
 
@@ -217,15 +210,13 @@ class Npc extends SpriteAnimationGroupComponent<NpcState> with Hitbox, Collidabl
     Block characterGridPosition = _map.getBlock(_character.position);
     Block npcGridPosition = _map.getBlock(this.position);
     Offset start = Offset(characterGridPosition.x.toDouble() + 1, characterGridPosition.y.toDouble());
-    Offset end = Offset(npcGridPosition.x.toDouble(), npcGridPosition.y.toDouble());
+    Offset end = Offset(npcGridPosition.y.toDouble(), npcGridPosition.x.toDouble());
     final result = AStar(
       rows: _map.matrix.length,
       columns: _map.matrix[0].length,
       start: start,
       end: end,
-      barriers: [
-
-      ],
+      barriers: _map.treeOffsets,
     ).findThePath();
     // print(result);
     // print(_map.getBlockPosition(Block(result[0].dx.toInt(), result[0].dy.toInt())));
