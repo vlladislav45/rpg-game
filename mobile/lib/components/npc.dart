@@ -89,8 +89,10 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
         }
       }
     }else if(other is Npc){
-      this.position -= Vector2(20,20);
-      other.position += Vector2(20,20);
+
+    }else if(other is Tree) {
+      position.x -= 3;
+      position.y -= 3;
     }
   }
 
@@ -185,11 +187,13 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
       var nextPosition = _map.getBlockPosition(nxtBlock);
       if (nextPosition.x > this.position.x)
         _velocity.add(Vector2(1, 0));
-      else if (nextPosition.x < this.position.x) _velocity.add(Vector2(-1, 0));
+      else
+      if (nextPosition.x < this.position.x) _velocity.add(Vector2(-1, 0));
 
       if (nextPosition.y > this.position.y)
         _velocity.add(Vector2(0, 1));
-      else if (nextPosition.y < this.position.y) _velocity.add(Vector2(0, -1));
+      else
+      if (nextPosition.y < this.position.y) _velocity.add(Vector2(0, -1));
 
       _displacement = _velocity * (speed * dt);
       position.add(_displacement);
@@ -221,8 +225,9 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
       columns: _map.matrix[0].length,
       start: start,
       end: end,
-      barriers: [],
+      barriers: _map.treeOffsets,
     ).findThePath();
+    print('Shortest path to the character $result');
 
     facing();
     if (differentX <= this._range &&
