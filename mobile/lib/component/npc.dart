@@ -82,10 +82,10 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
     if (other is Character) {
       if (other.isPlayerPressAttack) {
         _isCollision = true;
-        other.setIsPlayerPressAttack(false);
+        // other.setIsPlayerPressAttack(false);
 
         if (health > 0) {
-          health -= 20;
+          health -= 1;
         }
       }
     }else if(other is Npc){
