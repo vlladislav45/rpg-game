@@ -1,4 +1,4 @@
-package com.jrpg_game_server.network;
+package com.jrpg_game_server.cli.network;
 
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
