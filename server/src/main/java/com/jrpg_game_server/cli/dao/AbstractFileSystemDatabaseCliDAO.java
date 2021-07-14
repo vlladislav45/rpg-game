@@ -1,6 +1,6 @@
 package com.jrpg_game_server.cli.dao;
 
-import com.jrpg_game_server.cli.config.ServerConfig;
+import com.jrpg_game_server.cli.config.DatabaseConfig;
 import com.jrpg_game_server.cli.filters.SQLFilter;
 
 import java.io.File;
@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.prefs.Preferences;
 
 public abstract class AbstractFileSystemDatabaseCliDAO extends AbstractCliDAO {
-    AbstractFileSystemDatabaseCliDAO(ServerConfig server) {
-        super(server);
+    AbstractFileSystemDatabaseCliDAO(DatabaseConfig databaseConfig) {
+        super(databaseConfig);
     }
 
     public void basic(File sqlPath) {

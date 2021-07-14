@@ -3,12 +3,12 @@ import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:rpg_game/game.dart';
 
-class Blacksmith extends SpriteComponent with HasGameRef<MyGame>, Tapable {
+class Blacksmith extends SpriteComponent with HasGameRef<MyGame>, Tappable {
   static final String _overlay = 'BlacksmithMenu';
 
   Blacksmith({
-    Vector2 position,
-    Vector2 size,
+    Vector2? position,
+    Vector2? size,
   }): super(position: position, size: size);
 
   @override

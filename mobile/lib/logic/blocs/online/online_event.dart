@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:rpg_game/models/character_model.dart';
+import 'package:rpg_game/models/user_model.dart';
 
 abstract class OnlineEvent {
   const OnlineEvent();
@@ -59,8 +60,8 @@ class OnlineAuthenticationEvent extends OnlineEvent {
   final String password;
 
   OnlineAuthenticationEvent({
-    @required this.username,
-    @required this.password,
+    required this.username,
+    required this.password,
   });
 
   @override
@@ -68,24 +69,35 @@ class OnlineAuthenticationEvent extends OnlineEvent {
 }
 
 class OnlineAuthenticatedEvent extends OnlineEvent {
-  final String id;
-  final String username;
-  final String email;
+  final UserModel userViewModel;
 
   OnlineAuthenticatedEvent({
-    @required this.id,
-    @required this.email,
-    @required this.username,
+    required this.userViewModel,
   });
 
   factory OnlineAuthenticatedEvent.fromJson(Map<String, dynamic> json) {
     return OnlineAuthenticatedEvent(
-      id: json['id'],
-      email: json['email'],
-      username: json['username'],
+      userViewModel: UserModel.fromJson(json),
     );
   }
 
   @override
-  List<Object> get props => [username];
+  List<Object> get props => [userViewModel];
+}
+
+class OnlineAuthenticationErrorEvent extends OnlineEvent {
+  final String error;
+
+  OnlineAuthenticationErrorEvent({
+    required this.error,
+  });
+
+  factory OnlineAuthenticationErrorEvent.fromJson(Map<String, dynamic> json) {
+    return OnlineAuthenticationErrorEvent(
+      error: json['error'],
+    );
+  }
+
+  @override
+  List<Object> get props => [error];
 }

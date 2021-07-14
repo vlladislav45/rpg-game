@@ -4,15 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
-import 'package:rpg_game/logic/cubits/map_levels/map_level_cubit.dart';
-import 'package:rpg_game/logic/cubits/map_levels/map_level_state.dart';
+import 'package:rpg_game/logic/blocs/online/online_bloc.dart';
+import 'package:rpg_game/logic/blocs/online/online_state.dart';
+import 'package:rpg_game/logic/cubits/map/map_cubit.dart';
+import 'package:rpg_game/logic/cubits/map/map_state.dart';
 import 'package:rpg_game/presentation/widgets/buildings/blacksmith_overlay.dart';
 import 'package:rpg_game/presentation/widgets/buildings/castle_overlay.dart';
 import 'package:rpg_game/presentation/widgets/buildings/portal_overlay.dart';
 import 'package:rpg_game/presentation/widgets/buildings/shop_overlay.dart';
+import 'package:rpg_game/presentation/widgets/character/character_overlay.dart';
 
 class MyGameScreen extends StatefulWidget {
-  const MyGameScreen({Key key}) : super(key: key);
+  const MyGameScreen({Key? key}) : super(key: key);
 
   @override
   State<MyGameScreen> createState() {
@@ -29,7 +32,7 @@ class _MyGameScreenState extends State<MyGameScreen> {
           margin: EdgeInsets.all(0.0),
           child: FutureBuilder(
             future: DefaultAssetBundle.of(context)
-                .loadString('assets/maps/main-map.json'),
+                .loadString('assets/maps/level1.json'),
             builder: (context, snapshot) {
               if (!snapshot.hasData ||
                   snapshot.connectionState == ConnectionState.waiting)
@@ -39,17 +42,30 @@ class _MyGameScreenState extends State<MyGameScreen> {
                 );
               final jsonMap = snapshot.data;
 
-              return BlocBuilder<MapLevelCubit, MapLevelState>(
+              return BlocBuilder<MapCubit, MapState>(
                 builder: (context, state) {
-                  return GameWidget<MyGame>(
-                    game: MyGame(jsonMap: jsonMap, mapLevel: state.mapLevel),
-                    overlayBuilderMap: {
-                      'PortalMenu': portalOverlayBuilder,
-                      'CastleMenu': castleOverlayBuilder,
-                      'BlacksmithMenu': blacksmithOverlayBuilder,
-                      'ShopMenu': shopOverlayBuilder,
-                    },
-                  );
+                  return BlocBuilder<OnlineBloc, OnlineState>(
+                  builder: (_, gameState) {
+                  if (gameState is OnlineAuthenticatedState) {
+                    return GameWidget<MyGame>(
+                      game: MyGame(jsonMap: jsonMap.toString(),
+                          context: context,
+                          mapLevel: state.map,
+                          arena: state.arena,
+                          characterModel: gameState.userViewModel.characters[0],
+                          viewportResolution: Vector2(MediaQuery.of(context).size.width,
+                              MediaQuery.of(context).size.height)),
+                      overlayBuilderMap: {
+                        'PortalMenu': portalOverlayBuilder,
+                        'CastleMenu': castleOverlayBuilder,
+                        'BlacksmithMenu': blacksmithOverlayBuilder,
+                        'ShopMenu': shopOverlayBuilder,
+                        'CharacterOverlay': characterOverlayBuilder,
+                      },
+                    );
+                  }
+                  return CircularProgressIndicator();
+                  });
                 },
               );
             },

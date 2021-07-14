@@ -1,49 +1,78 @@
 package com.jrpg_game_server.cli.commands;
 
-import com.corundumstudio.socketio.AckRequest;
-import com.corundumstudio.socketio.Configuration;
-import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import com.corundumstudio.socketio.listener.DataListener;
+import com.jrpg_game_server.cli.dao.CharacterDAO;
 import com.jrpg_game_server.cli.dao.UserDAO;
+import com.jrpg_game_server.cli.entities.Character;
 import com.jrpg_game_server.cli.models.binding.AuthenticationRequestBindingModel;
+import com.jrpg_game_server.cli.models.binding.CharacterBindingModel;
+import com.jrpg_game_server.cli.models.views.CharacterViewModel;
 import com.jrpg_game_server.cli.models.views.UserViewModel;
+import com.jrpg_game_server.cli.services.CharacterServiceImpl;
 import com.jrpg_game_server.cli.services.ServiceWrapper;
-import com.jrpg_game_server.cli.services.UserServices;
-import com.jrpg_game_server.cli.services.impl.UserServicesImpl;
+import com.jrpg_game_server.cli.services.base.CharacterService;
+import com.jrpg_game_server.cli.services.base.UserService;
+import com.jrpg_game_server.cli.services.UserServiceImpl;
+import com.jrpg_game_server.network.SocketServerManager;
 import picocli.CommandLine;
+
+import java.util.HashMap;
+import java.util.UUID;
 
 @CommandLine.Command(name = "start server", aliases = "ss")
 
 public class ServerStartCommand extends AbstractCommand {
     private ServiceWrapper serviceWrapper;
+    private SocketServerManager socketServerManager;
 
     @Override
     public void run() {
         System.out.println("Server is starting..");
 
         // Initialize entire set of services and dao's
-        initialize();
+        initializeServices();
 
-        Configuration config = new Configuration();
-        config.setHostname("localhost");
-        config.setPort(9092);
+        // Init socket server
+        socketServerManager = SocketServerManager.setup();
+        final SocketIOServer server = socketServerManager.getSocketServer();
 
-        final SocketIOServer server = new SocketIOServer(config);
-        server.addEventListener("authentication", AuthenticationRequestBindingModel.class, new DataListener<AuthenticationRequestBindingModel>() {
-            @Override
-            public void onData(SocketIOClient client, AuthenticationRequestBindingModel data, AckRequest ackRequest) {
-                System.out.println(data.getUsername());
-                boolean isAuthenticated = loginCheck(data.getUsername(), data.getPassword());
-                if (isAuthenticated) {
-                    //TODO: Send message for new screen
-                    UserViewModel userViewModel = UserViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser());
-                    client.sendEvent("authentication", userViewModel);
-                } else {
-                    //TODO: Send error message: WRONG CREDENTIALS!
-                }
-                // broadcast messages to all clients
-//                server.getBroadcastOperations().sendEvent("authentication", data);
+        server.addEventListener("authentication", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {
+            boolean isAuthenticated = loginCheck(data.getUsername(), data.getPassword());
+            if (isAuthenticated) {
+                UserViewModel userViewModel = UserViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser());
+                client.sendEvent("authenticated", userViewModel);
+            } else {
+                // Wrong credentials
+                client.sendEvent("authenticationError", new HashMap<String, String>() {{
+                    put("error", "WRONG CREDENTIALS");
+                }});
+            }
+        });
+
+        server.addEventListener("handshake", CharacterBindingModel.class, (client, data, ackRequest) -> {
+            System.out.println("ITS HERE");
+            if (serviceWrapper.getUserServices().getLoggedUser() != null) {
+                CharacterViewModel characterViewModel =
+                        CharacterViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser().getCharacters().iterator().next());
+                client.sendEvent("loggedPlayer", characterViewModel);
+            }
+        });
+
+        server.addEventListener("update", CharacterBindingModel.class, (client, data, ackRequest) -> {
+            if (serviceWrapper.getUserServices().getLoggedUser() != null) {
+                // update the information about character
+                Character character = new Character(
+                        UUID.fromString(data.getId()),
+                        data.getNickname(),
+                        data.getLevel(),
+                        data.getHp(),
+                        data.getMana()
+                );
+                serviceWrapper.getCharacterService().update(character);
+
+                CharacterViewModel characterViewModel =
+                        CharacterViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser().getCharacters().iterator().next());
+                client.sendEvent("loggedPlayer", characterViewModel);
             }
         });
 
@@ -59,15 +88,18 @@ public class ServerStartCommand extends AbstractCommand {
 
     }
 
-    private void initialize() {
+    private void initializeServices() {
         //Init Database access objects
-        UserDAO userDAO = new UserDAO();
+        CharacterDAO characterDAO = new CharacterDAO();
+        UserDAO userDAO = new UserDAO(characterDAO);
 
         //Init service layer
-        UserServices userServices = new UserServicesImpl(userDAO);
+        UserService userService = new UserServiceImpl(userDAO,
+                characterDAO);
+        CharacterService characterService = new CharacterServiceImpl(characterDAO);
 
         serviceWrapper = new ServiceWrapper();
-        serviceWrapper.setServices(userServices);
+        serviceWrapper.setServices(userService, characterService);
     }
 
     private boolean loginCheck(String username, String password) {

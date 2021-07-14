@@ -1,295 +1,382 @@
+
 import 'dart:ui';
 import 'dart:async';
 
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
-import 'package:flame/gestures.dart';
-import 'package:flame/keyboard.dart';
+import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
+import 'package:rpg_game/animations/character_sprite_animation.dart';
+import 'package:rpg_game/animations/npc_sprite_animation.dart';
+import 'package:rpg_game/components/npc.dart';
 import 'package:rpg_game/components/portal.dart';
 import 'package:rpg_game/maps/maps/map.dart';
 import 'package:rpg_game/components/character.dart';
-import 'package:rpg_game/components/selector.dart';
 import 'package:rpg_game/maps/town.dart';
+import 'package:rpg_game/utils/directional_helper.dart';
 
-const x = 750.0;
-const y = 150.0;
-final topLeft = Vector2(x, y);
+import 'models/character_model.dart';
+import 'utils/hex_color.dart';
 
-typedef VoidCallback = void Function();
-
-class MyGame extends BaseGame with MouseMovementDetector, KeyboardEvents, HasCollidables, HasTapableComponents, ScrollDetector {
+class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
+        HasDraggableComponents {
   //Properties
-  String jsonMap;
-  int mapLevel;
-  Vector2 screenMousePosition;
+  Vector2? screenMousePosition;
+  String? jsonMap;
+  int? mapLevel;
+  int? arena;
 
-  //Town
-  Town _town;
-  
+  // Facing of the character, it is use in keyboard movement
+  String? _facing;
+
   // Components
-  Map map;
-  Character _character = Character();
-  Selector _selector;
-  Portal _portal;
-  
-  //Functions
-  VoidCallback selectMapLevel;
+  late Map map;
+  Town? _town;
+  late Character _character;
+  late JoystickComponent _joystick;
+  late final CharacterModel _characterModel;
+  late Npc _npc;
+  late List<Npc> _npcs = [];
+  bool _isAllNpcsAreDeath = false;
+  Portal? _portal;
+  late final BuildContext _context;
 
-  MyGame({this.jsonMap, this.mapLevel});
+  // Useful properties
+  bool _isCharacterSpawned = false;
+
+  // Screen Resolution
+  Vector2 viewportResolution;
+
+  MyGame({
+    CharacterModel? characterModel,
+    BuildContext? context,
+    String? jsonMap,
+    int? mapLevel,
+    int? arena,
+    required this.viewportResolution,
+  }) {
+    this.mapLevel = mapLevel;
+    this.jsonMap = jsonMap;
+    this.arena = arena;
+    this._characterModel = characterModel!;
+    this._context = context!;
+  }
 
   @override
   Color backgroundColor() {
-    return Colors.transparent;
+    return Color(HexColor.convertHexColor('#37B4Ba')).withOpacity(0.80);
   }
 
-  void loadMapLevel() async {
-    final tilesetImage = await images.load('sprites/tile_maps/grass_default.png');
-    final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2(151,71));
-    final matrix = Map.toList(this.jsonMap);
+  Future<void> loadMapLevel() async {
+    viewport = FixedResolutionViewport(viewportResolution);
+    print('ViewPort: ${viewport.canvasSize}');
+
+    final tilesetImage = await images.load('sprites/tile_maps/tileset.png');
+    final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2(151, 76));
+    final matrix = Map.toList(this.jsonMap.toString());
 
     // Add main town
-    add(
-      map = Map(
-        tileset,
-        matrix,
-      )
-        ..x = x
-        ..y = y,
-    );
+    add(map = Map(
+      tileset,
+      matrix,
+      tileHeight: 25.0,
+    )..position = Vector2(0,0));
+    map.renderTrees();
 
     spawnCharacter();
+    spawnNpcs();
+  }
+
+  // Future<void> loadArena() async {
+  //   viewport = FixedResolutionViewport(viewportResolution);
+  //   print('ViewPort: ${viewport.canvasSize}');
+  //
+  //   final tilesetImage = await images.load('sprites/tile_maps/tileset.png');
+  //   final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2(151, 76));
+  //   final matrix = Map.toList(this.jsonMap.toString());
+  //
+  //   // Add main town
+  //   add(map = Map(
+  //     tileset,
+  //     matrix,
+  //     tileHeight: 25.0,
+  //   )..position = Vector2(0,0)
+  //   ..isHud = true);
+  //
+  //   spawnCharacter();
+  // }
+
+  void spawnNpcs() async {
+    /// Load npc Sprite Direction Animations
+    final npcSpriteAnimation = NpcSpriteAnimation();
+    await npcSpriteAnimation.loadSpriteAnimations();
+
+    print('SIZE OF THE MAP ${map.mapSize()}');
+    for (int i = 0; i < 5; i++) {
+      final npcSpawnPosition = map.getBlock(map.genCoord());
+      final spawnPosition = map.getBlockPosition(npcSpawnPosition);
+
+      // bool isAggressive = false;
+      // // Odd number
+      // var rand = Random().nextInt(100);
+      // if(rand % 2 == 1)
+      //   isAggressive = true;
+
+      print('Npc is spawned on: $spawnPosition');
+      Npc npc;
+      add(npc = Npc(
+        map,
+        true,
+        _character,
+        {
+          NpcState.idleRight: npcSpriteAnimation.idleRight,
+          NpcState.hitRight: npcSpriteAnimation.hitRight,
+          NpcState.runRight: npcSpriteAnimation.runRight,
+          NpcState.idleDown: npcSpriteAnimation.idleDown,
+          NpcState.hitDown: npcSpriteAnimation.hitDown,
+          NpcState.runDown: npcSpriteAnimation.runDown,
+          NpcState.idleLeft: npcSpriteAnimation.idleLeft,
+          NpcState.hitLeft: npcSpriteAnimation.hitLeft,
+          NpcState.runLeft: npcSpriteAnimation.runLeft,
+          NpcState.idleTop: npcSpriteAnimation.idleTop,
+          NpcState.hitTop: npcSpriteAnimation.hitTop,
+          NpcState.runTop: npcSpriteAnimation.runTop,
+          NpcState.idleBottomRight: npcSpriteAnimation.idleBottomRight,
+          NpcState.hitBottomRight: npcSpriteAnimation.hitBottomRight,
+          NpcState.runBottomRight: npcSpriteAnimation.runBottomRight,
+          NpcState.idleBottomLeft: npcSpriteAnimation.idleBottomLeft,
+          NpcState.hitBottomLeft: npcSpriteAnimation.hitBottomLeft,
+          NpcState.runBottomLeft: npcSpriteAnimation.runBottomLeft,
+          NpcState.idleTopLeft: npcSpriteAnimation.idleTopLeft,
+          NpcState.hitTopLeft: npcSpriteAnimation.hitTopLeft,
+          NpcState.runTopLeft: npcSpriteAnimation.runTopLeft,
+          NpcState.idleTopRight: npcSpriteAnimation.idleTopRight,
+          NpcState.hitTopRight: npcSpriteAnimation.hitTopRight,
+          NpcState.runTopRight: npcSpriteAnimation.runTopRight,
+        },
+        size: Vector2(79, 63),
+        position: spawnPosition,
+      )..current = NpcState.idleDown);
+
+    _npcs.add(npc);
+    }
   }
 
   void spawnCharacter() async {
-    int lengthOfIdleSprites = 80; // 10 - 80
-    int lengthOfAttack1Sprites = 120; // 88 - 120
-    int lengthOfWalkSprites = 200; // 140 - 200
-    int lengthOfRunSprites = 264; // 220 - 264
-    int lengthOfIdle2Sprites = 320; // 268 - 320 When the character is heated or he is hitting
-    int lengthOfAttack2Sprites = 400; // 328 - 400
-    /// Right direction
-    // right idle
-    List<Sprite> characterSprites = [];
-    for (var i = 12; i <= lengthOfIdleSprites; i += 4)
-      characterSprites.add(await Sprite.load('sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
-    final idleRight = SpriteAnimation.spriteList(
-        characterSprites, stepTime: 0.20);
+    /// Load Character Sprite Direction Animations
+    final characterSpriteAnimation = CharacterSpriteAnimation();
 
-    // right attack1
-    characterSprites = [];
-    for (var i = 88; i < lengthOfAttack1Sprites; i += 4)
-      if (i >= 100)
-        characterSprites.add(await Sprite.load(
-            'sprites/characters/knights/seq_antlerKnight/A_right0${i}.png'));
-      else
-        characterSprites.add(await Sprite.load(
-            'sprites/characters/knights/seq_antlerKnight/A_right00${i}.png'));
-    final hitRight = SpriteAnimation.spriteList(
-        characterSprites, stepTime: 0.20);
+    /// Spawn the character
 
-    // right running
-    characterSprites = [];
-    for (var i = 220; i < lengthOfRunSprites; i += 4)
-      characterSprites.add(await Sprite.load(
-          'sprites/characters/knights/seq_antlerKnight/A_right0${i}.png'));
-    final runningRight = SpriteAnimation.spriteList(
-        characterSprites, stepTime: 0.10);
+    final characterSpawnPosition = map.getBlock(Vector2(600, 450));
+    print(characterSpawnPosition);
+    await characterSpriteAnimation.loadSpriteAnimations();
 
-    /// Down direction
-    // Idle down
-    characterSprites = [];
-    for (var i = 12; i < lengthOfIdleSprites; i += 4)
-      characterSprites.add(await Sprite.load(
-          'sprites/characters/knights/seq_antlerKnight/C_Front00${i}.png'));
-    final idleDown = SpriteAnimation.spriteList(
-        characterSprites, stepTime: 0.20);
+    _joystick = await getJoystick();
 
-    // Hit down
-    characterSprites = [];
-    for (var i = 88; i < lengthOfAttack1Sprites; i += 4)
-      if (i >= 100)
-        characterSprites.add(await Sprite.load(
-            'sprites/characters/knights/seq_antlerKnight/C_Front0${i}.png'));
-      else
-        characterSprites.add(await Sprite.load(
-            'sprites/characters/knights/seq_antlerKnight/C_Front00${i}.png'));
-      final hitDown = SpriteAnimation.spriteList(
-          characterSprites, stepTime: 0.20);
+    _character = Character(
+      _joystick,
+      _context,
+      _characterModel,
+      {
+        NpcState.idleRight: characterSpriteAnimation.idleRight,
+        NpcState.hitRight: characterSpriteAnimation.hitRight,
+        NpcState.runRight: characterSpriteAnimation.runRight,
+        NpcState.idleDown: characterSpriteAnimation.idleDown,
+        NpcState.hitDown: characterSpriteAnimation.hitDown,
+        NpcState.runDown: characterSpriteAnimation.runDown,
+        NpcState.idleLeft: characterSpriteAnimation.idleLeft,
+        NpcState.hitLeft: characterSpriteAnimation.hitLeft,
+        NpcState.runLeft: characterSpriteAnimation.runLeft,
+        NpcState.idleTop: characterSpriteAnimation.idleTop,
+        NpcState.hitTop: characterSpriteAnimation.hitTop,
+        NpcState.runTop: characterSpriteAnimation.runTop,
+        NpcState.idleBottomRight: characterSpriteAnimation.idleBottomRight,
+        NpcState.hitBottomRight: characterSpriteAnimation.hitBottomRight,
+        NpcState.runBottomRight: characterSpriteAnimation.runBottomRight,
+        NpcState.idleBottomLeft: characterSpriteAnimation.idleBottomLeft,
+        NpcState.hitBottomLeft: characterSpriteAnimation.hitBottomLeft,
+        NpcState.runBottomLeft: characterSpriteAnimation.runBottomLeft,
+        NpcState.idleTopLeft: characterSpriteAnimation.idleTopLeft,
+        NpcState.hitTopLeft: characterSpriteAnimation.hitTopLeft,
+        NpcState.runTopLeft: characterSpriteAnimation.runTopLeft,
+        NpcState.idleTopRight: characterSpriteAnimation.idleTopRight,
+        NpcState.hitTopRight: characterSpriteAnimation.hitTopRight,
+        NpcState.runTopRight: characterSpriteAnimation.runTopRight,
+      },
+      size: Vector2(200, 200),
+    )..current = NpcState.idleRight;
+    _character.position.setFrom(map.getBlockPosition(characterSpawnPosition));
 
-      // Running down
-      characterSprites = [];
-      for (var i = 220; i < lengthOfRunSprites; i += 4)
-        characterSprites.add(await Sprite.load(
-            'sprites/characters/knights/seq_antlerKnight/C_Front0${i}.png'));
-      final runningDown = SpriteAnimation.spriteList(
-          characterSprites, stepTime: 0.10);
+    final attack = await loadSprite('joystick_attack.png');
+    final attackBtnDown = await loadSprite('joystick_attack_selected.png');
+    final attackButton = HudButtonComponent(
+      button: SpriteComponent(
+        sprite: attack,
+        size: Vector2.all(50.0),
+      ),
+      buttonDown: SpriteComponent(
+        sprite: attackBtnDown,
+        size: Vector2.all(50.0),
+      ),
+      margin: const EdgeInsets.only(
+        right: 40,
+        bottom: 40,
+      ),
+      onPressed: () => {
+        _character.attack(),
+      }
+    );
 
-      /// Left direction
-      // Idle left
-      characterSprites = [];
-      for (var i = 12; i < lengthOfIdleSprites; i += 4)
-        characterSprites.add(await Sprite.load(
-            'sprites/characters/knights/seq_antlerKnight/E_Left00${i}.png'));
-      final idleLeft = SpriteAnimation.spriteList(
-          characterSprites, stepTime: 0.20);
+    add(_character);
+    add(_joystick);
+    add(attackButton);
+    camera.cameraSpeed = 1;
+    camera.followComponent(_character, relativeOffset: Anchor.center);
 
-      // Hit left
-      characterSprites = [];
-      for (var i = 88; i < lengthOfAttack1Sprites; i += 4)
-        if (i >= 100)
-          characterSprites.add(await Sprite.load(
-              'sprites/characters/knights/seq_antlerKnight/E_Left0${i}.png'));
-        else
-          characterSprites.add(await Sprite.load(
-              'sprites/characters/knights/seq_antlerKnight/E_Left00${i}.png'));
-        final hitLeft = SpriteAnimation.spriteList(
-            characterSprites, stepTime: 0.20);
+    if (!overlays.isActive(_character.overlay))
+      overlays.add(_character.overlay);
 
-        // Running left
-        characterSprites = [];
-        for (var i = 220; i < lengthOfRunSprites; i += 4)
-          characterSprites.add(await Sprite.load(
-              'sprites/characters/knights/seq_antlerKnight/E_Left0${i}.png'));
-        final runningLeft = SpriteAnimation.spriteList(
-            characterSprites, stepTime: 0.10);
+    _isCharacterSpawned = true;
+  }
 
-        /// Up direction
-        // Idle up
-        characterSprites = [];
-        for (var i = 12; i < lengthOfIdleSprites; i += 4)
-          characterSprites.add(await Sprite.load(
-              'sprites/characters/knights/seq_antlerKnight/G_Back00${i}.png'));
-        final idleUp = SpriteAnimation.spriteList(
-            characterSprites, stepTime: 0.20);
-
-        // Hit left
-        characterSprites = [];
-        for (var i = 88; i < lengthOfAttack1Sprites; i += 4)
-          if (i >= 100)
-            characterSprites.add(await Sprite.load(
-                'sprites/characters/knights/seq_antlerKnight/G_Back0${i}.png'));
-          else
-            characterSprites.add(await Sprite.load(
-                'sprites/characters/knights/seq_antlerKnight/G_Back00${i}.png'));
-          final hitUp = SpriteAnimation.spriteList(
-              characterSprites, stepTime: 0.20);
-
-          // Running left
-          characterSprites = [];
-          for (var i = 220; i < lengthOfRunSprites; i += 4)
-            characterSprites.add(await Sprite.load(
-                'sprites/characters/knights/seq_antlerKnight/G_Back0${i}.png'));
-          final runningUp = SpriteAnimation.spriteList(
-              characterSprites, stepTime: 0.10);
-
-          /// Spawn the character
-          final characterSpawnPosition = map.getBlock(
-              Vector2(x, y) + topLeft + Vector2(0, 150));
-          _character = Character(
-            size: Vector2(200, 200),
-            position: map.getBlockPosition(characterSpawnPosition),
-          )
-            ..animations = {
-              CharacterState.idleRight: idleRight,
-              CharacterState.hitRight: hitRight,
-              CharacterState.runningRight: runningRight,
-              CharacterState.idleDown: idleDown,
-              CharacterState.hitDown: hitDown,
-              CharacterState.runningDown: runningDown,
-              CharacterState.idleLeft: idleLeft,
-              CharacterState.hitLeft: hitLeft,
-              CharacterState.runningLeft: runningLeft,
-              CharacterState.idleUp: idleUp,
-              CharacterState.hitUp: hitUp,
-              CharacterState.runningUp: runningUp,
-            }
-            ..current = CharacterState.idleRight;
-          add(_character);
+  Future<JoystickComponent> getJoystick() async {
+    final knob = await loadSprite('joystick_knob.png');
+    final background = await loadSprite('joystick_background.png');
+    return JoystickComponent(
+      knob: SpriteComponent(
+        sprite: knob,
+        size: Vector2.all(50.0),
+      ),
+      background: SpriteComponent(
+        sprite: background,
+        size: Vector2.all(80.0),
+      ),
+      margin: const EdgeInsets.only(left: 40, bottom: 40),
+    );
   }
 
   void spawnTown() async {
     //Spawn town
     final townSprite = await Sprite.load('bg/Background_3_3840x2160.jpg');
-    _town = Town(size: size, position: Vector2(0, 0))..sprite = townSprite;
-    add(_town);
-    _town.spawnTown();
+    _town = Town(size: size, position: Vector2.zero())
+      ..sprite = townSprite
+      ..isHud = true;
+    add(_town!);
+    _town!.spawnTown();
+
+    camera.snapTo(Vector2.zero());
   }
 
   @override
   Future<void> onLoad() async {
-    print('MY MAP LEVEL: $mapLevel');
-    mapLevel == null ? spawnTown() : loadMapLevel();
-
-    //camera.cameraSpeed = 1;
-    // camera.followComponent(_character);
-
-    //Add walls around the town
-    //map.setWalls();
-
-    // final selectorImage = await images.load('tile_maps/selector.png');
-    // add(_selector = Selector(s, selectorImage));
-  }
-
-  @override
-  void onMouseMove(PointerHoverInfo event) {
-    final target = event.eventPosition.game;
-    // print(target);
+    print('Map Level: $mapLevel');
+    mapLevel == 0 ? spawnTown() : await loadMapLevel();
+    // arena == 0 ? spawnTown() : await loadArena();
   }
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-
   }
 
-  @override
-  void onKeyEvent(RawKeyEvent e) {
-    final isKeyDown = e is RawKeyDownEvent;
+  // @override
+  // void onKeyEvent(RawKeyEvent e) async {
+  //   final isKeyDown = e is RawKeyDownEvent;
+  //
+  //   // print(_facing);
+  //   // print(_character.isPlayerPressAttack);
+  //   if(e.data.keyLabel == '1') {
+  //     _character.current = DirectionalHelper.getDirectionalSpriteAnimation(
+  //         _facing!, StateAction.Attack);
+  //     _character.setIsPlayerPressAttack(true);
+  //     _character.timer.start();
+  //   }
+  //
+  //   // print(_character.velocity);
+  //   if (e.data.keyLabel == 'w') {
+  //     _character.current = NpcState.runTopRight;
+  //     _character.velocity.y = isKeyDown ? -1 : 0;
+  //     _facing = 'north-east';
+  //   } else if (e.data.keyLabel == 's') {
+  //     _character.velocity.y = isKeyDown ? 1 : 0;
+  //     _character.current = NpcState.runBottomLeft;
+  //     _facing = 'south-west';
+  //   }
+  //   if (e.data.keyLabel == 'a') {
+  //     _character.velocity.x = isKeyDown ? -1 : 0;
+  //     if (_character.velocity.y == 0) {
+  //       _character.current = NpcState.runTopLeft;
+  //       _facing = 'north-west';
+  //     } else if (_character.velocity.y == 1) {
+  //       // if (-1,1)
+  //       if (isKeyDown) _character.setVelocity(Vector2(-1, 1));
+  //       _character.current = NpcState.runLeft;
+  //       _facing = 'west';
+  //     } else {
+  //       if (isKeyDown) _character.setVelocity(Vector2(-1, -1));
+  //       _character.current = NpcState.runTop;
+  //       _facing = 'north';
+  //     }
+  //   } else if (e.data.keyLabel == 'd') {
+  //     _character.velocity.x = isKeyDown ? 1 : 0;
+  //     if (_character.velocity.y == 0) {
+  //       _character.current = NpcState.runBottomRight;
+  //       _facing = 'south-east';
+  //     } else if (_character.velocity.y == 1) {
+  //       if (isKeyDown) _character.setVelocity(Vector2(1, 1));
+  //       _character.current = NpcState.runDown;
+  //       _facing = 'south';
+  //     } else {
+  //       if (isKeyDown) _character.setVelocity(Vector2(1, -1));
+  //       _character.current = NpcState.runRight;
+  //       _facing = 'east';
+  //     }
+  //   }
+  //
+  //   if (_character.velocity.y == 0 && _character.velocity.x == 0 && e.data.keyLabel != '1') {
+  //     // print(_facing);
+  //     _character.current = DirectionalHelper.getDirectionalSpriteAnimation(
+  //         _facing!, StateAction.Idle);
+  //   }
+  // }
 
-    if (e.data.keyLabel == 'a') {
-      _character.current = isKeyDown ? CharacterState.runningLeft : CharacterState.idleLeft;
-      _character.velocity.x = isKeyDown ? -1 : 0;
-    } else if (e.data.keyLabel == 'd') {
-      _character.current = isKeyDown ? CharacterState.runningRight : CharacterState.idleRight;
-      _character.velocity.x = isKeyDown ? 1 : 0;
-    } else if (e.data.keyLabel == 'w') {
-      _character.current = isKeyDown ? CharacterState.runningUp : CharacterState.idleUp;
-      _character.velocity.y = isKeyDown ? -1 : 0;
-    } else if (e.data.keyLabel == 's') {
-      _character.current = isKeyDown ? CharacterState.runningDown : CharacterState.idleDown;
-      _character.velocity.y = isKeyDown ? 1 : 0;
-    } else if (e.data.keyLabel == '1') {
-      _character.current = CharacterState.hitRight;
-    }
-  }
-
   @override
-  void update(double dt) {
+  void update(double dt) async {
     super.update(dt);
 
-    // Block block = map.getBlock(_character.position);
-    //
-    // if (!map.containsBlock(block)) {
-    //   if (block.y <= 0)
-    //     _character.y += 15;
-    //   else if (block.y >= map.matrix.length)
-    //     _character.y -= 15;
-    //   else if (block.x <= 0)
-    //     _character.x += 15;
-    //   else if (block.x >= map.matrix[block.y].length) _character.x -= 15;
-    // }
-  }
+    List<Npc> matches = _npcs.where((n) => n.isNpcDeath == true).toList();
+    if(matches.length == _npcs.length && _npcs.length > 0) {
+      _isAllNpcsAreDeath = true;
+    }
+    if(_isAllNpcsAreDeath) {
+      map.removeChildComponents();
+      components.remove(map);
+      components.remove(_joystick);
 
-  static const _zoomPerScrollUnit = 0.001;
+      // this._characterModel.level += 1;
+      // SocketManager.socket.emit('update', this._characterModel);
 
-  @override
-  void onScroll(PointerScrollInfo event) {
-    // camera.zoom += event.scrollDelta.game.y * _zoomPerScrollUnit;
+      spawnTown();
+      _isAllNpcsAreDeath = false;
+    }
+    if(_isCharacterSpawned) {
+      if(_character.isDead) {
+        // Remove map and his restrictions
+        map.removeChildComponents();
+        components.remove(map);
+        components.remove(_joystick);
+
+        // and then spawn the town
+        spawnTown();
+
+        _character.setIsDead = false;
+      }
+    }
   }
 }

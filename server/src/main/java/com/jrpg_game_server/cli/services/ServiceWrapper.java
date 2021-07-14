@@ -1,16 +1,22 @@
 package com.jrpg_game_server.cli.services;
 
+import com.jrpg_game_server.cli.services.base.CharacterService;
+import com.jrpg_game_server.cli.services.base.UserService;
+
 public class ServiceWrapper {
     private static boolean isInstantiated = false;
 
-    private UserServices userServices;
+    private UserService userService;
+    private CharacterService characterService;
 
     public ServiceWrapper() {
     }
 
-    public void setServices(UserServices userServices) {
+    public void setServices(UserService userService, CharacterService characterService) {
         if(!isInstantiated) {
-            this.userServices = userServices;
+            this.userService = userService;
+            this.characterService = characterService;
+
             isInstantiated = true;
         }
         return;
@@ -20,7 +26,11 @@ public class ServiceWrapper {
      * Getters
      * @return Services
      */
-    public UserServices getUserServices() {
-        return userServices;
+    public UserService getUserServices() {
+        return userService;
+    }
+
+    public CharacterService getCharacterService() {
+        return characterService;
     }
 }

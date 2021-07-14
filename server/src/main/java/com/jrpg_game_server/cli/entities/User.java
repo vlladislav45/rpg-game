@@ -1,8 +1,8 @@
 package com.jrpg_game_server.cli.entities;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class User {
@@ -12,15 +12,17 @@ public class User {
     private String password;
     private Timestamp timestamp;
     private UserRole userRole;
+    private Set<Character> characters;
 
     public User() {
     }
 
-    public User(String username, String password, UserRole userRole) {
+    public User(String username, String password, UserRole userRole, Set<Character> characters) {
         this.username = username;
         this.password = password;
         this.timestamp = new Timestamp(System.currentTimeMillis());
         this.userRole = userRole;
+        this.characters = characters;
     }
 
     public UUID getId() {
@@ -69,6 +71,14 @@ public class User {
 
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
+    }
+
+    public Set<Character> getCharacters() {
+        return characters;
+    }
+
+    public void setCharacters(Set<Character> characters) {
+        this.characters = characters;
     }
 
     public static User map(Map<String, Object> map) {

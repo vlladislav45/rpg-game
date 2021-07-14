@@ -2,12 +2,15 @@ package com.jrpg_game_server.cli.models.views;
 
 import com.jrpg_game_server.cli.entities.User;
 
-import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserViewModel {
-    private UUID userId;
+    private String id;
     private String username;
     private String email;
+    private List<CharacterViewModel> characters;
+    private String userRole;
 
     public UserViewModel() {
     }
@@ -15,19 +18,22 @@ public class UserViewModel {
     public static UserViewModel toViewModel(User user) {
         UserViewModel userViewModel = new UserViewModel();
         if(user != null) {
-            userViewModel.setUserId(user.getId());
+            userViewModel.setUserId(user.getId().toString());
             userViewModel.setUsername(user.getUsername());
             userViewModel.setEmail(user.getEmail());
+
+            userViewModel.setCharacters(user.getCharacters().stream().map(CharacterViewModel::toViewModel).collect(Collectors.toList()));
+            userViewModel.setUserRole(user.getUserRole().getRoleName());
         }
         return userViewModel;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public String getUserId() {
+        return id;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setUserId(String userId) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -44,5 +50,29 @@ public class UserViewModel {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<CharacterViewModel> getCharacters() {
+        return characters;
+    }
+
+    public void setCharacters(List<CharacterViewModel> characters) {
+        this.characters = characters;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
     }
 }

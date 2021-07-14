@@ -1,14 +1,14 @@
 package com.jrpg_game_server.cli.dao;
 
-import com.jrpg_game_server.cli.config.ServerConfig;
+import com.jrpg_game_server.cli.config.DatabaseConfig;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class AbstractDatabaseCliDAO extends AbstractCliDAO {
-    public AbstractDatabaseCliDAO(ServerConfig server) {
-        super(server);
+    public AbstractDatabaseCliDAO(DatabaseConfig databaseConfig) {
+        super(databaseConfig);
     }
 
     /**

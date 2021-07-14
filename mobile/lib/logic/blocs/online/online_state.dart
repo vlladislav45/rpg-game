@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:rpg_game/models/character_model.dart';
+import 'package:rpg_game/models/user_model.dart';
 
 abstract class OnlineState {
   const OnlineState();
@@ -59,16 +60,12 @@ class OnlineAuthenticationState extends OnlineState {
 }
 
 class OnlineAuthenticatedState extends OnlineState {
-  final String id;
-  final String username;
-  final String email;
+  final UserModel userViewModel;
 
   OnlineAuthenticatedState({
-    @required this.id,
-    @required this.username,
-    @required this.email,
+    required this.userViewModel,
   });
 
   @override
-  List<Object> get props => [id, email, username];
+  List<Object> get props => [userViewModel];
 }

@@ -59,7 +59,7 @@ public class DatabaseInstallCommand extends AbstractCommand {
     }
 
     private AbstractFileSystemDatabaseCliDAO databaseDAO() {
-        overrideConfigs(Config.gameServer());
+        overrideConfigs(Config.databaseConfig());
         return new GameServerFileSystemDatabaseCliDAO();
     }
 
