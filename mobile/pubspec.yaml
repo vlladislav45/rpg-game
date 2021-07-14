@@ -23,7 +23,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flame: 1.0.0-releasecandidate.13
+  flame:
+    git:
+      url: git@github.com:flame-engine/flame.git
+      path: packages/flame
+      ref: spydon.refactor-joystick
   auto_size_text: ^2.1.0
   flutter_bloc: ^6.1.2
   bloc: ^6.1.0

@@ -227,7 +227,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
       end: end,
       barriers: _map.treeOffsets,
     ).findThePath();
-    print('Shortest path to the character $result');
+    // print('Shortest path to the character $result');
 
     facing();
     if (differentX <= this._range &&

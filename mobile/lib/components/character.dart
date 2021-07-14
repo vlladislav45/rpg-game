@@ -8,16 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:rpg_game/components/npc.dart';
 import 'package:rpg_game/components/water.dart';
 import 'package:rpg_game/game.dart';
-import 'package:flame/joystick.dart';
 import 'package:rpg_game/models/character_model.dart';
 import 'package:rpg_game/utils/convert_coordinates.dart';
 import 'package:rpg_game/utils/directional_helper.dart';
 
 class Character extends SpriteAnimationGroupComponent<NpcState>
-    with Hitbox, Collidable, HasGameRef<MyGame>
-    implements JoystickListener {
+    with Hitbox, Collidable, HasGameRef<MyGame> {
   // Directionals and speed
-  static const speed = 130;
+  static const maxSpeed = 300;
   late Vector2 _velocity = Vector2.zero();
 
   // Joystick
@@ -43,7 +41,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
 
   /// Where is facing of the character
   /// north, south, east, west, north-east, north-west, south-east, south-west
-  late String _facing;
+  String _facing = 'north-west';
 
   late final TextComponent _nickname;
   late String _overlay = 'CharacterOverlay';
@@ -51,7 +49,11 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   // There are eight images * 0.10
   static const double time = 8 * 0.10;
 
+  // Joystick implementation
+  final JoystickComponent joystick;
+
   Character(
+      this.joystick,
       BuildContext context,
       CharacterModel characterModel,
       Map<NpcState, SpriteAnimation> animations, {
@@ -65,10 +67,12 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     this.context = context;
     this._characterModel = characterModel;
 
+    this.joystick.anchor = Anchor.center;
+
     timer = Timer(time)
       ..stop()
       ..callback = () {
-        // _character.setIsPlayerPressAttack(false);
+        _isPlayerPressAttack = false;
         this.current = DirectionalHelper.getDirectionalSpriteAnimation(
             _facing, StateAction.Idle);
       };
@@ -86,6 +90,8 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   void setIsPlayerPressAttack(bool value) {
     _isPlayerPressAttack = value;
   }
+
+  String get facing => _facing;
 
   @override
   int get priority => 1;
@@ -133,7 +139,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     /// Until now
     /// So the changes are basically to use the position field of your position component and set it to the
     /// center of the rect and in render you don't call super since that will prepare the canvas
-
     if(_characterModel.hp <= 0) {
       timer.start();
       this.die();
@@ -145,11 +150,13 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     // Delta time is the time elapsed since last update. For devices with higher frame rates,
     // delta time will be smaller and for devices with lower frame rates, it will be larger. Multiplying speed with
     // delta time ensure that player speed remains same irrespective of the device FPS.
-    if(!_isWall) {
-      final displacement = _velocity * (speed * dt);
-
-      position.add(ConvertCoordinates.cartToIso(displacement));
+    updateCurrentAnimation();
+    if (!_isWall && !joystick.delta.isZero()) {
+      position.add(joystick.velocity * maxSpeed.toDouble() * dt);
     }
+    // if(!_isWall) {
+    //    position.add(ConvertCoordinates.cartToIso(_velocity * speed.toDouble() * dt));
+    // }
 
     _isCollision = false;
     _isWall = false;
@@ -161,8 +168,57 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     this._velocity = newVelocity;
   }
 
-
   String get overlay => _overlay;
+
+  void updateCurrentAnimation() {
+    move = joystick.direction != JoystickDirection.idle;
+    if(!_isPlayerPressAttack) {
+      if (move) {
+        if (joystick.direction == JoystickDirection.left) {
+          this.current = NpcState.runTopLeft;
+          this.setVelocity(Vector2(-1,0));
+          this._facing = 'north-west';
+        } else if (joystick.direction == JoystickDirection.right) {
+          this.current = NpcState.runBottomRight;
+          this.setVelocity(Vector2(1,0));
+          this._facing = 'south-east';
+        } else if (joystick.direction == JoystickDirection.up) {
+          this.current = NpcState.runTopRight;
+          this.setVelocity(Vector2(0,-1));
+          this._facing = 'north-east';
+        } else if (joystick.direction == JoystickDirection.down) {
+          this.current = NpcState.runBottomLeft;
+          this.setVelocity(Vector2(0,1));
+          this._facing = 'south-west';
+        } else if (joystick.direction == JoystickDirection.downLeft) {
+          this.current = NpcState.runLeft;
+          this.setVelocity(Vector2(-1,1));
+          this._facing = 'west';
+        } else if (joystick.direction == JoystickDirection.downRight) {
+          this.current = NpcState.runDown;
+          this.setVelocity(Vector2(1,1));
+          this._facing = 'south';
+        } else if (joystick.direction == JoystickDirection.upLeft) {
+          this.current = NpcState.runTop;
+          this.setVelocity(Vector2(-1,-1));
+          this._facing = 'north';
+        } else if (joystick.direction == JoystickDirection.upRight) {
+          this.current = NpcState.runRight;
+          this.setVelocity(Vector2(1,-1));
+          this._facing = 'east';
+        }
+      } else {
+        this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Idle);
+        this.setVelocity(Vector2(0,0));
+      }
+      timer.start();
+    }
+  }
+
+  void attack() {
+    _isPlayerPressAttack = true;
+    current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Attack);
+  }
 
   @override
   void onMount() {
@@ -200,68 +256,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
       }
       other.setWallHit(false);
       _isWall = other.isWallHit;
-    }
-  }
-
-  @override
-  void joystickAction(JoystickActionEvent event) {
-    if (event.id == 0 && event.event == ActionEvent.down) {
-      // print('Character is hitting');
-
-      this.current = DirectionalHelper.getDirectionalSpriteAnimation(
-          _facing, StateAction.Attack);
-      this.setIsPlayerPressAttack(true);
-      timer.start();
-    } else {
-      this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Idle);
-    }
-  }
-
-  /// *
-  /// Because our game is isometric and we put character coordinates to iso
-  /// we have to change the facing of the character
-  /// For example if we need top we have  to set topRight for correct position
-  @override
-  void joystickChangeDirectional(JoystickDirectionalEvent event) {
-    move = event.directional != JoystickMoveDirectional.idle;
-    print('${this.velocity} : ${event.directional}');
-    if (move) {
-      if (event.directional == JoystickMoveDirectional.moveLeft) {
-        this.current = NpcState.runTopLeft;
-        this.setVelocity(Vector2(-1,0));
-        this._facing = 'north-west';
-      } else if (event.directional == JoystickMoveDirectional.moveRight) {
-        this.current = NpcState.runBottomRight;
-        this.setVelocity(Vector2(1,0));
-        this._facing = 'south-east';
-      } else if (event.directional == JoystickMoveDirectional.moveUp) {
-        this.current = NpcState.runTopRight;
-        this.setVelocity(Vector2(0,-1));
-        this._facing = 'north-east';
-      } else if (event.directional == JoystickMoveDirectional.moveDown) {
-        this.current = NpcState.runBottomLeft;
-        this.setVelocity(Vector2(0,1));
-        this._facing = 'south-west';
-      } else if (event.directional == JoystickMoveDirectional.moveDownLeft) {
-        this.current = NpcState.runLeft;
-        this.setVelocity(Vector2(-1,1));
-        this._facing = 'west';
-      } else if (event.directional == JoystickMoveDirectional.moveDownRight) {
-        this.current = NpcState.runDown;
-        this.setVelocity(Vector2(1,1));
-        this._facing = 'south';
-      } else if (event.directional == JoystickMoveDirectional.moveUpLeft) {
-        this.current = NpcState.runTop;
-        this.setVelocity(Vector2(-1,-1));
-        this._facing = 'north';
-      } else if (event.directional == JoystickMoveDirectional.moveUpRight) {
-        this.current = NpcState.runRight;
-        this.setVelocity(Vector2(1,-1));
-        this._facing = 'east';
-      }
-    } else {
-      this.current = DirectionalHelper.getDirectionalSpriteAnimation(_facing, StateAction.Idle);
-      this.setVelocity(Vector2(0,0));
     }
   }
 
