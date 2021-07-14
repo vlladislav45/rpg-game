@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:rpg_game/presentation/routes/app_router.dart';
-import 'package:rpg_game/utils/theme.dart';
+import 'package:rpg_game/presentation/route/app_router.dart';
+import 'package:rpg_game/util/theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -10,18 +10,17 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter/services.dart';
-import 'package:rpg_game/animations/character_sprite_animation.dart';
-import 'package:rpg_game/animations/npc_sprite_animation.dart';
-import 'package:rpg_game/components/npc.dart';
-import 'package:rpg_game/components/portal.dart';
-import 'package:rpg_game/maps/maps/map.dart';
-import 'package:rpg_game/components/character.dart';
-import 'package:rpg_game/maps/town.dart';
-import 'package:rpg_game/utils/directional_helper.dart';
+import 'package:rpg_game/animation/character_sprite_animation.dart';
+import 'package:rpg_game/animation/npc_sprite_animation.dart';
+import 'package:rpg_game/component/npc.dart';
+import 'package:rpg_game/component/portal.dart';
+import 'package:rpg_game/map/map.dart';
+import 'package:rpg_game/component/character.dart';
+import 'package:rpg_game/map/town.dart';
+import 'package:rpg_game/util/directional_helper.dart';
 
-import 'models/character_model.dart';
-import 'utils/hex_color.dart';
+import 'model/character_model.dart';
+import 'util/hex_color.dart';
 
 class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
         HasDraggableComponents {
