@@ -27,7 +27,7 @@ dependencies:
     git:
       url: git@github.com:flame-engine/flame.git
       path: packages/flame
-      ref: spydon.refactor-joystick
+      ref: main
   auto_size_text: ^2.1.0
   flutter_bloc: ^6.1.2
   bloc: ^6.1.0
