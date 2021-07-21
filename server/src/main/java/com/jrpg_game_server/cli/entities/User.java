@@ -25,6 +25,15 @@ public class User {
         this.characters = characters;
     }
 
+    public User(UUID id, String username, String password, UserRole userRole, Set<Character> characters) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.timestamp = new Timestamp(System.currentTimeMillis());
+        this.userRole = userRole;
+        this.characters = characters;
+    }
+
     public UUID getId() {
         return id;
     }
