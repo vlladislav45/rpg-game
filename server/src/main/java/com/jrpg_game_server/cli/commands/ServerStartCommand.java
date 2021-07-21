@@ -13,7 +13,7 @@ import com.jrpg_game_server.cli.services.ServiceWrapper;
 import com.jrpg_game_server.cli.services.base.CharacterService;
 import com.jrpg_game_server.cli.services.base.UserService;
 import com.jrpg_game_server.cli.services.UserServiceImpl;
-import com.jrpg_game_server.network.SocketServerManager;
+import com.jrpg_game_server.cli.network.SocketServerManager;
 import picocli.CommandLine;
 
 import java.util.HashMap;

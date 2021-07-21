@@ -152,7 +152,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     // delta time ensure that player speed remains same irrespective of the device FPS.
     updateCurrentAnimation();
     if (!_isWall && !joystick.delta.isZero()) {
-      position.add(joystick.velocity * maxSpeed.toDouble() * dt);
+      position.add(joystick.relativeDelta * maxSpeed.toDouble() * dt);
     }
     // if(!_isWall) {
     //    position.add(ConvertCoordinates.cartToIso(_velocity * speed.toDouble() * dt));

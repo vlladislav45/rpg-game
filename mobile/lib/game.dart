@@ -235,7 +235,6 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
     add(_character);
     add(_joystick);
     add(attackButton);
-    camera.cameraSpeed = 1;
     camera.followComponent(_character, relativeOffset: Anchor.center);
 
     if (!overlays.isActive(_character.overlay))
