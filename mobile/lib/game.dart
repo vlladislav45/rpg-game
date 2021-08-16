@@ -158,7 +158,7 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
           NpcState.hitTopRight: npcSpriteAnimation.hitTopRight,
           NpcState.runTopRight: npcSpriteAnimation.runTopRight,
         },
-        size: Vector2(79, 63),
+        size: Vector2(84, 67),
         position: spawnPosition,
       )..current = NpcState.idleDown);
 
@@ -172,7 +172,7 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
 
     /// Spawn the character
 
-    final characterSpawnPosition = map.getBlock(Vector2(600, 450));
+    final characterSpawnPosition = map.getBlock(Vector2(300, 250));
     print(characterSpawnPosition);
     await characterSpriteAnimation.loadSpriteAnimations();
 

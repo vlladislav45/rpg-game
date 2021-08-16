@@ -17,7 +17,7 @@ import 'package:rpg_game/util/directional_helper.dart';
 class Character extends SpriteAnimationGroupComponent<NpcState>
     with Hitbox, Collidable, HasGameRef<MyGame> {
   // Directionals and speed
-  static const maxSpeed = 300;
+  static const maxSpeed = 180;
   late Vector2 _velocity = Vector2.zero();
 
   // Joystick
@@ -226,7 +226,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   void onMount() {
     super.onMount();
 
-    final shape = HitboxCircle(definition: 0.6);
+    final shape = HitboxCircle(definition: 0.4);
     addShape(shape);
   }
 

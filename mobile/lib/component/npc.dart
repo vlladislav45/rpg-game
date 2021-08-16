@@ -6,6 +6,7 @@ import 'package:flame/geometry.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:rpg_game/component/character.dart';
+import 'package:rpg_game/component/water.dart';
 import 'package:rpg_game/game.dart';
 import 'package:rpg_game/map/map.dart';
 import 'package:rpg_game/pathfinding/a_star.dart';
@@ -25,10 +26,10 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
   late final TextComponent _healthBar;
 
   // properties
-  static const speed = 50;
+  static const speed = 30;
   bool _isCollision = false;
   late final bool _isAggressive;
-  int _range = 150;
+  int _range = 200;
   int health = 100;
   String _facing = "";
 
@@ -104,6 +105,14 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
       }
       CollisionDetect.narrowPhase(this, other);
     }else if(other is Tree) {
+      if (this.position.x + this.size.x < other.position.x ||
+          this.position.x > other.position.x + other.size.x ||
+          this.position.y + this.size.y < other.position.y ||
+          this.position.y > other.position.y + other.size.y) {
+        return;
+      }
+      CollisionDetect.narrowPhase(this, other);
+    } else if(other is Water) {
       if (this.position.x + this.size.x < other.position.x ||
           this.position.x > other.position.x + other.size.x ||
           this.position.y + this.size.y < other.position.y ||
