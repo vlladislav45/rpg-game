@@ -9,6 +9,7 @@ import 'package:rpg_game/component/character.dart';
 import 'package:rpg_game/game.dart';
 import 'package:rpg_game/map/map.dart';
 import 'package:rpg_game/pathfinding/a_star.dart';
+import 'package:rpg_game/util/collision_detect.dart';
 import 'package:rpg_game/util/directional_helper.dart';
 
 import 'tree.dart';
@@ -77,6 +78,12 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
     addShape(shape);
   }
 
+  Vector2 get velocity => _velocity;
+
+  void setVelocity(Vector2 newVelocity) {
+    this._velocity = newVelocity;
+  }
+
   @override
   void onCollision(Set<Vector2> points, Collidable other) {
     if (other is Character) {
@@ -89,10 +96,21 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
         }
       }
     }else if(other is Npc){
-
+      if (this.position.x + this.size.x < other.position.x ||
+          this.position.x > other.position.x + other.size.x ||
+          this.position.y + this.size.y < other.position.y ||
+          this.position.y > other.position.y + other.size.y) {
+        return;
+      }
+      CollisionDetect.narrowPhase(this, other);
     }else if(other is Tree) {
-      position.x -= 3;
-      position.y -= 3;
+      if (this.position.x + this.size.x < other.position.x ||
+          this.position.x > other.position.x + other.size.x ||
+          this.position.y + this.size.y < other.position.y ||
+          this.position.y > other.position.y + other.size.y) {
+        return;
+      }
+      CollisionDetect.narrowPhase(this, other);
     }
   }
 

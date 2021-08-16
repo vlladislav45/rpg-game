@@ -26,7 +26,7 @@ class Tree extends SpriteComponent with HasGameRef<MyGame>, Hitbox, Collidable {
   void onMount() {
     super.onMount();
 
-    final shape = HitboxCircle(definition: 0.8);
+    final shape = HitboxCircle(definition: 0.2);
     addShape(shape);
   }
 

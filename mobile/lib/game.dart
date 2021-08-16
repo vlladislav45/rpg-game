@@ -7,7 +7,6 @@ import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
-import 'package:flame_forge2d/forge2d_game.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -23,7 +22,7 @@ import 'package:rpg_game/util/directional_helper.dart';
 import 'model/character_model.dart';
 import 'util/hex_color.dart';
 
-class MyGame extends Forge2DGame with HasCollidables, HasTappableComponents,
+class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
     HasDraggableComponents {
   //Properties
   Vector2? screenMousePosition;

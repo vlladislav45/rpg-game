@@ -6,9 +6,11 @@ import 'package:flame/geometry.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:rpg_game/component/npc.dart';
+import 'package:rpg_game/component/tree.dart';
 import 'package:rpg_game/component/water.dart';
 import 'package:rpg_game/game.dart';
 import 'package:rpg_game/model/character_model.dart';
+import 'package:rpg_game/util/collision_detect.dart';
 import 'package:rpg_game/util/convert_coordinates.dart';
 import 'package:rpg_game/util/directional_helper.dart';
 
@@ -238,24 +240,21 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
         _characterModel.hp -= 7;
       }
     } else if(other is Water) {
-      other.setWallHit(true);
-      if(other.isWallHit) {
-        if(velocity.y == -1) {
-          // final displacement = (_velocity.y * -1) + 10;
-          position.setFrom(ConvertCoordinates.cartToIso(Vector2(0, 125)));
-        }else if(velocity.y == 1) {
-          // final displacement = (_velocity.y * -1) - 10;
-          position.setFrom(ConvertCoordinates.cartToIso(Vector2(0, 125)));
-        } else if(velocity.x == 1) {
-          // final displacement = (_velocity.x * -1) - 10;
-          position.setFrom(ConvertCoordinates.cartToIso(Vector2(0, 125)));
-        }else if(velocity.x == -1) {
-          // final displacement = (_velocity.x * -1) + 10;
-          position.setFrom(ConvertCoordinates.cartToIso(Vector2(0, 125)));
-        }
+      if (this.position.x + this.size.x < other.position.x ||
+          this.position.x > other.position.x + other.size.x ||
+          this.position.y + this.size.y < other.position.y ||
+          this.position.y > other.position.y + other.size.y) {
+        return;
       }
-      other.setWallHit(false);
-      _isWall = other.isWallHit;
+      CollisionDetect.narrowPhase(this, other);
+    } else if(other is Tree) {
+      if (this.position.x + this.size.x < other.position.x ||
+          this.position.x > other.position.x + other.size.x ||
+          this.position.y + this.size.y < other.position.y ||
+          this.position.y > other.position.y + other.size.y) {
+        return;
+      }
+      CollisionDetect.narrowPhase(this, other);
     }
   }
 

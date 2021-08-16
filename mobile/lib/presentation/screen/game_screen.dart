@@ -45,10 +45,11 @@ class _MyGameScreenState extends State<MyGameScreen> {
               return BlocBuilder<MapCubit, MapState>(
                 builder: (context, state) {
                   return BlocBuilder<OnlineBloc, OnlineState>(
-                  builder: (_, gameState) {
+                  builder: (context, gameState) {
                   if (gameState is OnlineAuthenticatedState) {
                     return GameWidget<MyGame>(
-                      game: MyGame(jsonMap: jsonMap.toString(),
+                      game: MyGame(
+                          jsonMap: jsonMap.toString(),
                           context: context,
                           mapLevel: state.map,
                           arena: state.arena,

@@ -50,7 +50,6 @@ public class ServerStartCommand extends AbstractCommand {
         });
 
         server.addEventListener("handshake", CharacterBindingModel.class, (client, data, ackRequest) -> {
-            System.out.println("ITS HERE");
             if (serviceWrapper.getUserServices().getLoggedUser() != null) {
                 CharacterViewModel characterViewModel =
                         CharacterViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser().getCharacters().iterator().next());
