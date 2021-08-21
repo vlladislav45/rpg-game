@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
 import 'package:rpg_game/logic/bloc/online/online_bloc.dart';
 import 'package:rpg_game/logic/bloc/online/online_state.dart';
+import 'package:rpg_game/logic/cubit/single_player_statuses/single_player_statuses_cubit.dart';
+import 'package:rpg_game/logic/cubit/single_player_statuses/single_player_statuses_state.dart';
 import 'package:rpg_game/util/hex_color.dart';
 
 Widget characterOverlayBuilder(BuildContext context, MyGame myGame) {
@@ -106,13 +108,15 @@ class CharacterOverlayState extends State<CharacterOverlay>
                       duration: Duration(seconds: 3),
                       curve: Curves.fastOutSlowIn,
                       alignment: Alignment.center,
-                      child: AutoSizeText(
-                        '${state.userViewModel.characters[0].hp < 0 ? 'Dead' : state.userViewModel.characters[0].hp}',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: BlocBuilder<SinglePlayerStatusesCubit,SinglePlayerStatusesState> (builder: (context, singlePlayerState) {
+                        return AutoSizeText(
+                          '${singlePlayerState.currentHp < 0 ? 'Dead' : singlePlayerState.currentHp} / ${state.userViewModel.characters[0].hp}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        );
+                      }),
                     ),
                     AnimatedContainer(
                       width: double.infinity,

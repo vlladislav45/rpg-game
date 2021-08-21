@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -45,9 +47,10 @@ class _CastleOverlayState extends State<CastleOverlay> {
           children: <Widget>[
             ElevatedButton(
               onPressed: () {
-                print('The player was teleported to the dungeon level: 1');
+                int mapLevel = 1 + Random().nextInt(2);
+                print('The player was teleported to the dungeon level: $mapLevel');
 
-                context.read<MapCubit>().update(1, 0, isArena: false);
+                context.read<MapCubit>().update('level$mapLevel');
               },
               child: Container(
                 width: MediaQuery.of(context).size.width / 5,

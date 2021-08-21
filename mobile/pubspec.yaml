@@ -83,7 +83,7 @@ flutter:
    - assets/images/sprites/tile_maps/
    - assets/images/sprites/obstacles/
    - assets/images/sprites/walls/
-   - assets/maps/level1.json
+   - assets/maps/
 
   fonts:
     - family: Vecna

@@ -5,13 +5,14 @@ import 'package:flame/extensions.dart';
 import 'package:flame/geometry.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/component/npc.dart';
 import 'package:rpg_game/component/tree.dart';
 import 'package:rpg_game/component/water.dart';
 import 'package:rpg_game/game.dart';
+import 'package:rpg_game/logic/cubit/single_player_statuses/single_player_statuses_cubit.dart';
 import 'package:rpg_game/model/character_model.dart';
 import 'package:rpg_game/util/collision_detect.dart';
-import 'package:rpg_game/util/convert_coordinates.dart';
 import 'package:rpg_game/util/directional_helper.dart';
 
 class Character extends SpriteAnimationGroupComponent<NpcState>
@@ -35,7 +36,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   bool _isPlayerPressAttack = false;
 
   // Character Properties
-  late int currentHp;
+  late int hp = _characterModel.hp;
 
   //Character model
   late final CharacterModel _characterModel;
@@ -83,7 +84,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   //Getter and setters
   bool get isDead => _isDead;
 
-  set setIsDead(bool value) {
+  void setDead(bool value) {
     _isDead = value;
   }
 
@@ -101,7 +102,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   @override
   Future<void> onLoad() async {
     super.onLoad();
-
+    this.context.read<SinglePlayerStatusesCubit>().update(hp);
     //Player nickname
     gameRef.add(
       _nickname = _renderNickName(),
@@ -141,7 +142,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     /// Until now
     /// So the changes are basically to use the position field of your position component and set it to the
     /// center of the rect and in render you don't call super since that will prepare the canvas
-    if(_characterModel.hp <= 0) {
+    if(hp <= 0) {
       timer.start();
       this.die();
     }
@@ -237,7 +238,8 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
         _isCollision = true;
         other.isPlayerPressAttack = false;
 
-        _characterModel.hp -= 7;
+        hp -= 7;
+        this.context.read<SinglePlayerStatusesCubit>().update(hp);
       }
     } else if(other is Water) {
       if (this.position.x + this.size.x < other.position.x ||

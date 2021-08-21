@@ -1,8 +1,6 @@
 
 class MapState {
-  bool isArena;
-  int map;
-  int arena;
+  String map;
 
-  MapState(this.map, this.arena, { required this.isArena });
+  MapState(this.map);
 }

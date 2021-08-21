@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -47,16 +49,17 @@ class _PortalOverlayState extends State<PortalOverlay> {
           children: <Widget>[
             ElevatedButton(
               onPressed: () {
-                print('The player was teleported to the arena');
+                int arenaLevel = 1 + Random().nextInt(2);
+                print('The player was teleported to the arena, level $arenaLevel');
 
-                context.read<MapCubit>().update(0, 1, isArena: true);
+                context.read<MapCubit>().update('arena$arenaLevel');
               },
               child: Container(
                 width: MediaQuery.of(context).size.width / 5,
                 padding: EdgeInsets.all(8.0),
                 alignment: Alignment.centerLeft,
                 child: AutoSizeText(
-                  'Single player',
+                  'Teleport to arena',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),

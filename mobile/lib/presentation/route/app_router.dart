@@ -3,12 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/logic/bloc/game/game_bloc.dart';
 import 'package:rpg_game/logic/bloc/online/online_bloc.dart';
 import 'package:rpg_game/logic/cubit/map/map_cubit.dart';
+import 'package:rpg_game/logic/cubit/single_player_statuses/single_player_statuses_cubit.dart';
 import 'package:rpg_game/presentation/screen/game_screen.dart';
 import 'package:rpg_game/presentation/screen/login_screen.dart';
 
 class AppRouter {
   // Cubit
   MapCubit _mapCubit = MapCubit();
+  SinglePlayerStatusesCubit _singlePlayerStatusesCubit = SinglePlayerStatusesCubit();
 
   // Bloc
   OnlineBloc _onlineBloc = OnlineBloc();
@@ -41,6 +43,9 @@ class AppRouter {
             ),
             BlocProvider.value(
               value: _gameBloc,
+            ),
+            BlocProvider.value(
+              value: _singlePlayerStatusesCubit,
             ),
           ], child: MyGameScreen(),
           ),

@@ -27,51 +27,83 @@ class _MyGameScreenState extends State<MyGameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-          padding: EdgeInsets.all(0.0),
-          margin: EdgeInsets.all(0.0),
-          child: FutureBuilder(
-            future: DefaultAssetBundle.of(context)
-                .loadString('assets/maps/level1.json'),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData ||
-                  snapshot.connectionState == ConnectionState.waiting)
-                return Container(
-                  alignment: Alignment.center,
-                  child: CircularProgressIndicator(),
-                );
-              final jsonMap = snapshot.data;
-
+      body: Container(
+        padding: EdgeInsets.all(0.0),
+        margin: EdgeInsets.all(0.0),
+        child: BlocBuilder<MapCubit, MapState>(
+          builder: (context, mapState) {
+            if(mapState.map == '') {
               return BlocBuilder<MapCubit, MapState>(
-                builder: (context, state) {
-                  return BlocBuilder<OnlineBloc, OnlineState>(
-                  builder: (context, gameState) {
-                  if (gameState is OnlineAuthenticatedState) {
-                    return GameWidget<MyGame>(
-                      game: MyGame(
-                          jsonMap: jsonMap.toString(),
-                          context: context,
-                          mapLevel: state.map,
-                          arena: state.arena,
-                          characterModel: gameState.userViewModel.characters[0],
-                          viewportResolution: Vector2(MediaQuery.of(context).size.width,
-                              MediaQuery.of(context).size.height)),
-                      overlayBuilderMap: {
-                        'PortalMenu': portalOverlayBuilder,
-                        'CastleMenu': castleOverlayBuilder,
-                        'BlacksmithMenu': blacksmithOverlayBuilder,
-                        'ShopMenu': shopOverlayBuilder,
-                        'CharacterOverlay': characterOverlayBuilder,
-                      },
+                      builder: (context, state) {
+                        return BlocBuilder<OnlineBloc, OnlineState>(
+                            builder: (context, gameState) {
+                              if (gameState is OnlineAuthenticatedState) {
+                                return GameWidget<MyGame>(
+                                  game: MyGame(
+                                      jsonMap: '',
+                                      context: context,
+                                      loadMapLevel: false,
+                                      characterModel: gameState.userViewModel.characters[0],
+                                      viewportResolution: Vector2(
+                                          MediaQuery.of(context).size.width,
+                                          MediaQuery.of(context).size.height)),
+                                  overlayBuilderMap: {
+                                    'PortalMenu': portalOverlayBuilder,
+                                    'CastleMenu': castleOverlayBuilder,
+                                    'BlacksmithMenu': blacksmithOverlayBuilder,
+                                    'ShopMenu': shopOverlayBuilder,
+                                    'CharacterOverlay': characterOverlayBuilder,
+                                  },
+                                );
+                              }
+                              return CircularProgressIndicator();
+                            });
+                      });
+            }
+            print(mapState.map);
+            return FutureBuilder(
+                future: DefaultAssetBundle.of(context)
+                    .loadString('assets/maps/${mapState.map}.json'),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData ||
+                      snapshot.connectionState == ConnectionState.waiting)
+                    return Container(
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator(),
                     );
-                  }
-                  return CircularProgressIndicator();
-                  });
-                },
-              );
-            },
-          ),
+                  final jsonMap = snapshot.data;
+
+                  return BlocBuilder<MapCubit, MapState>(
+                    builder: (context, state) {
+                      return BlocBuilder<OnlineBloc, OnlineState>(
+                          builder: (context, gameState) {
+                            if (gameState is OnlineAuthenticatedState) {
+                              return GameWidget<MyGame>(
+                                game: MyGame(
+                                    jsonMap: jsonMap.toString(),
+                                    context: context,
+                                    loadMapLevel: true,
+                                    characterModel: gameState.userViewModel.characters[0],
+                                    viewportResolution: Vector2(
+                                        MediaQuery.of(context).size.width,
+                                        MediaQuery.of(context).size.height)),
+                                overlayBuilderMap: {
+                                  'PortalMenu': portalOverlayBuilder,
+                                  'CastleMenu': castleOverlayBuilder,
+                                  'BlacksmithMenu': blacksmithOverlayBuilder,
+                                  'ShopMenu': shopOverlayBuilder,
+                                  'CharacterOverlay': characterOverlayBuilder,
+                                },
+                              );
+                            }
+                            return CircularProgressIndicator();
+                          });
+                    },
+                  );
+                });
+          },
         ),
+      ),
     );
   }
 }

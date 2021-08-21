@@ -27,8 +27,6 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
   //Properties
   Vector2? screenMousePosition;
   String? jsonMap;
-  int? mapLevel;
-  int? arena;
 
   // Facing of the character, it is use in keyboard movement
   String? _facing;
@@ -44,26 +42,25 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
   bool _isAllNpcsAreDeath = false;
   Portal? _portal;
   late final BuildContext _context;
+  late bool _loadMapLevel;
 
   // Useful properties
-  bool _isCharacterSpawned = false;
+  bool ifCharacterSpawned = false;
 
   // Screen Resolution
   Vector2 viewportResolution;
 
   MyGame({
     CharacterModel? characterModel,
+    bool? loadMapLevel,
     BuildContext? context,
     String? jsonMap,
-    int? mapLevel,
-    int? arena,
     required this.viewportResolution,
   }) {
-    this.mapLevel = mapLevel;
     this.jsonMap = jsonMap;
-    this.arena = arena;
     this._characterModel = characterModel!;
     this._context = context!;
+    this._loadMapLevel = loadMapLevel!;
   }
 
   @override
@@ -85,37 +82,20 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
       matrix,
       tileHeight: 25.0,
     )..position = Vector2(0,0));
+    map.renderWater();
     map.renderTrees();
 
-    spawnCharacter();
-    spawnNpcs();
+    await spawnCharacter();
+    if(ifCharacterSpawned) {
+      await spawnNpcs();
+    }
   }
 
-  // Future<void> loadArena() async {
-  //   viewport = FixedResolutionViewport(viewportResolution);
-  //   print('ViewPort: ${viewport.canvasSize}');
-  //
-  //   final tilesetImage = await images.load('sprites/tile_maps/tileset.png');
-  //   final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2(151, 76));
-  //   final matrix = Map.toList(this.jsonMap.toString());
-  //
-  //   // Add main town
-  //   add(map = Map(
-  //     tileset,
-  //     matrix,
-  //     tileHeight: 25.0,
-  //   )..position = Vector2(0,0)
-  //   ..isHud = true);
-  //
-  //   spawnCharacter();
-  // }
-
-  void spawnNpcs() async {
+  Future<void> spawnNpcs() async {
     /// Load npc Sprite Direction Animations
     final npcSpriteAnimation = NpcSpriteAnimation();
     await npcSpriteAnimation.loadSpriteAnimations();
 
-    print('SIZE OF THE MAP ${map.mapSize()}');
     for (int i = 0; i < 5; i++) {
       final npcSpawnPosition = map.getBlock(map.genCoord());
       final spawnPosition = map.getBlockPosition(npcSpawnPosition);
@@ -166,7 +146,7 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
     }
   }
 
-  void spawnCharacter() async {
+  Future<void> spawnCharacter() async {
     /// Load Character Sprite Direction Animations
     final characterSpriteAnimation = CharacterSpriteAnimation();
 
@@ -178,7 +158,7 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
 
     _joystick = await getJoystick();
 
-    _character = Character(
+    _character = new Character(
       _joystick,
       _context,
       _characterModel,
@@ -240,7 +220,7 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
     if (!overlays.isActive(_character.overlay))
       overlays.add(_character.overlay);
 
-    _isCharacterSpawned = true;
+    ifCharacterSpawned = true;
   }
 
   Future<JoystickComponent> getJoystick() async {
@@ -273,8 +253,7 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
 
   @override
   Future<void> onLoad() async {
-    print('Map Level: $mapLevel');
-    mapLevel == 0 ? spawnTown() : await loadMapLevel();
+    _loadMapLevel == false ? spawnTown() : await loadMapLevel();
     // arena == 0 ? spawnTown() : await loadArena();
   }
 
@@ -356,6 +335,8 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
       map.removeChildComponents();
       components.remove(map);
       components.remove(_joystick);
+      components.removeAll(_npcs);
+      components.remove(_character);
 
       // this._characterModel.level += 1;
       // SocketManager.socket.emit('update', this._characterModel);
@@ -363,18 +344,19 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
       spawnTown();
       _isAllNpcsAreDeath = false;
     }
-    if(_isCharacterSpawned) {
-      if(_character.isDead) {
+    if(ifCharacterSpawned && _character.isDead) {
         // Remove map and his restrictions
         map.removeChildComponents();
         components.remove(map);
         components.remove(_joystick);
+        components.removeAll(_npcs);
+        components.remove(_character);
 
         // and then spawn the town
         spawnTown();
 
-        _character.setIsDead = false;
-      }
+        ifCharacterSpawned = false;
+        _character.setDead(false);
     }
   }
 }

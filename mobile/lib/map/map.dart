@@ -27,8 +27,26 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
 
   List<Offset> get treeOffsets => _treeOffsets;
 
-  @override
-  Future<void> onLoad() async {
+  void renderRectangle() async {
+    for(int i=0;i<matrix.length;i++) {
+      for (int j=0;j<matrix[i].length;j++) {
+        final waterSprite = await gameRef.loadSprite('sprites/tile_maps/water.png');
+
+        double tileX = (i - j) * (effectiveTileSize.x / 2);
+        tileX += (effectiveTileSize.x /* 2*/) - (waterSprite.srcSize.x / 2);
+        double tileY = (i + j) * (waterSprite.srcSize.y / 2);
+        tileY -= (effectiveTileSize.y /* 2*/);
+
+        gameRef.add(Water(
+          sprite: waterSprite,
+          position: Vector2(tileX, tileY),
+          size: waterSprite.srcSize,
+        ));
+      }
+    }
+  }
+
+  void renderWater() async {
     for (var i = 0; i < matrix.length; i++) {
       for (var j = 0; j < matrix[i].length; j++) {
         final element = matrix[i][j];
@@ -137,13 +155,6 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
     gameRef.components.removeAll(_restrictObstacles);
   }
 
-  Vector2 mapSize() {
-    // Map width and height contribute equally in both directions
-    final double side = matrix.length.toDouble() + matrix[0].length;
-    return Vector2(side * effectiveTileSize.x / 2,
-                   side * effectiveTileSize.y / 2);
-  }
-
   // Generate random coordinates
   Vector2 genCoord() {
     double x;
@@ -151,7 +162,12 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
     Block block;
     do {
       block = Block((R.nextInt(matrix.length)), (R.nextInt(matrix[0].length)));
-    }while(!this.containsBlock(block) && this.matrix[block.x][block.y] == 4 && block.x < 0 && block.y < 0);
+    }while(!this.containsBlock(block) &&
+        this.matrix[block.x][block.y] == 4 &&
+        this.matrix[block.x][block.y] == -1 &&
+        (block.x < 0 && block.y < 0) &&
+        (block.x > matrix.length && block.y > matrix[0].length) &&
+        (this.getBlockPosition(block).x > 0 && this.getBlockPosition(block).y > 0));
 
     x = this.getBlockPosition(block).x;
     y = this.getBlockPosition(block).y;

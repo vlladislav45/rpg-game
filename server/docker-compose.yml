@@ -4,7 +4,7 @@ version: '3'
 
 services:
   db:
-    container_name: jrpg-game-server
+    container_name: rpg-game-server
     image: postgres:12
     command: postgres -c 'max_connections=5000' -c 'shared_buffers=256MB'
     restart: on-failure
