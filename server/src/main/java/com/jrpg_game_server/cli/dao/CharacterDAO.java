@@ -64,11 +64,14 @@ public class CharacterDAO extends AbstractDatabaseCliDAO implements BaseDAO<Char
     @Override
     public void update(Character character) {
         String query = "UPDATE " + CHARACTER_TABLE_NAME +
-                " SET hp = ?," +
+                " SET  character_level = ?," +
+                " hp = ?, " +
                 " mana = ?," +
-                " character_level = ? " +
-                " WHERE id=?";
+                " offsetx = ?, " +
+                " offsety = ? " +
+                " WHERE id = ?";
 
-        executeQuery(query, character.getHp(), character.getMana(), character.getLevel(), character.getId());
+        executeQuery(query, character.getLevel(), character.getHp(), character.getMana(),
+                character.getOffsetX(), character.getOffsetY(), character.getId());
     }
 }

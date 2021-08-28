@@ -6,6 +6,7 @@ import com.jrpg_game_server.cli.entities.User;
 import com.jrpg_game_server.cli.entities.Character;
 import com.jrpg_game_server.cli.services.base.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Map<String,Object>> getUsers() {
+    public List<User> getAllUsers() {
         return userDao.getAllUsers();
     }
 
@@ -45,5 +46,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getLoggedUser() {
         return loggedUser;
+    }
+
+    @Override
+    public void updateOnlineStatus(User user, boolean status) {
+        this.userDao.updateOnlineStatus(user, status);
     }
 }

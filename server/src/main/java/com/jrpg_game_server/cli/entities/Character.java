@@ -9,16 +9,20 @@ public class Character {
     private int hp;
     private int level;
     private int mana;
+    private int offsetX;
+    private int offsetY;
 
     public Character() {
     }
 
-    public Character(UUID id, String nickname, int hp, int mana, int level) {
+    public Character(UUID id, String nickname, int hp, int mana, int level, int offsetX, int offsetY) {
         this.id = id;
         this.nickname = nickname;
         this.hp = hp;
         this.level = level;
         this.mana = mana;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
     }
 
     public Character(String nickname, int hp, int mana) {
@@ -67,6 +71,22 @@ public class Character {
         this.mana = mana;
     }
 
+    public int getOffsetX() {
+        return offsetX;
+    }
+
+    public void setOffsetX(int offsetX) {
+        this.offsetX = offsetX;
+    }
+
+    public int getOffsetY() {
+        return offsetY;
+    }
+
+    public void setOffsetY(int offsetY) {
+        this.offsetY = offsetY;
+    }
+
     public static Character map(Map<String,Object> objectMap) {
         Character character = new Character();
         character.setId((UUID) objectMap.get("id"));
@@ -74,6 +94,8 @@ public class Character {
         character.setLevel((Integer) objectMap.get("character_level"));
         character.setHp((Integer) objectMap.get("hp"));
         character.setMana((Integer) objectMap.get("mana"));
+        character.setOffsetX((Integer) objectMap.get("offsetx"));
+        character.setOffsetY((Integer) objectMap.get("offsety"));
 
         return character;
     }

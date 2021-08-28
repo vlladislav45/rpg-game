@@ -8,6 +8,8 @@ public class CharacterViewModel {
     private int hp;
     private int level;
     private int mana;
+    private int offsetX;
+    private int offsetY;
 
     public static CharacterViewModel toViewModel(Character character) {
         CharacterViewModel characterViewModel = new CharacterViewModel();
@@ -17,6 +19,8 @@ public class CharacterViewModel {
             characterViewModel.setHp(character.getHp());
             characterViewModel.setMana(character.getMana());
             characterViewModel.setLevel(character.getLevel());
+            characterViewModel.setOffsetX(character.getOffsetX());
+            characterViewModel.setOffsetY(character.getOffsetY());
         }
         return characterViewModel;
     }
@@ -59,5 +63,21 @@ public class CharacterViewModel {
 
     public void setMana(int mana) {
         this.mana = mana;
+    }
+
+    public int getOffsetX() {
+        return offsetX;
+    }
+
+    public void setOffsetX(int offsetX) {
+        this.offsetX = offsetX;
+    }
+
+    public int getOffsetY() {
+        return offsetY;
+    }
+
+    public void setOffsetY(int offsetY) {
+        this.offsetY = offsetY;
     }
 }

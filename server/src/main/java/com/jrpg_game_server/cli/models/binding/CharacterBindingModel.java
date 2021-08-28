@@ -6,6 +6,8 @@ public class CharacterBindingModel {
     private int hp;
     private int mana;
     private int level;
+    private int offsetX;
+    private int offsetY;
 
     public CharacterBindingModel() {
     }
@@ -52,5 +54,21 @@ public class CharacterBindingModel {
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public int getOffsetX() {
+        return offsetX;
+    }
+
+    public void setOffsetX(int offsetX) {
+        this.offsetX = offsetX;
+    }
+
+    public int getOffsetY() {
+        return offsetY;
+    }
+
+    public void setOffsetY(int offsetY) {
+        this.offsetY = offsetY;
     }
 }

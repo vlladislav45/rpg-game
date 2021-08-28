@@ -24,27 +24,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
         double? tileHeight})
       : super(tileset, matrix, destTileSize: destTileSize, tileHeight: tileHeight);
 
-
   List<Offset> get treeOffsets => _treeOffsets;
-
-  void renderRectangle() async {
-    for(int i=0;i<matrix.length;i++) {
-      for (int j=0;j<matrix[i].length;j++) {
-        final waterSprite = await gameRef.loadSprite('sprites/tile_maps/water.png');
-
-        double tileX = (i - j) * (effectiveTileSize.x / 2);
-        tileX += (effectiveTileSize.x /* 2*/) - (waterSprite.srcSize.x / 2);
-        double tileY = (i + j) * (waterSprite.srcSize.y / 2);
-        tileY -= (effectiveTileSize.y /* 2*/);
-
-        gameRef.add(Water(
-          sprite: waterSprite,
-          position: Vector2(tileX, tileY),
-          size: waterSprite.srcSize,
-        ));
-      }
-    }
-  }
 
   void renderWater() async {
     for (var i = 0; i < matrix.length; i++) {
@@ -74,7 +54,7 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
           final p = getBlockPositionInts(j, i);
           final treeSprite = await gameRef.loadSprite('sprites/obstacles/Tree_2.png');
 
-          _treeOffsets.add(new Offset(j.toDouble(), i.toDouble()));
+          _treeOffsets.add(new Offset(p.x, p.y));
           gameRef.add(Tree(
             sprite: treeSprite,
             position: p,
@@ -110,67 +90,64 @@ class Map extends IsometricTileMapComponent with HasGameRef<MyGame> {
   /// DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!
   /// If map is loaded in onLoad method, 
   /// the water tiles will be appear on top the iso tiles
-  void addRestrictions() async {
-    final waterSprite = await gameRef.loadSprite('sprites/tile_maps/water.png');
-    //Add watter around isometric map
-    for (int i = 0; i < this.matrix.length; i++) {
-      int lastRow = this.matrix.length - 1;
-      if (i == 0 || i == lastRow) {
-        //Loop columns
-        for (int j = 0; j < this.matrix[i].length; j++) {
-          final element = this.matrix[i][j];
-          if (element != -1) {
-            // if tile exists
-            final p = this.getBlockPositionInts(j, i); // get coordinate of the tile
-            // and add obstacle(wall)
-            gameRef.add(Water(
-              sprite: waterSprite,
-              position: p,
-              size: waterSprite.srcSize,
-            ));
-          }
-          int lastColumn = this.matrix[i].length - 1;
-          if (j == 0 || j == lastColumn) {
-            // Loop first and last columns vertically
-            for (int r = 0; r < this.matrix.length; r++) {
-              final element = this.matrix[r][j]; // in first column [0][0], [1][0] etc..
-              if (element != -1) {
-                // if tile exists
-                final p = this.getBlockPositionInts(j, r); // get coordinates of tile
-                //add obstacle (wall)
-                  gameRef.add(Water(
-                    sprite: waterSprite,
-                    position: p,
-                    size: waterSprite.srcSize,
-                  ));
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+  // void addRestrictions() async {
+  //   final waterSprite = await gameRef.loadSprite('sprites/tile_maps/water.png');
+  //   //Add watter around isometric map
+  //   for (int i = 0; i < this.matrix.length; i++) {
+  //     int lastRow = this.matrix.length - 1;
+  //     if (i == 0 || i == lastRow) {
+  //       //Loop columns
+  //       for (int j = 0; j < this.matrix[i].length; j++) {
+  //         final element = this.matrix[i][j];
+  //         if (element != -1) {
+  //           // if tile exists
+  //           final p = this.getBlockPositionInts(j, i); // get coordinate of the tile
+  //           // and add obstacle(wall)
+  //           gameRef.add(Water(
+  //             sprite: waterSprite,
+  //             position: p,
+  //             size: waterSprite.srcSize,
+  //           ));
+  //         }
+  //         int lastColumn = this.matrix[i].length - 1;
+  //         if (j == 0 || j == lastColumn) {
+  //           // Loop first and last columns vertically
+  //           for (int r = 0; r < this.matrix.length; r++) {
+  //             final element = this.matrix[r][j]; // in first column [0][0], [1][0] etc..
+  //             if (element != -1) {
+  //               // if tile exists
+  //               final p = this.getBlockPositionInts(j, r); // get coordinates of tile
+  //               //add obstacle (wall)
+  //                 gameRef.add(Water(
+  //                   sprite: waterSprite,
+  //                   position: p,
+  //                   size: waterSprite.srcSize,
+  //                 ));
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
   void removeChildComponents() {
     gameRef.components.removeAll(_restrictObstacles);
   }
 
-  // Generate random coordinates
   Vector2 genCoord() {
-    double x;
-    double y;
-    Block block;
+    Vector2 position = Vector2.zero();
     do {
-      block = Block((R.nextInt(matrix.length)), (R.nextInt(matrix[0].length)));
-    }while(!this.containsBlock(block) &&
-        this.matrix[block.x][block.y] == 4 &&
-        this.matrix[block.x][block.y] == -1 &&
-        (block.x < 0 && block.y < 0) &&
-        (block.x > matrix.length && block.y > matrix[0].length) &&
-        (this.getBlockPosition(block).x > 0 && this.getBlockPosition(block).y > 0));
+      int i = R.nextInt(matrix.length);
+      int j = R.nextInt(matrix[0].length);
+      if (matrix[i][j] != 4 && matrix[i][j] != -1) {
+        position = getBlockPositionInts(j, i);
+        break;
+      }
+    }while(true);
 
-    x = this.getBlockPosition(block).x;
-    y = this.getBlockPosition(block).y;
-    return Vector2(x, y);
+    position.x; // maybe to ceil
+    position.y;
+    return position;
   }
 }

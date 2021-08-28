@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS public.users (
     username VARCHAR(15) UNIQUE NOT NULL,
     password VARCHAR NOT NULL,
     time_created timestamp NOT NULL,
+    online BOOLEAN NOT NULL,
     role_id SMALLINT REFERENCES user_roles(id) ON DELETE NO ACTION NOT NULL,
     PRIMARY KEY (id)
 );

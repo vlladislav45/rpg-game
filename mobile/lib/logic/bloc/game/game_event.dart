@@ -1,4 +1,5 @@
 
+import 'package:rpg_game/model/character_model.dart';
 import 'package:rpg_game/model/user_model.dart';
 
 abstract class GameEvent {
@@ -27,4 +28,26 @@ class GamePropertiesEvent extends GameEvent {
 
   @override
   List<Object> get props => [userModel];
+}
+
+class MultiplayerEvent extends GameEvent {
+  @override
+  List<Object> get props => [];
+}
+
+class OnlineAuthenticatedMultiplayerEvent extends GameEvent {
+  final List<CharacterModel> players;
+
+  OnlineAuthenticatedMultiplayerEvent({
+    required this.players,
+  });
+
+  factory OnlineAuthenticatedMultiplayerEvent.fromJson(List<dynamic> json) {
+    return OnlineAuthenticatedMultiplayerEvent(
+      players: CharacterModel.fromJson(json)
+    );
+  }
+
+  @override
+  List<Object> get props => [players];
 }

@@ -1,9 +1,11 @@
 package com.jrpg_game_server.cli.commands;
 
+import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.jrpg_game_server.cli.dao.CharacterDAO;
 import com.jrpg_game_server.cli.dao.UserDAO;
 import com.jrpg_game_server.cli.entities.Character;
+import com.jrpg_game_server.cli.entities.User;
 import com.jrpg_game_server.cli.models.binding.AuthenticationRequestBindingModel;
 import com.jrpg_game_server.cli.models.binding.CharacterBindingModel;
 import com.jrpg_game_server.cli.models.views.CharacterViewModel;
@@ -16,7 +18,9 @@ import com.jrpg_game_server.cli.services.UserServiceImpl;
 import com.jrpg_game_server.cli.network.SocketServerManager;
 import picocli.CommandLine;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 @CommandLine.Command(name = "start server", aliases = "ss")
@@ -39,7 +43,10 @@ public class ServerStartCommand extends AbstractCommand {
         server.addEventListener("authentication", AuthenticationRequestBindingModel.class, (client, data, ackRequest) -> {
             boolean isAuthenticated = loginCheck(data.getUsername(), data.getPassword());
             if (isAuthenticated) {
-                UserViewModel userViewModel = UserViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser());
+                User user = serviceWrapper.getUserServices().getLoggedUser();
+                UserViewModel userViewModel = UserViewModel.toViewModel(user);
+                // Update online status to 'TRUE' -> Active
+                serviceWrapper.getUserServices().updateOnlineStatus(user, true);
                 client.sendEvent("authenticated", userViewModel);
             } else {
                 // Wrong credentials
@@ -57,21 +64,50 @@ public class ServerStartCommand extends AbstractCommand {
             }
         });
 
-        server.addEventListener("update", CharacterBindingModel.class, (client, data, ackRequest) -> {
-            if (serviceWrapper.getUserServices().getLoggedUser() != null) {
+        server.addEventListener("multiplayer", CharacterBindingModel.class, (client, data, ackRequest) -> {
+            User loggedUser = serviceWrapper.getUserServices().getLoggedUser();
+            if (loggedUser != null) {
+                returnRemotePlayers(client, "players", loggedUser);
+            }
+        });
+
+        server.addEventListener("singlePlayerUpdate", CharacterBindingModel.class, (client, data, ackRequest) -> {
+            User loggedUser = serviceWrapper.getUserServices().getLoggedUser();
+            if (loggedUser != null) {
                 // update the information about character
                 Character character = new Character(
                         UUID.fromString(data.getId()),
                         data.getNickname(),
-                        data.getLevel(),
                         data.getHp(),
-                        data.getMana()
+                        data.getLevel(),
+                        data.getMana(),
+                        data.getOffsetX(),
+                        data.getOffsetY()
                 );
                 serviceWrapper.getCharacterService().update(character);
 
-                CharacterViewModel characterViewModel =
-                        CharacterViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser().getCharacters().iterator().next());
-                client.sendEvent("loggedPlayer", characterViewModel);
+
+                returnRemotePlayers(client, "remotePlayers", loggedUser);
+            }
+        });
+
+        server.addEventListener("mutliplayerUpdate", CharacterBindingModel.class, (client, data, ackRequest) -> {
+            User loggedUser = serviceWrapper.getUserServices().getLoggedUser();
+            if (loggedUser != null) {
+                // update the information about character
+                Character character = new Character(
+                        UUID.fromString(data.getId()),
+                        data.getNickname(),
+                        data.getHp(),
+                        data.getLevel(),
+                        data.getMana(),
+                        data.getOffsetX(),
+                        data.getOffsetY()
+                );
+                serviceWrapper.getCharacterService().update(character);
+
+
+                returnRemotePlayers(client, "remotePlayers", loggedUser);
             }
         });
 
@@ -85,6 +121,17 @@ public class ServerStartCommand extends AbstractCommand {
 
         server.stop();
 
+    }
+
+    private void returnRemotePlayers(SocketIOClient client, String eventName, User loggedUser) {
+        List<CharacterViewModel> characterViewModels = new ArrayList<>();
+        for(User user : serviceWrapper.getUserServices().getAllUsers()) {
+            if(!user.getId().toString().equals(loggedUser.getId().toString())) {
+                characterViewModels.add(CharacterViewModel.toViewModel(user.getCharacters().iterator().next()));
+            }
+        }
+
+        client.sendEvent(eventName, characterViewModels);
     }
 
     private void initializeServices() {

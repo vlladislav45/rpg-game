@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
 import 'package:rpg_game/logic/bloc/online/online_bloc.dart';
 import 'package:rpg_game/logic/bloc/online/online_state.dart';
+import 'package:rpg_game/logic/cubit/map/map_cubit.dart';
 import 'package:rpg_game/logic/cubit/single_player_statuses/single_player_statuses_cubit.dart';
 import 'package:rpg_game/logic/cubit/single_player_statuses/single_player_statuses_state.dart';
 import 'package:rpg_game/util/hex_color.dart';
@@ -34,12 +35,10 @@ class CharacterOverlayState extends State<CharacterOverlay>
       vsync: this,
       duration: const Duration(seconds: 5),
     )..addListener(() {
-        setState(() {
-        });
+        setState(() {});
       });
     controller!.repeat(reverse: true);
   }
-
 
   @override
   void dispose() {
@@ -64,8 +63,7 @@ class CharacterOverlayState extends State<CharacterOverlay>
       ),
       width: MediaQuery.of(context).size.width / 5,
       height: MediaQuery.of(context).size.width / 12,
-      child: BlocBuilder<OnlineBloc, OnlineState>
-        (builder: (context, state) {
+      child: BlocBuilder<OnlineBloc, OnlineState>(builder: (context, state) {
         if (state is OnlineAuthenticatedState) {
           return Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -108,7 +106,9 @@ class CharacterOverlayState extends State<CharacterOverlay>
                       duration: Duration(seconds: 3),
                       curve: Curves.fastOutSlowIn,
                       alignment: Alignment.center,
-                      child: BlocBuilder<SinglePlayerStatusesCubit,SinglePlayerStatusesState> (builder: (context, singlePlayerState) {
+                      child: BlocBuilder<SinglePlayerStatusesCubit,
+                              SinglePlayerStatusesState>(
+                          builder: (context, singlePlayerState) {
                         return AutoSizeText(
                           '${singlePlayerState.currentHp < 0 ? 'Dead' : singlePlayerState.currentHp} / ${state.userViewModel.characters[0].hp}',
                           textAlign: TextAlign.center,
@@ -144,6 +144,25 @@ class CharacterOverlayState extends State<CharacterOverlay>
                           color: Colors.white,
                         ),
                       ),
+                    ),
+
+                    InkWell(
+                      child: Container(
+                        padding: EdgeInsets.all(10.0),
+                        alignment: Alignment.topLeft,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage(
+                                  'assets/images/icons8-arrow-left-64.png'),
+                              fit: BoxFit.fill),
+                        ),
+                        width: 12,
+                        height: 12,
+                      ),
+                      onTap: () => {
+                      context.read<MapCubit>().update(''),
+                        // Navigator.of(context).pushNamed('/game'),
+                      },
                     ),
                   ],
                 ),

@@ -5,10 +5,7 @@ import com.jrpg_game_server.cli.entities.Character;
 import com.jrpg_game_server.cli.entities.User;
 import com.jrpg_game_server.cli.entities.UserRole;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO<User> {
     private static final String USER_TABLE_NAME = "users";
@@ -68,6 +65,14 @@ public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO<User> {
         executeQuery(query, user.getPassword(), user.getUsername());
     }
 
+    public void updateOnlineStatus(User user,boolean onlineStatus) {
+        String query = "UPDATE " + USER_TABLE_NAME +
+                " SET online=? " +
+                " WHERE id=?";
+
+        executeQuery(query, onlineStatus, user.getId());
+    }
+
     public User getByParams(String username, String password) {
         String query = "SELECT * FROM " + USER_TABLE_NAME + " WHERE username='" + username + "'" +
                 " AND password='" + password + "'";
@@ -89,11 +94,20 @@ public class UserDAO extends AbstractDatabaseCliDAO implements BaseDAO<User> {
         return user;
     }
 
-    public List<Map<String,Object>> getAllUsers() { // Get all users at database
+    public List<User> getAllUsers() {
+        String query = "SELECT * FROM " + USER_TABLE_NAME +
+                " WHERE online = '" + true + "'";
 
-        String query = "SELECT * FROM " + USER_TABLE_NAME;
+        List<Map<String,Object>> result = executeQueryWithMultipleResult(query);
 
-        return executeQueryWithMultipleResult(query);
+        List<User> users = new ArrayList<>();
+        for(int i = 0; i < result.size(); i++) {
+            users.add(User.map(result.get(i)));
+            // Get characters of the user
+            Set<Character> characterSet = characterDAO.getCharactersByUserId(users.get(i).getId());
+            users.get(i).setCharacters(characterSet);
+        }
+        return users;
     }
 
     /**

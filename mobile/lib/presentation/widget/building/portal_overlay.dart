@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
+import 'package:rpg_game/logic/bloc/game/game_bloc.dart';
+import 'package:rpg_game/logic/bloc/game/game_event.dart';
 import 'package:rpg_game/logic/cubit/map/map_cubit.dart';
 import 'package:rpg_game/util/hex_color.dart';
 
@@ -49,9 +51,10 @@ class _PortalOverlayState extends State<PortalOverlay> {
           children: <Widget>[
             ElevatedButton(
               onPressed: () {
+                context.read<GameBloc>().add(MultiplayerEvent());
+
                 int arenaLevel = 1 + Random().nextInt(2);
                 print('The player was teleported to the arena, level $arenaLevel');
-
                 context.read<MapCubit>().update('arena$arenaLevel');
               },
               child: Container(

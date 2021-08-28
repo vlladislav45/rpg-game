@@ -27,7 +27,6 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
 
   // properties
   static const speed = 30;
-  bool _isCollision = false;
   late final bool _isAggressive;
   int _range = 200;
   int health = 100;
@@ -36,8 +35,6 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
   bool isPlayerPressAttack = false;
   bool isNpcDeath = false;
 
-  bool _isHasObstacle = false;
-  late Tree _obstacle;
   late Map _map;
 
   // Timer
@@ -89,7 +86,6 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
   void onCollision(Set<Vector2> points, Collidable other) {
     if (other is Character) {
       if (other.isPlayerPressAttack) {
-        _isCollision = true;
         // other.setIsPlayerPressAttack(false);
 
         if (health > 0) {
@@ -111,7 +107,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
           this.position.y > other.position.y + other.size.y) {
         return;
       }
-      CollisionDetect.narrowPhase(this, other);
+      // CollisionDetect.narrowPhase(this, other);
     } else if(other is Water) {
       if (this.position.x + this.size.x < other.position.x ||
           this.position.x > other.position.x + other.size.x ||
@@ -229,9 +225,6 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
     if (health <= 0) {
       die();
     }
-
-    _isCollision = false;
-    _isHasObstacle = false;
   }
 
   List<Offset> _pathFinding() {
@@ -245,7 +238,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
     Block npcGridPosition = _map.getBlock(npcPos);
 
     Offset start = Offset(characterGridPosition.x.toDouble(), characterGridPosition.y.toDouble());
-    Offset end = Offset(npcGridPosition.y.toDouble(), npcGridPosition.x.toDouble());
+    Offset end = Offset(npcGridPosition.x.toDouble(), npcGridPosition.y.toDouble());
 
     final result = AStar(
       rows: _map.matrix.length,
@@ -285,7 +278,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
 
     final double npcAngle = (atan2(differentY, differentX) / pi) * 180;
 
-    // print(npcAngle);
+     // print(npcAngle);
     /// TOP right side of the circle
     if (npcAngle >= 60 && npcAngle <= 90) {
       // Top direction
@@ -308,7 +301,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
     } else if (npcAngle >= 120 && npcAngle < 150) {
       // Top left direction
       current = NpcState.runBottomLeft;
-      _facing = "south-left";
+      _facing = "south-west";
     } else if (npcAngle >= 180 && npcAngle < 150) {
       // Left direction
       current = NpcState.runLeft;

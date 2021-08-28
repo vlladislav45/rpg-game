@@ -1,4 +1,5 @@
 
+import 'package:rpg_game/model/character_model.dart';
 import 'package:rpg_game/model/user_model.dart';
 
 abstract class GameState {
@@ -20,4 +21,15 @@ class GamePropertiesState extends GameState {
 
   @override
   List<Object> get props => [userModel];
+}
+
+class OnlineAuthenticatedMultiplayerState extends GameState {
+  final List<CharacterModel> players;
+
+  OnlineAuthenticatedMultiplayerState({
+    required this.players,
+  });
+
+  @override
+  List<Object> get props => [players];
 }
