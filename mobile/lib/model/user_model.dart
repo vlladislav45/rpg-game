@@ -7,14 +7,16 @@ class UserModel {
   late final String _email;
   late final List<CharacterModel> _characters;
   late final String _userRole;
+  late bool _online;
 
-  UserModel(this._id, this._username, this._email, this._characters);
+  UserModel(this._id, this._username, this._email, this._characters, this._online);
 
   UserModel.clear() {
     this._id = '';
     this._username = '';
     this._email = '';
     this._characters = [];
+    this._online = false;
   }
 
   UserModel.fromJson(Map<String, dynamic>? json) {
@@ -23,7 +25,17 @@ class UserModel {
     this._email = json['email'];
     this._characters = CharacterModel.fromJson(json['characters']);
     this._userRole = json['userRole'];
+    this._online = json['online'];
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': _id,
+    'username': _username,
+    'email': _email,
+    'characters': _characters,
+    'userRole': _userRole,
+    'online': _online,
+  };
 
   String get userRole => _userRole;
 
@@ -53,5 +65,11 @@ class UserModel {
 
   set id(String value) {
     _id = value;
+  }
+
+  bool get online => _online;
+
+  set online(bool value) {
+    _online = value;
   }
 }

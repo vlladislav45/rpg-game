@@ -47,7 +47,7 @@ class _CastleOverlayState extends State<CastleOverlay> {
           children: <Widget>[
             ElevatedButton(
               onPressed: () {
-                int mapLevel = 1 + Random().nextInt(2);
+                int mapLevel = 1 + Random().nextInt(3);
                 print('The player was teleported to the dungeon level: $mapLevel');
 
                 context.read<MapCubit>().update('level$mapLevel');
@@ -82,7 +82,26 @@ class _CastleOverlayState extends State<CastleOverlay> {
                   ),
                 ),
               ),
-            )
+            ),
+
+            SizedBox(height: 30.0,),
+
+            ElevatedButton(
+              onPressed: () {
+               Navigator.pushNamed(context, '/');
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width / 5,
+                padding: EdgeInsets.all(8.0),
+                alignment: Alignment.centerLeft,
+                child: AutoSizeText(
+                  'Exit',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

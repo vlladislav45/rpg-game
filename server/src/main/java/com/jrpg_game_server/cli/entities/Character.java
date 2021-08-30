@@ -11,11 +11,13 @@ public class Character {
     private int mana;
     private int offsetX;
     private int offsetY;
+    private String action;
+    private String direction;
 
     public Character() {
     }
 
-    public Character(UUID id, String nickname, int hp, int mana, int level, int offsetX, int offsetY) {
+    public Character(UUID id, String nickname, int hp, int mana, int level, int offsetX, int offsetY, String action, String direction) {
         this.id = id;
         this.nickname = nickname;
         this.hp = hp;
@@ -23,6 +25,8 @@ public class Character {
         this.mana = mana;
         this.offsetX = offsetX;
         this.offsetY = offsetY;
+        this.action = action;
+        this.direction = direction;
     }
 
     public Character(String nickname, int hp, int mana) {
@@ -87,6 +91,22 @@ public class Character {
         this.offsetY = offsetY;
     }
 
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+
     public static Character map(Map<String,Object> objectMap) {
         Character character = new Character();
         character.setId((UUID) objectMap.get("id"));
@@ -96,6 +116,8 @@ public class Character {
         character.setMana((Integer) objectMap.get("mana"));
         character.setOffsetX((Integer) objectMap.get("offsetx"));
         character.setOffsetY((Integer) objectMap.get("offsety"));
+        character.setAction((String) objectMap.get("action"));
+        character.setDirection((String) objectMap.get("direction"));
 
         return character;
     }

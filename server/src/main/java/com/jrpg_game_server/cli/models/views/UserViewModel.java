@@ -11,6 +11,7 @@ public class UserViewModel {
     private String email;
     private List<CharacterViewModel> characters;
     private String userRole;
+    private boolean online;
 
     public UserViewModel() {
     }
@@ -24,6 +25,7 @@ public class UserViewModel {
 
             userViewModel.setCharacters(user.getCharacters().stream().map(CharacterViewModel::toViewModel).collect(Collectors.toList()));
             userViewModel.setUserRole(user.getUserRole().getRoleName());
+            userViewModel.setOnline(user.isOnline());
         }
         return userViewModel;
     }
@@ -33,7 +35,7 @@ public class UserViewModel {
     }
 
     public void setUserId(String userId) {
-        this.id = id;
+        this.id = userId;
     }
 
     public String getUsername() {
@@ -74,5 +76,13 @@ public class UserViewModel {
 
     public void setUserRole(String userRole) {
         this.userRole = userRole;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 }

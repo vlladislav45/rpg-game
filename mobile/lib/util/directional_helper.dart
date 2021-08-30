@@ -1,7 +1,8 @@
 
 enum StateAction {
   Idle,
-  Attack
+  Attack,
+  Move
 }
 
 enum NpcState {

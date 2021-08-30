@@ -42,19 +42,22 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
   late Character _character;
   late JoystickComponent _joystick;
   late final CharacterModel _characterModel; // logged player
-  late final List<CharacterModel> _players; // current online players
+  late List<CharacterModel> _players; // current online players
   late bool _multiplayer = false;
   late Npc _npc;
   late List<Npc> _npcs = [];
-  late List<CharacterModel> _onlinePlayers = [];
   bool _isAllNpcsAreDeath = false;
   Portal? _portal;
   late final BuildContext _context;
   late bool _loadMapLevel;
+  static const double CHARACTER_WIDTH = 200;
+  static const double CHARACTER_HEIGHT = 200;
+  late SpriteSheet tileset;
+  bool _firstOnlineUpdate = false;
 
   bool ifCharacterSpawned = false;
   /// Load Character Sprite Direction Animations
-  final CharacterSpriteAnimation characterSpriteAnimation = new CharacterSpriteAnimation();
+  late final CharacterSpriteAnimation characterSpriteAnimation = new CharacterSpriteAnimation();
 
   // Screen Resolution
   Vector2 viewportResolution;
@@ -85,8 +88,14 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
     viewport = FixedResolutionViewport(viewportResolution);
     print('ViewPort: ${viewport.canvasSize}');
 
-    final tilesetImage = await images.load('sprites/tile_maps/tileset.png');
-    final tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2(151, 76));
+    var tilesetImage;
+    try {
+      tilesetImage = await images.load('sprites/tile_maps/tileset.png');
+    } catch (e) {
+      print(e);
+    }
+
+    tileset = SpriteSheet(image: tilesetImage, srcSize: Vector2(151, 76));
     final matrix = Map.toList(this.jsonMap.toString());
 
     // Add main town
@@ -98,9 +107,18 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
     map.renderWater();
     map.renderTrees();
 
-    await spawnCharacter();
-    if(ifCharacterSpawned && !_multiplayer) {
-      spawnNpcs();
+    if(!_multiplayer) {
+      await spawnCharacter();
+      if(ifCharacterSpawned) spawnNpcs();
+    } else {
+      await spawnPlayers();
+      SocketManager.socket.on("newPlayer", (data) async {
+        var newPlayer = CharacterModel.fromJsonSingle(data);
+        if(_firstOnlineUpdate && newPlayer.id != _characterModel.id) {
+          print('New player is entered in the arena ${newPlayer.nickname}');
+          spawnPlayer(newPlayer);
+        }
+      });
     }
   }
 
@@ -158,42 +176,62 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
     _npcs.add(npc);
     }
   }
-  
-  /// Spawn other players that
-  Future<void> spawnPlayers() async {
+
+  void updatePlayers() async {
     // Online players that are clicked on arena
     for(int i = 0; i < _players.length; i++) {
-      await spawnPlayer(_players[i]);
+      var player = _players[i];
+      if (player.id != _characterModel.id) {
+        await spawnPlayer(_players[i]);
+      }
     }
+  }
+  
+  /// Spawn new player
+  Future<void> spawnPlayers() async {
+    Vector2 randomSpawn = this.map.genCoord();
+    await spawnCharacter(randomSpawn.x, randomSpawn.y);
+    _characterModel.offsetX = randomSpawn.x.toInt();
+    _characterModel.offsetY = randomSpawn.y.toInt();
+    SocketManager.socket.emit('update', _characterModel);
+
+    if(_players.isNotEmpty) {
+      // Online players that are clicked on arena
+      for(int i = 0; i < _players.length; i++) {
+        var player = _players[i];
+        if (player.id != _characterModel.id) {
+          await spawnPlayer(_players[i]);
+        }
+      }
+    }
+    _firstOnlineUpdate = true;
   }
 
   Future<void> spawnPlayer(CharacterModel newPlayer) async {
-    double cw = map.effectiveTileSize.x * map.matrix.length;
-    double ch = map.effectiveTileSize.y * map.matrix[0].length;
-
-    Vector2 generatePosition = Vector2(Random().nextDouble() * cw-2*200 + 200,Random().nextDouble() * (ch-2*200) + 200);
+    Vector2 generatePosition = this.map.genCoord();
 
     // make sure new player doesn't overlap any existing players
     while (true) {
       var hit = 0;
-      for (var i = 0; i < _onlinePlayers.length; i++) {
+      for (var i = 0; i < _players.length; i++) {
         var player = _players[i];
-        var dx = generatePosition.x - player.offsetX;
-        var dy = generatePosition.y - player.offsetY;
-        if (dx < 200 || dy < 200) {
+        var dx = player.offsetX + (CHARACTER_WIDTH / 2) - _character.x;
+        var dy = player.offsetY + (CHARACTER_HEIGHT / 2) - _character.y;
+        // The radius between new player and the old must be minimum from 200 pixels
+        if (dx.abs() < 200 || dy.abs() < 200) {
           hit++;
-          print('hitted');
         }
       }
       // new player doesn't overlap any other, so break
       if (hit == 0) {
         break;
       }
-      generatePosition = Vector2(Random().nextDouble() * cw-2*200 + 200,Random().nextDouble() * (ch-2*200) + 200);
+      generatePosition = this.map.genCoord();
+      _character.position = generatePosition;
     }
 
-    final characterSpawnPosition = map.getBlock(generatePosition);
-    print('New player spawn position $characterSpawnPosition');
+    final characterSpawnPosition = map.getBlock(Vector2(newPlayer.offsetX.toDouble(), newPlayer.offsetY.toDouble()));
+    await characterSpriteAnimation.loadSpriteAnimations();
     RemotePlayer remotePlayer = new RemotePlayer(
       _context,
       newPlayer,
@@ -224,16 +262,15 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
         NpcState.runTopRight: characterSpriteAnimation.runTopRight,
       },
       size: Vector2(200, 200),
-    )..current = NpcState.idleRight;
+    )..current = NpcState.idleDown;
     remotePlayer.position.setFrom(map.getBlockPosition(characterSpawnPosition));
 
     add(remotePlayer);
-    _onlinePlayers.add(newPlayer);
   }
 
-  /// Spawn the character
-  Future<void> spawnCharacter() async {
-    final characterSpawnPosition = map.getBlock(Vector2(300, 250));
+  /// Spawn main character
+  Future<void> spawnCharacter([double? offsetX, double? offsetY]) async {
+    final characterSpawnPosition = map.getBlock(Vector2(offsetX ?? 300, offsetY ?? 250));
     await characterSpriteAnimation.loadSpriteAnimations();
 
     _joystick = await getJoystick();
@@ -268,12 +305,18 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
         NpcState.runTopRight: characterSpriteAnimation.runTopRight,
       },
       joystick: _joystick,
-      size: Vector2(200, 200),
+      size: Vector2(CHARACTER_WIDTH, CHARACTER_HEIGHT),
     )..current = NpcState.idleRight;
     _character.position.setFrom(map.getBlockPosition(characterSpawnPosition));
 
-    final attack = await loadSprite('joystick_attack.png');
-    final attackBtnDown = await loadSprite('joystick_attack_selected.png');
+    var attack;
+    var attackBtnDown;
+    try {
+      attack = await loadSprite('joystick_attack.png');
+      attackBtnDown = await loadSprite('joystick_attack_selected.png');
+    } catch (e) {
+      print(e);
+    }
     final attackButton = HudButtonComponent(
       button: SpriteComponent(
         sprite: attack,
@@ -301,14 +344,24 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
       overlays.add(_character.overlay);
     }
 
-    // Add current character of logged player into the array of online players
-    _onlinePlayers.add(this._characterModel);
+    if(_multiplayer) {
+      // Update current spawned character coordinates
+      this._characterModel.offsetX = characterSpawnPosition.x;
+      this._characterModel.offsetY = characterSpawnPosition.y;
+      SocketManager.socket.emit('update', this._characterModel);
+    }
     ifCharacterSpawned = true;
   }
 
   Future<JoystickComponent> getJoystick() async {
-    final knob = await loadSprite('joystick_knob.png');
-    final background = await loadSprite('joystick_background.png');
+    var knob;
+    var background;
+    try {
+      knob = await loadSprite('joystick_knob.png');
+      background = await loadSprite('joystick_background.png');
+    } catch (e) {
+      print(e);
+    }
     return JoystickComponent(
       knob: SpriteComponent(
         sprite: knob,
@@ -337,7 +390,7 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
   void updateCharacterStatus() {
     this._characterModel.level += 1;
     this._characterModel.hp += 150;
-    SocketManager.socket.emit('singlePlayerUpdate', this._characterModel);
+    SocketManager.socket.emit('update', this._characterModel);
   }
 
   @override
@@ -414,22 +467,18 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
   @override
   void update(double dt) async {
     super.update(dt);
-    // if(ifCharacterSpawned && _multiplayer) {
-    //   SocketManager.socket.on('remotePlayers', (data) async => {
-    //     spawnPlayers(),
-    //   });
-    // }
+    // if(this._multiplayer) updatePlayers();
 
       List<Npc> matches = _npcs.where((n) => n.isNpcDeath == true).toList();
       if(matches.length == _npcs.length && _npcs.length > 0) {
         _isAllNpcsAreDeath = true;
       }
       if(ifCharacterSpawned && _isAllNpcsAreDeath) {
-        // map.removeChildComponents();
-        // components.remove(map);
-        // components.remove(_joystick);
-        // components.removeAll(_npcs);
-        // components.remove(_character);
+        map.removeChildComponents();
+        components.remove(map);
+        components.remove(_joystick);
+        components.removeAll(_npcs);
+        components.remove(_character);
 
         // spawnTown();
         updateCharacterStatus();
@@ -439,11 +488,11 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
       }
       if(ifCharacterSpawned && _character.isDead) {
         // Remove map and his restrictions
-        // map.removeChildComponents();
-        // components.remove(map);
-        // components.remove(_joystick);
-        // components.removeAll(_npcs);
-        // components.remove(_character);
+        map.removeChildComponents();
+        components.remove(map);
+        components.remove(_joystick);
+        components.removeAll(_npcs);
+        components.remove(_character);
 
         // and then spawn the town
         // spawnTown();

@@ -9,6 +9,7 @@ import com.jrpg_game_server.cli.services.base.UserService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class UserServiceImpl implements UserService {
     private final UserDAO userDao;
@@ -46,6 +47,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getLoggedUser() {
         return loggedUser;
+    }
+
+    @Override
+    public User getUserBy(UUID id) {
+        return this.userDao.getById(id);
     }
 
     @Override

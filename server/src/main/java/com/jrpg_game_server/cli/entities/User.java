@@ -13,25 +13,28 @@ public class User {
     private Timestamp timestamp;
     private UserRole userRole;
     private Set<Character> characters;
+    private boolean online;
 
     public User() {
     }
 
-    public User(String username, String password, UserRole userRole, Set<Character> characters) {
+    public User(String username, String password, UserRole userRole, Set<Character> characters, boolean online) {
         this.username = username;
         this.password = password;
         this.timestamp = new Timestamp(System.currentTimeMillis());
         this.userRole = userRole;
         this.characters = characters;
+        this.online = online;
     }
 
-    public User(UUID id, String username, String password, UserRole userRole, Set<Character> characters) {
+    public User(UUID id, String username, String password, UserRole userRole, Set<Character> characters, boolean online) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.timestamp = new Timestamp(System.currentTimeMillis());
         this.userRole = userRole;
         this.characters = characters;
+        this.online = online;
     }
 
     public UUID getId() {
@@ -90,12 +93,21 @@ public class User {
         this.characters = characters;
     }
 
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
+
     public static User map(Map<String, Object> map) {
         final User user = new User();
         user.setId((UUID) map.get("id"));
         user.setUsername((String) map.get("username"));
         user.setPassword((String) map.get("password"));
         user.setTimestamp((Timestamp) map.get("time_created"));
+        user.setOnline((Boolean) map.get("online"));
 
         return user;
     }

@@ -5,6 +5,7 @@ import com.jrpg_game_server.cli.entities.Character;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface UserService {
     List<User> getAllUsers();
@@ -14,6 +15,8 @@ public interface UserService {
     void register(User user, Character character);
 
     User getLoggedUser();
+
+    User getUserBy(UUID id);
 
     void updateOnlineStatus(User user, boolean status);
 }

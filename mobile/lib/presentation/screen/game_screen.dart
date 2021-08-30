@@ -65,6 +65,9 @@ class _MyGameScreenState extends State<MyGameScreen> {
                 future: DefaultAssetBundle.of(context)
                     .loadString('assets/maps/${mapState.map}.json'),
                 builder: (context, snapshot) {
+                  if(snapshot.hasError) {
+                    Navigator.pushNamed(context, '/');
+                  }
                   if (!snapshot.hasData ||
                       snapshot.connectionState == ConnectionState.waiting)
                     return Container(

@@ -45,14 +45,27 @@ public class ServerStartCommand extends AbstractCommand {
             if (isAuthenticated) {
                 User user = serviceWrapper.getUserServices().getLoggedUser();
                 UserViewModel userViewModel = UserViewModel.toViewModel(user);
-                // Update online status to 'TRUE' -> Active
-                serviceWrapper.getUserServices().updateOnlineStatus(user, true);
+
                 client.sendEvent("authenticated", userViewModel);
             } else {
                 // Wrong credentials
                 client.sendEvent("authenticationError", new HashMap<String, String>() {{
                     put("error", "WRONG CREDENTIALS");
                 }});
+            }
+        });
+
+        server.addEventListener("onlineStatus", UserViewModel.class, (client, data, ackRequest) -> {
+            User user = serviceWrapper.getUserServices().getUserBy(UUID.fromString(data.getId()));
+            serviceWrapper.getUserServices().updateOnlineStatus(user, data.isOnline());
+
+            // If player leave arena
+            if (!data.isOnline()) {
+                System.out.println(user.getUsername() + " leaves the arena");
+                server.getBroadcastOperations().sendEvent("leaveArena", user.getCharacters().iterator().next());
+            } else {
+                System.out.println(user.getUsername() + " enter in arena");
+                server.getBroadcastOperations().sendEvent("newPlayer", user.getCharacters().iterator().next());
             }
         });
 
@@ -67,11 +80,21 @@ public class ServerStartCommand extends AbstractCommand {
         server.addEventListener("multiplayer", CharacterBindingModel.class, (client, data, ackRequest) -> {
             User loggedUser = serviceWrapper.getUserServices().getLoggedUser();
             if (loggedUser != null) {
-                returnRemotePlayers(client, "players", loggedUser);
+                List<CharacterViewModel> characterViewModels = new ArrayList<>();
+                for (User user : serviceWrapper.getUserServices().getAllUsers()) {
+                    if (!user.getId().toString().equals(loggedUser.getId().toString())) {
+                        characterViewModels.add(CharacterViewModel.toViewModel(user.getCharacters().iterator().next()));
+                    }
+                }
+
+                for (var c : characterViewModels) {
+                    System.out.println(c.getNickname());
+                }
+                client.sendEvent("firstUpdate", characterViewModels);
             }
         });
 
-        server.addEventListener("singlePlayerUpdate", CharacterBindingModel.class, (client, data, ackRequest) -> {
+        server.addEventListener("update", CharacterBindingModel.class, (client, data, ackRequest) -> {
             User loggedUser = serviceWrapper.getUserServices().getLoggedUser();
             if (loggedUser != null) {
                 // update the information about character
@@ -82,32 +105,13 @@ public class ServerStartCommand extends AbstractCommand {
                         data.getLevel(),
                         data.getMana(),
                         data.getOffsetX(),
-                        data.getOffsetY()
+                        data.getOffsetY(),
+                        data.getAction(),
+                        data.getDirection()
                 );
                 serviceWrapper.getCharacterService().update(character);
 
-
-                returnRemotePlayers(client, "remotePlayers", loggedUser);
-            }
-        });
-
-        server.addEventListener("mutliplayerUpdate", CharacterBindingModel.class, (client, data, ackRequest) -> {
-            User loggedUser = serviceWrapper.getUserServices().getLoggedUser();
-            if (loggedUser != null) {
-                // update the information about character
-                Character character = new Character(
-                        UUID.fromString(data.getId()),
-                        data.getNickname(),
-                        data.getHp(),
-                        data.getLevel(),
-                        data.getMana(),
-                        data.getOffsetX(),
-                        data.getOffsetY()
-                );
-                serviceWrapper.getCharacterService().update(character);
-
-
-                returnRemotePlayers(client, "remotePlayers", loggedUser);
+                server.getBroadcastOperations().sendEvent("remotePlayer", character);
             }
         });
 
@@ -123,16 +127,16 @@ public class ServerStartCommand extends AbstractCommand {
 
     }
 
-    private void returnRemotePlayers(SocketIOClient client, String eventName, User loggedUser) {
-        List<CharacterViewModel> characterViewModels = new ArrayList<>();
-        for(User user : serviceWrapper.getUserServices().getAllUsers()) {
-            if(!user.getId().toString().equals(loggedUser.getId().toString())) {
-                characterViewModels.add(CharacterViewModel.toViewModel(user.getCharacters().iterator().next()));
-            }
-        }
-
-        client.sendEvent(eventName, characterViewModels);
-    }
+//    private void returnRemotePlayers(SocketIOClient client, String eventName) {
+//        List<CharacterViewModel> characterViewModels = new ArrayList<>();
+//        for (User user : serviceWrapper.getUserServices().getAllUsers()) {
+////            if(!user.getId().toString().equals(loggedUser.getId().toString())) {
+//            characterViewModels.add(CharacterViewModel.toViewModel(user.getCharacters().iterator().next()));
+////            }
+//        }
+//
+//        client.sendEvent(eventName, characterViewModels);
+//    }
 
     private void initializeServices() {
         //Init Database access objects

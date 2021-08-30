@@ -3,11 +3,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
+import 'package:rpg_game/logic/bloc/game/game_bloc.dart';
+import 'package:rpg_game/logic/bloc/game/game_event.dart';
 import 'package:rpg_game/logic/bloc/online/online_bloc.dart';
+import 'package:rpg_game/logic/bloc/online/online_event.dart';
 import 'package:rpg_game/logic/bloc/online/online_state.dart';
 import 'package:rpg_game/logic/cubit/map/map_cubit.dart';
 import 'package:rpg_game/logic/cubit/single_player_statuses/single_player_statuses_cubit.dart';
 import 'package:rpg_game/logic/cubit/single_player_statuses/single_player_statuses_state.dart';
+import 'package:rpg_game/network/socket_manager.dart';
 import 'package:rpg_game/util/hex_color.dart';
 
 Widget characterOverlayBuilder(BuildContext context, MyGame myGame) {
@@ -159,9 +163,11 @@ class CharacterOverlayState extends State<CharacterOverlay>
                         width: 12,
                         height: 12,
                       ),
-                      onTap: () => {
-                      context.read<MapCubit>().update(''),
-                        // Navigator.of(context).pushNamed('/game'),
+                      onTap: () {
+                        state.userViewModel.online = false;
+                        context.read<OnlineBloc>().add(UpdateOnlineStatusEvent(userModel: state.userViewModel));
+                        // context.read<OnlineBloc>().add(UpdateOnlineStatusEvent(status: false));
+                        context.read<MapCubit>().update('');
                       },
                     ),
                   ],

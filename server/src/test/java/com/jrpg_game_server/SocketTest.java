@@ -35,7 +35,7 @@ public class SocketTest {
         UserDAO userDAO = new UserDAO(characterDAO);
         Set<Character> characters = new HashSet();
         characters.add(new Character("bro", 200, 300));
-        User user = new User("bb", "bb", new UserRole("user"), characters);
+        User user = new User("bb", "bb", new UserRole("user"), characters, false);
 
         // act
         userDAO.add(user);

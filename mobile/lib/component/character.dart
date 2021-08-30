@@ -25,7 +25,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   // Joystick
   bool move = false;
 
-  // Camera
   late Timer timer;
 
   // Collisions
@@ -54,6 +53,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
 
   // Joystick implementation
   late JoystickComponent joystick;
+  bool _isIdle = true;
 
   Character(
     BuildContext context,
@@ -72,7 +72,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
 
     this.joystick = joystick;
     this.joystick.anchor = Anchor.center;
-
 
     timer = Timer(time)
       ..stop()
@@ -158,11 +157,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     updateCurrentAnimation();
     if (!joystick.delta.isZero()) {
       position.add(joystick.relativeDelta * maxSpeed.toDouble() * dt);
-      this.updateCoordinates();
     }
-    // if(!_isWall) {
-    //    position.add(ConvertCoordinates.cartToIso(_velocity * speed.toDouble() * dt));
-    // }
 
     _isCollision = false;
   }
@@ -175,19 +170,9 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
 
   String get overlay => _overlay;
 
-  void updateCoordinates() {
-    move = joystick.direction != JoystickDirection.idle;
-    if(move) {
-      this._characterModel.offsetX = position.x.toInt();
-      this._characterModel.offsetY = position.y.toInt();
-      SocketManager.socket.emit('mutliplayerUpdate', this._characterModel);
-    }
-  }
-
   void updateCurrentAnimation() {
     move = joystick.direction != JoystickDirection.idle;
-    if (!_isPlayerPressAttack) {
-      if (move) {
+    if (!_isPlayerPressAttack && move) {
         if (joystick.direction == JoystickDirection.left) {
           this.current = NpcState.runTopLeft;
           this.setVelocity(Vector2(-1, 0));
@@ -221,12 +206,28 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
           this.setVelocity(Vector2(1, -1));
           this._facing = 'east';
         }
-      } else {
+
+        _characterModel.offsetX = position.x.toInt();
+        _characterModel.offsetY = position.y.toInt();
+        _characterModel.action = StateAction.Move.toString().substring(
+            StateAction.Move.toString().indexOf('.') + 1).toUpperCase();
+        _characterModel.direction = _facing;
+        SocketManager.socket.emit('update',
+            _characterModel
+        );
+        _isIdle = true;
+    }
+    if(joystick.direction == JoystickDirection.idle && _isIdle) {
         this.current = DirectionalHelper.getDirectionalSpriteAnimation(
             _facing, StateAction.Idle);
         this.setVelocity(Vector2(0, 0));
-      }
-      timer.start();
+        _characterModel.action = StateAction.Idle.toString().substring(
+            StateAction.Idle.toString().indexOf('.') + 1).toUpperCase();
+        _characterModel.direction = _facing;
+        SocketManager.socket.emit('update',
+            _characterModel
+        );
+        _isIdle = false;
     }
   }
 
@@ -234,6 +235,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     _isPlayerPressAttack = true;
     current = DirectionalHelper.getDirectionalSpriteAnimation(
         _facing, StateAction.Attack);
+    timer.start();
   }
 
   @override

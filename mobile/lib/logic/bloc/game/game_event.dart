@@ -51,3 +51,14 @@ class OnlineAuthenticatedMultiplayerEvent extends GameEvent {
   @override
   List<Object> get props => [players];
 }
+
+class UpdateCharacterEvent extends GameEvent {
+  final CharacterModel characterModel;
+
+  UpdateCharacterEvent({
+    required this.characterModel,
+  });
+
+  @override
+  List<Object> get props => [characterModel];
+}

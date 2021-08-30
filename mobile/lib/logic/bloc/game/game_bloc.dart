@@ -8,7 +8,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
   GameBloc() : super(GameInitialState()) {
     SocketManager.socket.on('loggedPlayer', (data) => add(GamePropertiesEvent.fromJson(data)));
-    SocketManager.socket.on('players', (data) => add(OnlineAuthenticatedMultiplayerEvent.fromJson(data)));
+    SocketManager.socket.on('firstUpdate', (data) => add(OnlineAuthenticatedMultiplayerEvent.fromJson(data)));
   }
 
   @override
@@ -23,6 +23,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       yield OnlineAuthenticatedMultiplayerState(
         players: event.players,
       );
+    }else if(event is UpdateCharacterEvent) {
+      SocketManager.socket.emit("update", event.characterModel);
     }
   }
 }

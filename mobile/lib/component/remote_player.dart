@@ -5,13 +5,13 @@ import 'package:flame/extensions.dart';
 import 'package:flame/geometry.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/component/npc.dart';
 import 'package:rpg_game/component/tree.dart';
 import 'package:rpg_game/component/water.dart';
 import 'package:rpg_game/game.dart';
-import 'package:rpg_game/logic/cubit/single_player_statuses/single_player_statuses_cubit.dart';
 import 'package:rpg_game/model/character_model.dart';
+import 'package:rpg_game/network/socket_manager.dart';
+import 'package:rpg_game/util/buffer_delay.dart';
 import 'package:rpg_game/util/collision_detect.dart';
 import 'package:rpg_game/util/directional_helper.dart';
 
@@ -39,7 +39,7 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
   late int hp = _characterModel.hp;
 
   //Character model
-  late final CharacterModel _characterModel;
+  late CharacterModel _characterModel;
   late final BuildContext context;
 
   /// Where is facing of the character
@@ -72,6 +72,8 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
         this.current = DirectionalHelper.getDirectionalSpriteAnimation(
             _facing, StateAction.Idle);
       };
+
+    _listenBuffer();
   }
 
   //Getter and setters
@@ -79,6 +81,13 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
 
   void setDead(bool value) {
     _isDead = value;
+  }
+
+
+  CharacterModel get characterModel => _characterModel;
+
+  set characterModel(CharacterModel value) {
+    _characterModel = value;
   }
 
   bool get isPlayerPressAttack => _isPlayerPressAttack;
@@ -94,13 +103,30 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
 
   @override
   Future<void> onLoad() async {
-    print(_characterModel);
-    print(hp);
     super.onLoad();
     //Player nickname
     gameRef.add(
       _nickname = _renderNickName(),
     );
+  }
+
+  void _listenBuffer() {
+    SocketManager.socket.on('remotePlayer', (data) {
+        bool isMine = data['id'] == _characterModel.id;
+        if (!isMine) return;
+
+        this._characterModel = CharacterModel.fromJsonSingle(data);
+        if(this._characterModel.action == 'MOVE') {
+          serverMove(this._characterModel.direction,
+              Vector2(this._characterModel.offsetX.toDouble(),
+                  this._characterModel.offsetY.toDouble()));
+        }
+    });
+
+    SocketManager.socket.on("leaveArena", (data) {
+      gameRef.components.remove(_nickname);
+      gameRef.components.remove(this);
+    });
   }
 
   TextComponent _renderNickName() {
@@ -142,7 +168,10 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
 
     debugColor = _isCollision ? _collisionColor : _defaultColor;
 
-
+    updateCurrentAnimation(_characterModel.action, this._facing);
+    if(!_velocity.isZero()) {
+      position.add(_velocity * maxSpeed.toDouble() * dt);
+    }
 
     _isCollision = false;
     _isWall = false;
@@ -154,8 +183,58 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
     this._velocity = newVelocity;
   }
 
-  void updateCurrentAnimation() {
+  void serverMove(String direction, Vector2 serverPosition) {
+    this._facing = direction;
 
+    /// Fix position if it is too different from the server
+    this.position = Vector2(serverPosition.x, serverPosition.y);
+    // if (dist > (tileSize * 0.5)) {
+    //   position = serverPosition.toPositionedRect(size);
+    // }
+  }
+
+  void updateCurrentAnimation(String action, String direction) {
+    if(action == 'MOVE') {
+      switch (direction) {
+        case 'north-west':
+          this.current = NpcState.runTopLeft;
+          this.setVelocity(Vector2(-1, 0));
+          break;
+        case 'south-east':
+          this.current = NpcState.runBottomRight;
+          this.setVelocity(Vector2(1, 0));
+          break;
+        case 'north-east':
+          this.current = NpcState.runTopRight;
+          this.setVelocity(Vector2(0, -1));
+          break;
+        case 'south-west':
+          this.current = NpcState.runBottomLeft;
+          this.setVelocity(Vector2(0, 1));
+          break;
+        case 'west':
+          this.current = NpcState.runLeft;
+          this.setVelocity(Vector2(-1, 1));
+          break;
+        case 'south':
+          this.current = NpcState.runDown;
+          this.setVelocity(Vector2(1, 1));
+          break;
+        case 'north':
+          this.current = NpcState.runTop;
+          this.setVelocity(Vector2(-1, -1));
+          break;
+        case 'east':
+          this.current = NpcState.runRight;
+          this.setVelocity(Vector2(1, -1));
+          break;
+        }
+    }
+    if(action == 'IDLE') {
+      this.current = DirectionalHelper.getDirectionalSpriteAnimation(
+          _facing, StateAction.Idle);
+      this.setVelocity(Vector2(0, 0));
+    }
   }
 
   void attack() {

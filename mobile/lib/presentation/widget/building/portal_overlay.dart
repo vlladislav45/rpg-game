@@ -7,6 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
 import 'package:rpg_game/logic/bloc/game/game_bloc.dart';
 import 'package:rpg_game/logic/bloc/game/game_event.dart';
+import 'package:rpg_game/logic/bloc/online/online_bloc.dart';
+import 'package:rpg_game/logic/bloc/online/online_event.dart';
+import 'package:rpg_game/logic/bloc/online/online_state.dart';
 import 'package:rpg_game/logic/cubit/map/map_cubit.dart';
 import 'package:rpg_game/util/hex_color.dart';
 
@@ -49,30 +52,37 @@ class _PortalOverlayState extends State<PortalOverlay> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                context.read<GameBloc>().add(MultiplayerEvent());
+            BlocBuilder<OnlineBloc, OnlineState>(builder: (context, state) {
+              if (state is OnlineAuthenticatedState) {
+                return ElevatedButton(
+                  onPressed: () {
+                    context.read<GameBloc>().add(MultiplayerEvent());
 
-                int arenaLevel = 1 + Random().nextInt(2);
-                print('The player was teleported to the arena, level $arenaLevel');
-                context.read<MapCubit>().update('arena$arenaLevel');
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width / 5,
-                padding: EdgeInsets.all(8.0),
-                alignment: Alignment.centerLeft,
-                child: AutoSizeText(
-                  'Teleport to arena',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                    // int arenaLevel = 1 + Random().nextInt(2); // MAX 2
+                    print('The player was teleported to the arena, level 1');
+                    context.read<MapCubit>().update('arena1');
+                    state.userViewModel.online = true;
+                    context.read<OnlineBloc>().add(UpdateOnlineStatusEvent(userModel: state.userViewModel));
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width / 5,
+                    padding: EdgeInsets.all(8.0),
+                    alignment: Alignment.centerLeft,
+                    child: AutoSizeText(
+                      'Teleport to arena',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
+                );
+              }
+              return Text('Loading...');
+            }),
 
-            SizedBox(height: 30.0,),
+          SizedBox(height: 30.0,),
 
-            ElevatedButton(
+          ElevatedButton(
               onPressed: () {
                 widget.myGame.overlays.remove(_portalOverlay);
               },

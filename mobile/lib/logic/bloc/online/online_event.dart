@@ -1,4 +1,3 @@
-import 'package:rpg_game/model/character_model.dart';
 import 'package:rpg_game/model/user_model.dart';
 
 abstract class OnlineEvent {
@@ -100,4 +99,21 @@ class OnlineAuthenticationErrorEvent extends OnlineEvent {
 
   @override
   List<Object> get props => [error];
+}
+
+class UpdateOnlineStatusEvent extends OnlineEvent {
+  final UserModel userModel;
+
+  UpdateOnlineStatusEvent({
+    required this.userModel,
+  });
+
+  factory UpdateOnlineStatusEvent.fromJson(Map<String, dynamic> json) {
+    return UpdateOnlineStatusEvent(
+      userModel: json['userModel'],
+    );
+  }
+
+  @override
+  List<Object> get props => [userModel];
 }

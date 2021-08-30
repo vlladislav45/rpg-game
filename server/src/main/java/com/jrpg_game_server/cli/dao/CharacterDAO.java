@@ -68,10 +68,13 @@ public class CharacterDAO extends AbstractDatabaseCliDAO implements BaseDAO<Char
                 " hp = ?, " +
                 " mana = ?," +
                 " offsetx = ?, " +
-                " offsety = ? " +
+                " offsety = ?, " +
+                " action = ?, " +
+                " direction = ? " +
                 " WHERE id = ?";
 
         executeQuery(query, character.getLevel(), character.getHp(), character.getMana(),
-                character.getOffsetX(), character.getOffsetY(), character.getId());
+                character.getOffsetX(), character.getOffsetY(),
+                character.getAction(), character.getDirection(), character.getId());
     }
 }

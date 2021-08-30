@@ -175,6 +175,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 if (state is OnlineAuthenticatedState) {
                   Navigator.of(context).pushNamed('/game');
                 }
+
+                if(state is OnlineDisconnectedState) {
+                  Navigator.of(context).pushNamed('/');
+                }
               },
                 builder: (context, state) {
                     print(state);

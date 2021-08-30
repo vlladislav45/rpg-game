@@ -42,6 +42,8 @@ class OnlineBloc extends Bloc<OnlineEvent, OnlineState> {
       yield OnlineErrorState(
         event.error,
       );
+    } else if (event is UpdateOnlineStatusEvent) {
+     SocketManager.socket.emit('onlineStatus', event.userModel);
     } else if (event is OnlineConnectingEvent) {
       yield OnlineConnectingState();
     } else if (event is OnlineConnectedEvent) {
@@ -59,6 +61,7 @@ class OnlineBloc extends Bloc<OnlineEvent, OnlineState> {
 
   @override
   Future<void> close() {
+    SocketManager.socket.close();
     SocketManager.socket.dispose();
     return super.close();
   }

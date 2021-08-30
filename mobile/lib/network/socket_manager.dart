@@ -24,4 +24,5 @@ class SocketManager {
   }
 
   bool get connected => socket.connected;
+
 }

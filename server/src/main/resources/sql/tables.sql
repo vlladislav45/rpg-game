@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS public.character (
     mana INT NOT NULL,
     offsetX INT,
     offsetY INT,
+    action VARCHAR NOT NULL DEFAULT 'IDLE',
+    direction VARCHAR NOT NULL DEFAULT 'right',
     exp INT NOT NULL,
     PRIMARY KEY (id)
 );
