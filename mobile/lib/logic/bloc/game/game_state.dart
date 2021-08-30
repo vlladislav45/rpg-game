@@ -33,3 +33,8 @@ class OnlineAuthenticatedMultiplayerState extends GameState {
   @override
   List<Object> get props => [players];
 }
+
+class SingleplayerState extends GameState {
+  @override
+  List<Object> get props => [];
+}

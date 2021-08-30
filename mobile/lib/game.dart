@@ -43,7 +43,7 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
   late JoystickComponent _joystick;
   late final CharacterModel _characterModel; // logged player
   late List<CharacterModel> _players; // current online players
-  late bool _multiplayer = false;
+  late bool multiplayer = false;
   late Npc _npc;
   late List<Npc> _npcs = [];
   bool _isAllNpcsAreDeath = false;
@@ -74,7 +74,7 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
     this.jsonMap = jsonMap;
     this._characterModel = characterModel!;
     this._players = players!;
-    this._multiplayer = multiplayer!;
+    this.multiplayer = multiplayer!;
     this._context = context!;
     this._loadMapLevel = loadMapLevel!;
   }
@@ -107,7 +107,7 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
     map.renderWater();
     map.renderTrees();
 
-    if(!_multiplayer) {
+    if(!multiplayer) {
       await spawnCharacter();
       if(ifCharacterSpawned) spawnNpcs();
     } else {
@@ -344,7 +344,7 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
       overlays.add(_character.overlay);
     }
 
-    if(_multiplayer) {
+    if(multiplayer) {
       // Update current spawned character coordinates
       this._characterModel.offsetX = characterSpawnPosition.x;
       this._characterModel.offsetY = characterSpawnPosition.y;
@@ -467,7 +467,7 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
   @override
   void update(double dt) async {
     super.update(dt);
-    // if(this._multiplayer) updatePlayers();
+    // if(this.multiplayer) updatePlayers();
 
       List<Npc> matches = _npcs.where((n) => n.isNpcDeath == true).toList();
       if(matches.length == _npcs.length && _npcs.length > 0) {

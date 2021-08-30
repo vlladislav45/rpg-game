@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/game.dart';
+import 'package:rpg_game/logic/bloc/game/game_bloc.dart';
+import 'package:rpg_game/logic/bloc/game/game_event.dart';
 import 'package:rpg_game/logic/cubit/map/map_cubit.dart';
 import 'package:rpg_game/util/hex_color.dart';
 
@@ -51,6 +53,7 @@ class _CastleOverlayState extends State<CastleOverlay> {
                 print('The player was teleported to the dungeon level: $mapLevel');
 
                 context.read<MapCubit>().update('level$mapLevel');
+                context.read<GameBloc>().add(SingleplayerEvent());
               },
               child: Container(
                 width: MediaQuery.of(context).size.width / 5,

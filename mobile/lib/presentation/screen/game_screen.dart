@@ -83,6 +83,7 @@ class _MyGameScreenState extends State<MyGameScreen> {
                         if (onlineState is OnlineAuthenticatedState) {
                           return BlocBuilder<GameBloc, GameState>(
                               builder: (context, gameState) {
+                            print('GAME STATE IS: $gameState');
                             if (gameState is OnlineAuthenticatedMultiplayerState) {
                               // If Game is multiplayer take entire set of online players
                               return GameWidget<MyGame>(

@@ -62,3 +62,8 @@ class UpdateCharacterEvent extends GameEvent {
   @override
   List<Object> get props => [characterModel];
 }
+
+class SingleplayerEvent extends GameEvent {
+  @override
+  List<Object> get props => [];
+}

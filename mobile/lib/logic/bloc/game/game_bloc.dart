@@ -19,7 +19,10 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       SocketManager.socket.emit('handshake');
     }else if(event is MultiplayerEvent) {
       SocketManager.socket.emit('multiplayer');
-    }else if(event is OnlineAuthenticatedMultiplayerEvent) {
+    } else if(event is SingleplayerEvent) {
+     yield SingleplayerState();
+    }
+    else if(event is OnlineAuthenticatedMultiplayerEvent) {
       yield OnlineAuthenticatedMultiplayerState(
         players: event.players,
       );

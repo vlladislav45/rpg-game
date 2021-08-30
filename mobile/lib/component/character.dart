@@ -97,7 +97,6 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
           hp -= damage;
           this.context.read<SinglePlayerStatusesCubit>().update(hp);
           if (hp <= 0) {
-            print('DEAD');
             this.die();
           }
         }
