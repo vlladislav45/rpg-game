@@ -204,7 +204,6 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
         }
       }
     }
-    _firstOnlineUpdate = true;
   }
 
   Future<void> spawnPlayer(CharacterModel newPlayer) async {
@@ -266,6 +265,7 @@ class MyGame extends BaseGame with HasCollidables, HasTappableComponents,
     remotePlayer.position.setFrom(map.getBlockPosition(characterSpawnPosition));
 
     add(remotePlayer);
+    _firstOnlineUpdate = true;
   }
 
   /// Spawn main character

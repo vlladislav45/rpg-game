@@ -18,10 +18,7 @@ import com.jrpg_game_server.cli.services.UserServiceImpl;
 import com.jrpg_game_server.cli.network.SocketServerManager;
 import picocli.CommandLine;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @CommandLine.Command(name = "start server", aliases = "ss")
 
@@ -75,6 +72,13 @@ public class ServerStartCommand extends AbstractCommand {
                         CharacterViewModel.toViewModel(serviceWrapper.getUserServices().getLoggedUser().getCharacters().iterator().next());
                 client.sendEvent("loggedPlayer", characterViewModel);
             }
+        });
+
+        server.addEventListener("attack", Character.class, (client, data, ackRequest) -> {
+            Map<String, Object> json = new HashMap<>();
+            json.put("character", data);
+            json.put("damage", 200);
+            server.getBroadcastOperations().sendEvent("receiveDamage", json);
         });
 
         server.addEventListener("multiplayer", CharacterBindingModel.class, (client, data, ackRequest) -> {

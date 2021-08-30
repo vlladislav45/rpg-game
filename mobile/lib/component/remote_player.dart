@@ -5,13 +5,13 @@ import 'package:flame/extensions.dart';
 import 'package:flame/geometry.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
+import 'package:rpg_game/component/character.dart';
 import 'package:rpg_game/component/npc.dart';
 import 'package:rpg_game/component/tree.dart';
 import 'package:rpg_game/component/water.dart';
 import 'package:rpg_game/game.dart';
 import 'package:rpg_game/model/character_model.dart';
 import 'package:rpg_game/network/socket_manager.dart';
-import 'package:rpg_game/util/buffer_delay.dart';
 import 'package:rpg_game/util/collision_detect.dart';
 import 'package:rpg_game/util/directional_helper.dart';
 
@@ -26,17 +26,16 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
 
   // Camera
   late Timer timer;
+  late Timer hideDeadMonumentTimer;
 
   // Collisions
   final _collisionColor = Colors.amber;
   final _defaultColor = Colors.cyan;
   bool _isCollision = false;
-  bool _isWall = false;
-  bool _isDead = false;
-  bool _isPlayerPressAttack = false;
 
   // Character Properties
   late int hp = _characterModel.hp;
+  late SpriteComponent _crypt;
 
   //Character model
   late CharacterModel _characterModel;
@@ -68,32 +67,24 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
     timer = Timer(time)
       ..stop()
       ..callback = () {
-        _isPlayerPressAttack = false;
         this.current = DirectionalHelper.getDirectionalSpriteAnimation(
             _facing, StateAction.Idle);
+      };
+
+    hideDeadMonumentTimer = Timer(5.0)
+      ..stop()
+      ..callback = () {
+        gameRef.components.remove(_crypt);
       };
 
     _listenBuffer();
   }
 
   //Getter and setters
-  bool get isDead => _isDead;
-
-  void setDead(bool value) {
-    _isDead = value;
-  }
-
-
   CharacterModel get characterModel => _characterModel;
 
   set characterModel(CharacterModel value) {
     _characterModel = value;
-  }
-
-  bool get isPlayerPressAttack => _isPlayerPressAttack;
-
-  void setIsPlayerPressAttack(bool value) {
-    _isPlayerPressAttack = value;
   }
 
   String get facing => _facing;
@@ -120,6 +111,10 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
           serverMove(this._characterModel.direction,
               Vector2(this._characterModel.offsetX.toDouble(),
                   this._characterModel.offsetY.toDouble()));
+        }
+        if(this._characterModel.action == 'ATTACK') {
+          _facing = this._characterModel.direction;
+          this.remoteAttackAnimation();
         }
     });
 
@@ -174,7 +169,6 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
     }
 
     _isCollision = false;
-    _isWall = false;
   }
 
   Vector2 get velocity => _velocity;
@@ -186,11 +180,7 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
   void serverMove(String direction, Vector2 serverPosition) {
     this._facing = direction;
 
-    /// Fix position if it is too different from the server
     this.position = Vector2(serverPosition.x, serverPosition.y);
-    // if (dist > (tileSize * 0.5)) {
-    //   position = serverPosition.toPositionedRect(size);
-    // }
   }
 
   void updateCurrentAnimation(String action, String direction) {
@@ -237,8 +227,7 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
     }
   }
 
-  void attack() {
-    _isPlayerPressAttack = true;
+  void remoteAttackAnimation() {
     current = DirectionalHelper.getDirectionalSpriteAnimation(
         _facing, StateAction.Attack);
   }
@@ -268,14 +257,18 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
         return;
       }
       CollisionDetect.narrowPhase(this, other);
+    } else if (other is Character) {
+      if (other.isPlayerPressAttack) {
+        print('${other.characterModel.nickname} hit on enemy --> ${this.characterModel.nickname}');
+        SocketManager.socket.emit('attack', this.characterModel);
+        other.setIsPlayerPressAttack(false);
+      }
     }
   }
 
   void die() async {
-    this._isDead = true;
-
     Sprite sprite = await Sprite.load('crypt.png');
-    gameRef.add(SpriteComponent(
+    gameRef.add(_crypt = SpriteComponent(
       sprite: sprite,
       position: this.position,
       size: Vector2(50, 50),

@@ -7,6 +7,7 @@ import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rpg_game/component/npc.dart';
+import 'package:rpg_game/component/remote_player.dart';
 import 'package:rpg_game/component/tree.dart';
 import 'package:rpg_game/component/water.dart';
 import 'package:rpg_game/game.dart';
@@ -79,7 +80,29 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
         _isPlayerPressAttack = false;
         this.current = DirectionalHelper.getDirectionalSpriteAnimation(
             _facing, StateAction.Idle);
+
+        // Set idle on remote player when he hit on yet
+        _characterModel.action = StateAction.Idle.toString().substring(StateAction.Idle.toString().indexOf('.') + 1).toUpperCase();
+        _characterModel.direction = _facing;
+        SocketManager.socket.emit('update',
+            _characterModel
+        );
       };
+
+    SocketManager.socket.on('receiveDamage', (data) {
+      CharacterModel damagedCharacter = CharacterModel.fromJsonSingle(data['character']);
+      if(this.characterModel.id == damagedCharacter.id) {
+        int damage = data['damage'] as int;
+        if (hp > 0) {
+          hp -= damage;
+          this.context.read<SinglePlayerStatusesCubit>().update(hp);
+          if (hp <= 0) {
+            print('DEAD');
+            this.die();
+          }
+        }
+      }
+    });
   }
 
   //Getter and setters
@@ -94,6 +117,8 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
   void setIsPlayerPressAttack(bool value) {
     _isPlayerPressAttack = value;
   }
+
+  CharacterModel get characterModel => _characterModel;
 
   String get facing => _facing;
 
@@ -235,6 +260,14 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     _isPlayerPressAttack = true;
     current = DirectionalHelper.getDirectionalSpriteAnimation(
         _facing, StateAction.Attack);
+
+    // Update animation of remote player
+    _characterModel.action = StateAction.Attack.toString().substring(StateAction.Attack.toString().indexOf('.') + 1).toUpperCase();
+    _characterModel.direction = _facing;
+    SocketManager.socket.emit('update',
+        _characterModel
+    );
+
     timer.start();
   }
 
@@ -272,6 +305,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
         return;
       }
       CollisionDetect.narrowPhase(this, other);
+    } else if (other is RemotePlayer) {
     }
   }
 
