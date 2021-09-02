@@ -73,7 +73,7 @@ class Npc extends SpriteAnimationGroupComponent<NpcState>
     super.onMount();
 
     final shape = HitboxCircle(definition: 1.0);
-    addShape(shape);
+    addHitbox(shape);
   }
 
   Vector2 get velocity => _velocity;

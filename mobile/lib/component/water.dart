@@ -25,7 +25,7 @@ class Water extends SpriteComponent with HasGameRef<MyGame>, Hitbox, Collidable 
     super.onMount();
 
     final shape = HitboxCircle(definition: 0.6);
-    addShape(shape);
+    addHitbox(shape);
   }
   
    @override

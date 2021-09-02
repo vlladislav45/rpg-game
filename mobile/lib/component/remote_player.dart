@@ -141,7 +141,7 @@ class RemotePlayer extends SpriteAnimationGroupComponent<NpcState>
   void render(Canvas canvas) {
     super.render(canvas);
     final shape = HitboxCircle(definition: 0.4);
-    addShape(shape);
+    addHitbox(shape);
 
     _nickname.position = Vector2(this.position.x + this.size.x / 2, this.position.y);
   }

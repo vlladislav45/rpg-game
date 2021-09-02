@@ -275,7 +275,7 @@ class Character extends SpriteAnimationGroupComponent<NpcState>
     super.onMount();
 
     final shape = HitboxCircle(definition: 0.4);
-    addShape(shape);
+    addHitbox(shape);
   }
 
   @override
